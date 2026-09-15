@@ -1,0 +1,1475 @@
+{% extends "base.html" %}
+{% block title %}Enterprise Team &amp; RBAC Matrix — AegisAppSec | Company Workspace{% endblock %}
+
+{% block extra_head %}
+<style>
+/* ══ ENTERPRISE TEAM & RBAC WORKSPACE STYLES ═════════════════ */
+.sk-team-wrap {
+  padding: 32px 0 80px;
+}
+
+/* Company Workspace Telemetry Card */
+.sk-company-banner {
+  background: radial-gradient(circle at 0% 0%, rgba(0, 240, 255, 0.05), transparent 45%),
+              radial-gradient(circle at 100% 100%, rgba(255, 0, 51, 0.03), transparent 40%),
+              rgba(9, 13, 24, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 24px 28px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
+}
+
+.sk-company-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #00f0ff, #ff0033 60%, transparent);
+}
+
+.sk-company-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 28px;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .sk-company-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+.sk-company-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+.sk-company-icon-box {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px solid rgba(0, 240, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cyan, #00f0ff);
+  flex-shrink: 0;
+  box-shadow: 0 0 18px rgba(0, 240, 255, 0.15);
+}
+
+.sk-company-title-area {
+  flex: 1;
+}
+
+.sk-company-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.sk-account-type-badge {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(0, 240, 255, 0.12);
+  color: #00f0ff;
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.sk-tenant-pill {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.65rem;
+  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.sk-company-name {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.015em;
+  margin: 0 0 6px;
+}
+
+.sk-company-sub {
+  font-size: 0.80rem;
+  color: var(--text-muted, #94a3b8);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.sk-company-sub span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Right side seats usage */
+.sk-company-seats-card {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+  padding: 16px 20px;
+}
+
+.sk-seats-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.74rem;
+}
+
+.sk-seats-label {
+  color: #94a3b8;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.sk-seats-count {
+  color: #00f0ff;
+  font-weight: 800;
+}
+
+.sk-seats-bar {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.sk-seats-fill {
+  height: 100%;
+  width: 40%;
+  background: linear-gradient(90deg, #00f0ff, #10b981);
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+.sk-seats-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.70rem;
+  font-family: var(--font-mono, monospace);
+  color: #64748b;
+}
+
+/* Session Notice Banner */
+.sk-session-banner {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.sk-session-banner.admin {
+  border-color: rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.06);
+}
+
+.sk-session-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sk-session-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+  background: rgba(0, 240, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #00f0ff;
+  flex-shrink: 0;
+}
+
+.sk-session-banner.admin .sk-session-icon {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.sk-session-text {
+  font-size: 0.82rem;
+  color: #cbd5e1;
+}
+
+.sk-session-text strong {
+  color: #ffffff;
+}
+
+.sk-session-text .subtext {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  margin-top: 2px;
+  font-family: var(--font-mono, monospace);
+}
+
+.sk-session-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sk-btn-elevate {
+  background: rgba(0, 240, 255, 0.15);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  color: #00f0ff;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+}
+
+.sk-btn-elevate:hover {
+  background: rgba(0, 240, 255, 0.25);
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.3);
+  color: #ffffff;
+}
+
+.sk-btn-login-comp {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #94a3b8;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+}
+
+.sk-btn-login-comp:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+}
+
+/* Controls Bar */
+.sk-table-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.sk-search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 8px 12px;
+  width: 320px;
+  max-width: 100%;
+}
+
+.sk-search-input {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.78rem;
+  outline: none;
+  width: 100%;
+}
+
+.sk-search-input::placeholder {
+  color: #64748b;
+}
+
+.sk-filter-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.sk-filter-chip {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.70rem;
+  font-weight: 700;
+  padding: 6px 11px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+
+.sk-filter-chip:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.sk-filter-chip.active {
+  background: rgba(0, 240, 255, 0.12);
+  border-color: rgba(0, 240, 255, 0.35);
+  color: #00f0ff;
+}
+
+.sk-btn-invite {
+  background: var(--red, #ff0033);
+  color: #ffffff;
+  border: 1px solid #ff2255;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 0 16px rgba(255, 0, 51, 0.3);
+}
+
+.sk-btn-invite:hover {
+  background: #ff2255;
+  box-shadow: 0 0 24px rgba(255, 0, 51, 0.5);
+  transform: translateY(-1px);
+}
+
+/* Table container styling */
+.sk-team-table-card {
+  background: rgba(9, 13, 24, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 40px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.sk-team-table-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.sk-team-table-header h3 {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sk-team-table-header h3::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 2px;
+  background: var(--red, #ff0033);
+}
+
+.sk-team-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.sk-team-table th {
+  padding: 14px 18px;
+  text-align: left;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #64748b;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.sk-team-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  font-size: 0.82rem;
+  color: #cbd5e1;
+  vertical-align: middle;
+}
+
+.sk-team-table tr:hover td {
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.sk-member-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sk-member-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0, 240, 255, 0.12);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono, monospace);
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: #00f0ff;
+  flex-shrink: 0;
+}
+
+.sk-member-name {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.sk-member-email {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  color: #64748b;
+  margin-top: 1px;
+}
+
+.sk-role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border-radius: 4px;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sk-role-badge.admin {
+  background: rgba(255, 0, 51, 0.15);
+  color: var(--red, #ff0033);
+  border: 1px solid rgba(255, 0, 51, 0.35);
+}
+
+.sk-role-badge.pentester {
+  background: rgba(0, 240, 255, 0.15);
+  color: var(--cyan, #00f0ff);
+  border: 1px solid rgba(0, 240, 255, 0.35);
+}
+
+.sk-role-badge.developer {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.sk-role-title {
+  font-size: 0.68rem;
+  color: #64748b;
+  margin-top: 3px;
+  font-family: var(--font-mono, monospace);
+}
+
+.sk-sec-badge {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sk-sec-badge.enforced {
+  color: #10b981;
+}
+
+.sk-sec-badge.optional {
+  color: #f59e0b;
+}
+
+.sk-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.sk-status-pill.active {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.sk-status-pill.invited {
+  background: rgba(0, 240, 255, 0.1);
+  color: #00f0ff;
+  border: 1px solid rgba(0, 240, 255, 0.25);
+}
+
+.sk-status-pill.suspended {
+  background: rgba(244, 63, 94, 0.1);
+  color: #f43f5e;
+  border: 1px solid rgba(244, 63, 94, 0.25);
+}
+
+.sk-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.sk-btn-revoke {
+  background: rgba(244, 63, 94, 0.08);
+  border: 1px solid rgba(244, 63, 94, 0.25);
+  color: #f43f5e;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 4px 9px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sk-btn-revoke:hover {
+  background: rgba(244, 63, 94, 0.2);
+  border-color: #f43f5e;
+  color: #ffffff;
+}
+
+/* RBAC Matrix Card */
+.sk-rbac-card {
+  background: rgba(9, 13, 24, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.sk-rbac-card-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.sk-rbac-card-header h3 {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sk-rbac-card-header h3::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 2px;
+  background: var(--cyan, #00f0ff);
+}
+
+.sk-rbac-col-highlight {
+  background: rgba(0, 240, 255, 0.03);
+}
+
+/* Modal Styling */
+.sk-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 16, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.sk-modal-box {
+  width: 100%;
+  max-width: 480px;
+  background: rgba(9, 13, 24, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 28px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.8), 0 0 32px rgba(255, 0, 51, 0.15);
+  position: relative;
+}
+
+.sk-modal-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #ff0033, #00f0ff);
+}
+
+.sk-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.sk-modal-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 4px;
+}
+
+.sk-modal-sub {
+  font-size: 0.74rem;
+  color: #94a3b8;
+  font-family: var(--font-mono, monospace);
+}
+
+.sk-modal-close {
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 4px;
+}
+.sk-modal-close:hover { color: #ffffff; }
+
+.sk-form-group {
+  margin-bottom: 16px;
+}
+
+.sk-form-label {
+  display: block;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.70rem;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+
+.sk-form-input, .sk-form-select {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  padding: 9px 12px;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.80rem;
+  color: #ffffff;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.sk-form-input:focus, .sk-form-select:focus {
+  border-color: #00f0ff;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.25);
+}
+
+.sk-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.sk-btn-cancel {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.sk-btn-cancel:hover {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* Toast notification */
+.sk-team-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: rgba(9, 13, 24, 0.96);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  border-radius: 6px;
+  padding: 12px 18px;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.76rem;
+  color: #ffffff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 16px rgba(0, 240, 255, 0.2);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sk-page-hero">
+  <div class="sk-container">
+    <div class="sk-page-eyebrow">IDENTITY &amp; ACCESS GOVERNANCE // MULTI-USER WORKSPACE</div>
+    <h1 class="sk-page-title">
+      ENTERPRISE TEAM COLLABORATION &amp; <span class="cyan">RBAC MATRIX</span>.
+    </h1>
+    <p class="sk-page-desc">
+      Manage security team members, offensive red teamers, and software engineering collaborators with strict least-privilege role policies.
+    </p>
+  </div>
+</div>
+
+<div class="sk-container sk-team-wrap">
+
+  <!-- ══ 1. ENTERPRISE COMPANY WORKSPACE CONTEXT CARD ════════════ -->
+  <div class="sk-company-banner">
+    <div class="sk-company-grid">
+      <div class="sk-company-left">
+        <div class="sk-company-icon-box">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="4" y="2" width="16" height="20" rx="2" ry="2"/>
+            <line x1="9" y1="6" x2="9" y2="6.01"/>
+            <line x1="15" y1="6" x2="15" y2="6.01"/>
+            <line x1="9" y1="10" x2="9" y2="10.01"/>
+            <line x1="15" y1="10" x2="15" y2="10.01"/>
+            <line x1="9" y1="14" x2="9" y2="14.01"/>
+            <line x1="15" y1="14" x2="15" y2="14.01"/>
+            <line x1="9" y1="18" x2="15" y2="18"/>
+          </svg>
+        </div>
+        <div class="sk-company-title-area">
+          <div class="sk-company-badge-row">
+            <span class="sk-account-type-badge">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg>
+              COMPANY / ENTERPRISE WORKSPACE
+            </span>
+            <span class="sk-tenant-pill" id="companyTenantId">TENANT: AEGIS-ORG-2026-9042</span>
+          </div>
+          <h2 class="sk-company-name" id="companyOrgName">{{ (user.company if user and user.company and user.company != 'Independent' else 'CyberMart Enterprise Defense Corp') }}</h2>
+          <div class="sk-company-sub">
+            <span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Plan: <strong>Enterprise Shield</strong> (Multi-Seat)
+            </span>
+            <span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#00f0ff" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              SSO: <strong>Okta SAML 2.0 Enforced</strong>
+            </span>
+            <span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Audit: <strong>SOC 2 Type II Certified</strong>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Seats Card -->
+      <div class="sk-company-seats-card">
+        <div class="sk-seats-header">
+          <span class="sk-seats-label">ENTERPRISE SEATS UTILIZATION</span>
+          <span class="sk-seats-count" id="seatsCountDisplay">4 / 10 Active</span>
+        </div>
+        <div class="sk-seats-bar">
+          <div class="sk-seats-fill" id="seatsFillBar" style="width: 40%;"></div>
+        </div>
+        <div class="sk-seats-footer">
+          <span id="seatsAvailDisplay">6 Available Seats</span>
+          <span>MFA Policy: Strict Hardware/TOTP</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 2. CURRENT OPERATOR SESSION STATUS & PERSONA CONTEXT ════ -->
+  {% set is_admin_session = (user and user.role == 'admin') %}
+  <div class="sk-session-banner {% if is_admin_session %}admin{% endif %}" id="sessionBanner">
+    <div class="sk-session-banner-left">
+      <div class="sk-session-icon">
+        {% if is_admin_session %}
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+        {% else %}
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        {% endif %}
+      </div>
+      <div class="sk-session-text">
+        {% if is_admin_session %}
+        <div>
+          <strong>COMPANY ADMIN SESSION:</strong> {{ (user.full_name if user else "Alex Mercer") }} (<span style="color: #10b981;">{{ (user.email if user else "admin@aegisappsec.io") }}</span>)
+        </div>
+        <div class="subtext">
+          Full governance authority active: Member invitations, role modification, and access revocation enabled.
+        </div>
+        {% else %}
+        <div>
+          <strong>OPERATOR SESSION (READ-ONLY VIEW):</strong> {{ (user.full_name if user else "Sarah Chen") }} (<span style="color: #00f0ff;">{{ (user.email if user else "pentester@aegisappsec.io") }}</span>)
+        </div>
+        <div class="subtext">
+          Signed in with {{ ((user.role if user else 'pentester')|upper) }} persona. Inviting members or changing roles requires Company Admin credentials.
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="sk-session-actions">
+      {% if not is_admin_session %}
+      <button type="button" class="sk-btn-elevate" onclick="switchSession('admin')" title="Elevate session to Company Admin">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        <span>Switch to Company Admin (Alex Mercer)</span>
+      </button>
+      <a href="{{ url_for('auth', plan='company') }}" class="sk-btn-login-comp" title="Open Enterprise Login Gateway">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        <span>Company Sign In</span>
+      </a>
+      {% else %}
+      <button type="button" class="sk-btn-login-comp" onclick="switchSession('operator')" title="Test Operator View">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        <span>View as Operator (Pentester)</span>
+      </button>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- ══ 3. TABLE CONTROLS BAR ═══════════════════════════════════ -->
+  <div class="sk-table-controls">
+    <div class="sk-search-box">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="memberSearchInput" class="sk-search-input" placeholder="Filter by collaborator name, email, or role..." oninput="filterTeamMembers()">
+    </div>
+
+    <div class="sk-filter-group">
+      <button type="button" class="sk-filter-chip active" id="filterAll" onclick="setRoleFilter('ALL')">All Roles (<span id="countAll">4</span>)</button>
+      <button type="button" class="sk-filter-chip" id="filterAdmin" onclick="setRoleFilter('admin')">Admins (<span id="countAdmin">1</span>)</button>
+      <button type="button" class="sk-filter-chip" id="filterPentester" onclick="setRoleFilter('pentester')">Pentesters (<span id="countPentester">2</span>)</button>
+      <button type="button" class="sk-filter-chip" id="filterDeveloper" onclick="setRoleFilter('developer')">Developers (<span id="countDev">1</span>)</button>
+    </div>
+
+    <div>
+      <button type="button" class="sk-btn-invite" id="btnOpenInviteModal" onclick="openInviteModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+        <span>+ Invite Team Member</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ 4. ACTIVE TEAM ROSTER TABLE ═════════════════════════════ -->
+  <div class="sk-team-table-card">
+    <div class="sk-team-table-header">
+      <h3>Active Team Roster</h3>
+      <span style="font-size: 0.72rem; color: #00f0ff; font-family: var(--font-mono, monospace); font-weight: 700;" id="rosterStatsBadge">
+        4 ACTIVE COLLABORATORS // 10 SEAT QUOTA
+      </span>
+    </div>
+
+    <div style="overflow-x: auto;">
+      <table class="sk-team-table">
+        <thead>
+          <tr>
+            <th style="min-width: 220px;">Collaborator &amp; Email</th>
+            <th style="min-width: 170px;">Designated Role</th>
+            <th style="min-width: 170px;">2FA Security Policy</th>
+            <th style="min-width: 110px;">Status</th>
+            <th style="min-width: 130px;">Last Active</th>
+            <th style="text-align: right; min-width: 90px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="teamTableBody">
+          <tr>
+            <td colspan="6" style="text-align: center; color: #64748b; padding: 28px; font-family: var(--font-mono, monospace);">
+              Loading enterprise collaborator telemetry...
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ 5. ROLE-BASED SECURITY CAPABILITY MATRIX ════════════════ -->
+  {% set current_role = (user.role if user else 'pentester') %}
+  <div class="sk-rbac-card">
+    <div class="sk-rbac-card-header">
+      <h3>Role-Based Security Capability Matrix</h3>
+      <span style="font-size: 0.72rem; color: #64748b; font-family: var(--font-mono, monospace);">
+        LEAST-PRIVILEGE AUDIT MATRIX // ENFORCED BY ASGI WAF
+      </span>
+    </div>
+
+    <div style="overflow-x: auto;">
+      <table class="sk-team-table" style="font-size: 0.80rem;">
+        <thead>
+          <tr>
+            <th style="width: 38%;">Platform Capability &amp; Scope</th>
+            <th style="text-align: center; color: var(--red, #ff0033); width: 20%;" class="{% if current_role == 'admin' %}sk-rbac-col-highlight{% endif %}">
+              SecOps Admin {% if current_role == 'admin' %}(You){% endif %}
+            </th>
+            <th style="text-align: center; color: var(--cyan, #00f0ff); width: 20%;" class="{% if current_role == 'pentester' %}sk-rbac-col-highlight{% endif %}">
+              Offensive Pentester {% if current_role == 'pentester' %}(You){% endif %}
+            </th>
+            <th style="text-align: center; color: #10b981; width: 20%;" class="{% if current_role == 'developer' %}sk-rbac-col-highlight{% endif %}">
+              AppSec Developer {% if current_role == 'developer' %}(You){% endif %}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-weight: 700; color: #ffffff;">
+              <div>Target Domain Ownership Verification</div>
+              <div style="font-size: 0.70rem; color: #64748b; font-family: var(--font-mono, monospace); font-weight: 400;">DNS TXT, HTTP .well-known, &amp; HTML meta tag governance</div>
+            </td>
+            <td style="text-align: center; color: #10b981; font-weight: 800;" class="{% if current_role == 'admin' %}sk-rbac-col-highlight{% endif %}">&#10003;</td>
+            <td style="text-align: center; color: #475569;" class="{% if current_role == 'pentester' %}sk-rbac-col-highlight{% endif %}">&mdash;</td>
+            <td style="text-align: center; color: #475569;" class="{% if current_role == 'developer' %}sk-rbac-col-highlight{% endif %}">&mdash;</td>
+          </tr>
+          <tr>
+            <td style="font-weight: 700; color: #ffffff;">
+              <div>Trigger Full DAST Scans &amp; Deep Crawl</div>
+              <div style="font-size: 0.70rem; color: #64748b; font-family: var(--font-mono, monospace); font-weight: 400;">Autonomous vulnerability discovery, active proofs, and CVSS computation</div>
+            </td>
+            <td style="text-align: center; color: #10b981; font-weight: 800;" class="{% if current_role == 'admin' %}sk-rbac-col-highlight{% endif %}">&#10003;</td>
+            <td style="text-align: center; color: #10b981; font-weight: 800;" class="{% if current_role == 'pentester' %}sk-rbac-col-highlight{% endif %}">&#10003;</td>
+            <td style="text-align: center; color: #475569;" class="{% if current_role == 'developer' %}sk-rbac-col-highlight{% endif %}">&mdash;</td>
+          </tr>
+          <tr>
+            <td style="font-weight: 700; color: #ffffff;">
+              <div>Manual Payload Testing &amp; PoC Verification</div>
+              <div style="font-size: 0.70rem; color: #64748b; font-family: var(--font-mono, monospace); font-weight: 400;">cURL proof generation, SQLi time delays, SSRF callbacks</div>
+            </td>
+            <td style="text-align: center; color: #10b981; font-weight: 800;" class="{% if current_role == 'admin' %}sk-rbac-col-highlight{% endif %}">&#10003;</td>
+            <td style="text-align: center; color: #10b981; font-weight: 800;" class="{% if current_role == 'pentester' %}sk-rbac-col-highlight{% endif %}">&#10003;</td>
+            <td style="text-align: center; color: #475569;" class="{% if current_role == 'developer' %}sk-rbac-col-highlight{% endif %}">&mdash;</td>
+          </tr>
+          <tr>
+            <td style="font-weight: 700; color: #ffffff;">
+              <div>Modify WAF Defense Mode (Off / Monitor / Active Block)</div>
+              <div style="font-size: 0.70rem; color: #64748b; font-family: var(--font-mono, monospace); font-weight: 400;">Global ASGI gateway protection level and rate limits</div>
+            </td>
+            <td style="text-align: center; color: #10b981; font-weight: 800;" class="{% if current_role == 'admin' %}sk-rbac-col-highlight{% endif %}">&#10003;</td>
+            <td style="text-align: center; color: #10b981; font-weight: 800;" class="{% if current_role == 'pentester' %}sk-rbac-col-highlight{% endif %}">&#10003;</td>
+            <td style="text-align: center; color: #475569;" class="{% if current_role == 'developer' %}sk-rbac-col-highlight{% endif %}">&mdash;</td>
+          </tr>
+          <tr>
+            <td style="font-weight: 700; color: #ffffff;">
+              <div>Deploy Virtual Patches (Custom WAF Regex)</div>
+              <div style="font-size: 0.70rem; color: #64748b; font-family: var(--font-mono, monospace); font-weight: 400;">Real-time mitigation before production code release</div>
+            </td>
+            <td style="text-align: center; color: #10b981; font-weight: 800;" class="{% if current_role == 'admin' %}sk-rbac-col-highlight{% endif %}">&#10003;</td>
+            <td style="text-align: center; color: #10b981; font-weight: 800;" class="{% if current_role == 'pentester' %}sk-rbac-col-highlight{% endif %}">&#10003;</td>
+            <td style="text-align: center; color: #475569;" class="{% if current_role == 'developer' %}sk-rbac-col-highlight{% endif %}">&mdash;</td>
+          </tr>
+          <tr>
+            <td style="font-weight: 700; color: #ffffff;">
+              <div>View Vulnerability Diffs &amp; Code Remediation Recipes</div>
+              <div style="font-size: 0.70rem; color: #64748b; font-family: var(--font-mono, monospace); font-weight: 400;">Access to developer remediation studio and secure patterns</div>
+            </td>
+            <td style="text-align: center; color: #10b981; font-weight: 800;" class="{% if current_role == 'admin' %}sk-rbac-col-highlight{% endif %}">&#10003;</td>
+            <td style="text-align: center; color: #10b981; font-weight: 800;" class="{% if current_role == 'pentester' %}sk-rbac-col-highlight{% endif %}">&#10003;</td>
+            <td style="text-align: center; color: #10b981; font-weight: 800;" class="{% if current_role == 'developer' %}sk-rbac-col-highlight{% endif %}">&#10003;</td>
+          </tr>
+          <tr>
+            <td style="font-weight: 700; color: #ffffff;">
+              <div>Manage Team Collaborators &amp; RBAC Roles</div>
+              <div style="font-size: 0.70rem; color: #64748b; font-family: var(--font-mono, monospace); font-weight: 400;">Issue invitations, alter permissions, and revoke access</div>
+            </td>
+            <td style="text-align: center; color: #10b981; font-weight: 800;" class="{% if current_role == 'admin' %}sk-rbac-col-highlight{% endif %}">&#10003;</td>
+            <td style="text-align: center; color: #475569;" class="{% if current_role == 'pentester' %}sk-rbac-col-highlight{% endif %}">&mdash;</td>
+            <td style="text-align: center; color: #475569;" class="{% if current_role == 'developer' %}sk-rbac-col-highlight{% endif %}">&mdash;</td>
+          </tr>
+          <tr>
+            <td style="font-weight: 700; color: #ffffff;">
+              <div>Generate CI/CD Automation API Keys</div>
+              <div style="font-size: 0.70rem; color: #64748b; font-family: var(--font-mono, monospace); font-weight: 400;">Secret token generation for GitHub Actions and GitLab CI</div>
+            </td>
+            <td style="text-align: center; color: #10b981; font-weight: 800;" class="{% if current_role == 'admin' %}sk-rbac-col-highlight{% endif %}">&#10003;</td>
+            <td style="text-align: center; color: #475569;" class="{% if current_role == 'pentester' %}sk-rbac-col-highlight{% endif %}">&mdash;</td>
+            <td style="text-align: center; color: #475569;" class="{% if current_role == 'developer' %}sk-rbac-col-highlight{% endif %}">&mdash;</td>
+          </tr>
+          <tr>
+            <td style="font-weight: 700; color: #ffffff;">
+              <div>Export Executive Reports &amp; SARIF Attestation</div>
+              <div style="font-size: 0.70rem; color: #64748b; font-family: var(--font-mono, monospace); font-weight: 400;">Cryptographically signed compliance attestation reports</div>
+            </td>
+            <td style="text-align: center; color: #10b981; font-weight: 800;" class="{% if current_role == 'admin' %}sk-rbac-col-highlight{% endif %}">&#10003;</td>
+            <td style="text-align: center; color: #10b981; font-weight: 800;" class="{% if current_role == 'pentester' %}sk-rbac-col-highlight{% endif %}">&#10003;</td>
+            <td style="text-align: center; color: #10b981; font-weight: 800;" class="{% if current_role == 'developer' %}sk-rbac-col-highlight{% endif %}">&#10003;</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ INVITE TEAM MEMBER MODAL ════════════════════════════════ -->
+<div class="sk-modal-backdrop" id="inviteModal" style="display: none;" onclick="handleModalBackdrop(event)">
+  <div class="sk-modal-box" onclick="event.stopPropagation()">
+    <div class="sk-modal-header">
+      <div>
+        <h3 class="sk-modal-title">INVITE ENTERPRISE COLLABORATOR</h3>
+        <div class="sk-modal-sub">Issue a cryptographically signed workspace invitation.</div>
+      </div>
+      <button type="button" class="sk-modal-close" onclick="closeInviteModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <form id="inviteForm" onsubmit="submitInvite(event)">
+      <div class="sk-form-group">
+        <label class="sk-form-label" for="inviteName">Collaborator Full Name</label>
+        <input id="inviteName" class="sk-form-input" type="text" placeholder="e.g. Marcus Vance" required>
+      </div>
+
+      <div class="sk-form-group">
+        <label class="sk-form-label" for="inviteEmail">Corporate Work Email</label>
+        <input id="inviteEmail" class="sk-form-input" type="email" placeholder="e.g. marcus@company.sec" required>
+      </div>
+
+      <div class="sk-form-group">
+        <label class="sk-form-label" for="inviteRole">Designated Operational Role</label>
+        <select id="inviteRole" class="sk-form-select">
+          <option value="pentester" selected>Offensive Pentester (Red Team Testing)</option>
+          <option value="developer">AppSec Software Engineer (Remediation)</option>
+          <option value="admin">Enterprise SecOps Admin (Full Governance)</option>
+        </select>
+      </div>
+
+      <div class="sk-form-group">
+        <label class="sk-form-label" for="invite2fa">2FA Enforcement Policy</label>
+        <select id="invite2fa" class="sk-form-select">
+          <option value="hardware" selected>Hardware Key (FIDO2 / WebAuthn) Enforced</option>
+          <option value="totp">TOTP Authenticator App Enforced</option>
+          <option value="optional">Optional / Standard Password</option>
+        </select>
+      </div>
+
+      <div id="inviteErrorNotice" style="display: none; color: #f43f5e; font-family: var(--font-mono, monospace); font-size: 0.72rem; margin-bottom: 12px;"></div>
+
+      <div class="sk-modal-actions">
+        <button type="button" class="sk-btn-cancel" onclick="closeInviteModal()">Cancel</button>
+        <button type="submit" id="inviteSubmitBtn" class="sk-btn-invite">
+          <span>Send Workspace Invitation</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div id="teamToast" class="sk-team-toast" style="display: none;"></div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+/**
+ * Enterprise Team Collaboration & RBAC Governance Client
+ */
+let allMembers = [];
+let currentRoleFilter = 'ALL';
+const IS_ADMIN = {{ 'true' if (user and user.role == 'admin') else 'false' }};
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadOrganizationTelemetry();
+  loadTeamMembers();
+});
+
+async function loadOrganizationTelemetry() {
+  try {
+    const res = await fetch('/api/team/organization');
+    if (!res.ok) return;
+    const data = await res.json();
+    const org = data.organization;
+    if (!org) return;
+
+    const orgNameEl = document.getElementById('companyOrgName');
+    if (orgNameEl && org.name) orgNameEl.textContent = org.name;
+
+    const tenantEl = document.getElementById('companyTenantId');
+    if (tenantEl && org.tenant_id) tenantEl.textContent = `TENANT: ${org.tenant_id}`;
+
+    const seatsCountEl = document.getElementById('seatsCountDisplay');
+    if (seatsCountEl) seatsCountEl.textContent = `${org.seats_assigned} / ${org.seats_total} Active`;
+
+    const seatsFillEl = document.getElementById('seatsFillBar');
+    if (seatsFillEl) {
+      const pct = Math.min(100, Math.round((org.seats_assigned / org.seats_total) * 100));
+      seatsFillEl.style.width = `${pct}%`;
+    }
+
+    const availEl = document.getElementById('seatsAvailDisplay');
+    if (availEl) availEl.textContent = `${org.seats_available} Available Seats`;
+  } catch (err) {
+    console.warn('Organization telemetry fetch notice:', err);
+  }
+}
+
+async function loadTeamMembers() {
+  const tbody = document.getElementById('teamTableBody');
+  try {
+    const res = await fetch('/api/team/members');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    allMembers = data.members || [];
+    renderTeamMembers();
+  } catch (err) {
+    if (tbody) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align: center; color: #f43f5e; padding: 24px; font-family: var(--font-mono, monospace);">
+            Failed to load team roster: ${escapeHtml(err.message)}
+          </td>
+        </tr>
+      `;
+    }
+  }
+}
+
+function renderTeamMembers() {
+  const tbody = document.getElementById('teamTableBody');
+  if (!tbody) return;
+
+  // Compute counts
+  const countAll = allMembers.length;
+  const countAdmin = allMembers.filter(m => m.role === 'admin').length;
+  const countPentester = allMembers.filter(m => m.role === 'pentester').length;
+  const countDev = allMembers.filter(m => m.role === 'developer').length;
+
+  document.getElementById('countAll').textContent = countAll;
+  document.getElementById('countAdmin').textContent = countAdmin;
+  document.getElementById('countPentester').textContent = countPentester;
+  document.getElementById('countDev').textContent = countDev;
+
+  const rosterBadge = document.getElementById('rosterStatsBadge');
+  if (rosterBadge) {
+    rosterBadge.textContent = `${countAll} ACTIVE COLLABORATORS // 10 SEAT QUOTA`;
+  }
+
+  // Filter
+  const q = (document.getElementById('memberSearchInput').value || '').toLowerCase().trim();
+  let filtered = allMembers.filter(m => {
+    if (currentRoleFilter !== 'ALL' && m.role !== currentRoleFilter) return false;
+    if (!q) return true;
+    return (
+      (m.name || '').toLowerCase().includes(q) ||
+      (m.email || '').toLowerCase().includes(q) ||
+      (m.role_title || '').toLowerCase().includes(q) ||
+      (m.role || '').toLowerCase().includes(q)
+    );
+  });
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6" style="text-align: center; color: #64748b; padding: 32px; font-family: var(--font-mono, monospace);">
+          No collaborators matched your filter criteria.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(m => {
+    const initial = (m.name || 'U').charAt(0).toUpperCase();
+    const roleClass = m.role || 'developer';
+    const isEnforced = Boolean(m.two_factor);
+    const statusClass = (m.status || 'ACTIVE').toLowerCase();
+
+    return `
+      <tr>
+        <td>
+          <div class="sk-member-cell">
+            <div class="sk-member-avatar">${escapeHtml(initial)}</div>
+            <div>
+              <div class="sk-member-name">${escapeHtml(m.name)}</div>
+              <div class="sk-member-email">${escapeHtml(m.email)}</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div>
+            <span class="sk-role-badge ${roleClass}" onclick="cycleRole(${m.id}, '${m.role}')" title="${IS_ADMIN ? 'Click to cycle designated role' : 'Designated Role'}">
+              ${escapeHtml(m.role)}
+              ${IS_ADMIN ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:2px;"><polyline points="6 9 12 15 18 9"/></svg>' : ''}
+            </span>
+            <div class="sk-role-title">${escapeHtml(m.role_title || '')}</div>
+          </div>
+        </td>
+        <td>
+          <span class="sk-sec-badge ${isEnforced ? 'enforced' : 'optional'}" onclick="toggle2Fa(${m.id})" title="${IS_ADMIN ? 'Click to toggle 2FA requirement' : 'Security Policy'}">
+            ${isEnforced ? '&#10003; Hardware Key Enforced' : '&#9888; Optional'}
+          </span>
+        </td>
+        <td>
+          <span class="sk-status-pill ${statusClass}" onclick="toggleStatus(${m.id}, '${m.status}')" title="${IS_ADMIN ? 'Click to toggle operational status' : 'Status'}">
+            <span class="sk-status-dot"></span>
+            <span>${escapeHtml(m.status || 'ACTIVE')}</span>
+          </span>
+        </td>
+        <td style="font-family: var(--font-mono, monospace); font-size: 0.74rem; color: #64748b;">
+          ${escapeHtml(m.last_active || 'Recent')}
+        </td>
+        <td style="text-align: right;">
+          <button type="button" class="sk-btn-revoke" onclick="removeMember(${m.id}, '${escapeHtml(m.name)}')">
+            Revoke
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function filterTeamMembers() {
+  renderTeamMembers();
+}
+
+function setRoleFilter(role) {
+  currentRoleFilter = role;
+  document.querySelectorAll('.sk-filter-chip').forEach(c => c.classList.remove('active'));
+  if (role === 'ALL') document.getElementById('filterAll').classList.add('active');
+  if (role === 'admin') document.getElementById('filterAdmin').classList.add('active');
+  if (role === 'pentester') document.getElementById('filterPentester').classList.add('active');
+  if (role === 'developer') document.getElementById('filterDeveloper').classList.add('active');
+  renderTeamMembers();
+}
+
+// ══ MODAL & ACTIONS ══════════════════════════════════════════
+function openInviteModal() {
+  document.getElementById('inviteModal').style.display = 'flex';
+  document.getElementById('inviteName').focus();
+}
+
+function closeInviteModal() {
+  document.getElementById('inviteModal').style.display = 'none';
+  document.getElementById('inviteForm').reset();
+  document.getElementById('inviteErrorNotice').style.display = 'none';
+}
+
+function handleModalBackdrop(e) {
+  if (e.target.id === 'inviteModal') closeInviteModal();
+}
+
+async function submitInvite(e) {
+  e.preventDefault();
+  const name = document.getElementById('inviteName').value.trim();
+  const email = document.getElementById('inviteEmail').value.trim();
+  const role = document.getElementById('inviteRole').value;
+  const twoFaPolicy = document.getElementById('invite2fa').value;
+  const errEl = document.getElementById('inviteErrorNotice');
+  const btn = document.getElementById('inviteSubmitBtn');
+
+  btn.disabled = true;
+  btn.textContent = 'Dispatching Invitation...';
+  errEl.style.display = 'none';
+
+  try {
+    const res = await fetch('/api/team/members', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name,
+        email,
+        role,
+        company: 'CyberMart Enterprise Defense Corp',
+        two_factor: twoFaPolicy !== 'optional'
+      })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      showToast(`[ENTERPRISE] Invitation dispatched to ${email}`);
+      closeInviteModal();
+      await loadTeamMembers();
+      await loadOrganizationTelemetry();
+    } else {
+      errEl.textContent = data.detail || 'Failed to dispatch workspace invitation.';
+      errEl.style.display = 'block';
+    }
+  } catch (err) {
+    errEl.textContent = 'Connection error communicating with team governance API.';
+    errEl.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Send Workspace Invitation';
+  }
+}
+
+async function removeMember(id, name) {
+  if (!confirm(`Are you sure you want to revoke enterprise access for ${name} (#${id})?`)) return;
+
+  try {
+    const res = await fetch(`/api/team/members/${id}`, { method: 'DELETE' });
+    if (res.ok) {
+      showToast(`[REVOKED] Enterprise credentials for ${name} removed.`);
+      await loadTeamMembers();
+      await loadOrganizationTelemetry();
+    } else {
+      alert('Failed to revoke member.');
+    }
+  } catch (err) {
+    alert('Network error revoking collaborator access.');
+  }
+}
+
+async function cycleRole(id, currentRole) {
+  if (!IS_ADMIN) {
+    showToast('[ACCESS RESTRICTED] Elevate to Company Admin to change team roles.');
+    return;
+  }
+  const roleCycle = { admin: 'pentester', pentester: 'developer', developer: 'admin' };
+  const nextRole = roleCycle[currentRole] || 'pentester';
+
+  try {
+    const res = await fetch(`/api/team/members/${id}/role`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ role: nextRole })
+    });
+    if (res.ok) {
+      showToast(`[RBAC UPDATED] Member #${id} designated as ${nextRole.toUpperCase()}`);
+      await loadTeamMembers();
+    }
+  } catch (err) {
+    showToast('Failed to update member role.');
+  }
+}
+
+async function toggleStatus(id, currentStatus) {
+  if (!IS_ADMIN) {
+    showToast('[ACCESS RESTRICTED] Elevate to Company Admin to modify operational status.');
+    return;
+  }
+  const nextStatus = currentStatus === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE';
+
+  try {
+    const res = await fetch(`/api/team/members/${id}/status`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: nextStatus })
+    });
+    if (res.ok) {
+      showToast(`[STATUS] Member #${id} is now ${nextStatus}`);
+      await loadTeamMembers();
+    }
+  } catch (err) {
+    showToast('Failed to toggle status.');
+  }
+}
+
+async function toggle2Fa(id) {
+  if (!IS_ADMIN) {
+    showToast('[ACCESS RESTRICTED] Elevate to Company Admin to modify 2FA policies.');
+    return;
+  }
+  try {
+    const res = await fetch(`/api/team/members/${id}/2fa`, { method: 'PUT' });
+    if (res.ok) {
+      const data = await res.json();
+      showToast(`[SECURITY] 2FA policy updated for Member #${id}: ${data.two_factor ? 'ENFORCED' : 'OPTIONAL'}`);
+      await loadTeamMembers();
+    }
+  } catch (err) {
+    showToast('Failed to toggle 2FA policy.');
+  }
+}
+
+async function switchSession(target) {
+  const url = target === 'admin' ? '/api/team/switch-admin' : '/api/team/switch-operator';
+  try {
+    const res = await fetch(url, { method: 'POST' });
+    const data = await res.json();
+    if (res.ok) {
+      showToast(`[SESSION SWITCHED] Active Operator: ${data.user.full_name}`);
+      setTimeout(() => window.location.reload(), 600);
+    } else {
+      showToast('Failed to switch workspace session.');
+    }
+  } catch (err) {
+    showToast('Network error switching session.');
+  }
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('teamToast');
+  if (!toast) return;
+  toast.textContent = msg;
+  toast.style.display = 'flex';
+  setTimeout(() => {
+    toast.style.display = 'none';
+  }, 3500);
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+</script>
+{% endblock %}

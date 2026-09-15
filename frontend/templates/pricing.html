@@ -1,0 +1,368 @@
+{% extends "base.html" %}
+{% block title %}Pricing &amp; Plans — AegisAppSec | Autonomous DAST for Individuals &amp; Companies{% endblock %}
+
+{% block content %}
+<div class="sk-page-hero">
+  <div class="sk-container">
+    <div class="sk-page-eyebrow">TRANSPARENT VALUE-DRIVEN APPSPEC SECURITY</div>
+    <h1 class="sk-page-title">
+      PLANS TAILORED FOR <span class="cyan">INDIVIDUALS</span> &amp; <span class="rose">COMPANIES</span>.
+    </h1>
+    <p class="sk-page-desc">
+      Whether you are an offensive security consultant probing bug bounties or an enterprise security team defending revenue-critical web applications.
+    </p>
+
+    <!-- Billing Cycle Toggle -->
+    <div style="display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 32px;">
+      <span id="labelMonthly" style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; color: var(--text-white);">MONTHLY BILLING</span>
+      <label class="sk-toggle-wrap" style="position: relative; display: inline-block; width: 52px; height: 28px; cursor: pointer;">
+        <input type="checkbox" id="billingToggle" onchange="toggleBillingCycle()" style="opacity: 0; width: 0; height: 0;">
+        <span style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, 0.1); border: 1px solid var(--frame-border); border-radius: 999px; transition: .3s;" id="toggleTrack">
+          <span style="position: absolute; content: ''; height: 20px; width: 20px; left: 4px; bottom: 3px; background: var(--cyan); border-radius: 50%; transition: .3s; box-shadow: 0 0 10px var(--cyan);" id="toggleKnob"></span>
+        </span>
+      </label>
+      <span id="labelAnnual" style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">
+        ANNUAL BILLING <span class="sk-badge" style="background: rgba(0, 240, 255, 0.15); color: var(--cyan); border: 1px solid var(--cyan-border); padding: 3px 8px; border-radius: 4px; margin-left: 6px; font-size: 0.7rem;">SAVE 20%</span>
+      </span>
+    </div>
+  </div>
+</div>
+
+<div class="sk-container" style="padding: 40px 32px 80px;">
+
+  <!-- Audience Segment Switcher Tabs -->
+  <div style="display: flex; justify-content: center; margin-bottom: 40px;">
+    <div class="sk-auth-tabs" style="max-width: 520px; width: 100%;">
+      <button type="button" class="sk-auth-tab active" id="tabIndivBtn" onclick="switchAudience('individual')">
+        FOR INDIVIDUALS &amp; PENTESTERS
+      </button>
+      <button type="button" class="sk-auth-tab" id="tabCompBtn" onclick="switchAudience('company')">
+        FOR COMPANIES &amp; TEAMS
+      </button>
+    </div>
+  </div>
+
+  <!-- ════════ SECTION 1: FOR INDIVIDUALS & PENTESTERS ════════ -->
+  <div id="sectionIndividual" style="display: block;">
+    <div style="text-align: center; margin-bottom: 30px;">
+      <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--cyan); letter-spacing: 0.14em; text-transform: uppercase;">
+        // OFFENSIVE RESEARCHERS &bull; FREELANCE CONSULTANTS &bull; BUG BOUNTY HUNTERS
+      </div>
+      <h2 style="font-family: var(--font-main); font-size: 1.6rem; font-weight: 800; color: var(--text-white); margin-top: 6px;">
+        Rapid Payload Fuzzing &amp; Exploit Verification
+      </h2>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-bottom: 50px;">
+
+      <!-- Community / Free Tier -->
+      <div class="sk-donut-card" style="padding: 36px 30px; display: flex; flex-direction: column; justify-content: space-between; position: relative;">
+        <div>
+          <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); letter-spacing: 0.15em; text-transform: uppercase;">RESEARCHER COMMUNITY</div>
+          <h3 style="font-size: 1.8rem; font-weight: 800; color: var(--text-white); margin: 8px 0 14px;">Free Forever</h3>
+          <div style="display: flex; align-items: baseline; gap: 6px; margin-bottom: 20px;">
+            <span style="font-size: 2.8rem; font-weight: 900; color: var(--text-white);">$0</span>
+            <span style="color: var(--text-muted); font-size: 0.85rem;">/ forever</span>
+          </div>
+          <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px; border-bottom: 1px solid var(--frame-border); padding-bottom: 20px;">
+            Essential autonomous crawling and OWASP Top 10 detection for single-domain testing, learning, and self-hosted sites.
+          </p>
+
+          <ul style="list-style: none; padding: 0; margin: 0 0 28px; display: flex; flex-direction: column; gap: 12px; font-size: 0.86rem; color: #cbd5e1;">
+            <li style="display: flex; gap: 10px; align-items: center;"><span style="color: var(--cyan);">✓</span> 1 Active Authorized Target Domain</li>
+            <li style="display: flex; gap: 10px; align-items: center;"><span style="color: var(--cyan);">✓</span> Core OWASP Top 10 Detection (SQLi, XSS, SSRF)</li>
+            <li style="display: flex; gap: 10px; align-items: center;"><span style="color: var(--cyan);">✓</span> Interactive Donut Severity Telemetry</li>
+            <li style="display: flex; gap: 10px; align-items: center;"><span style="color: var(--cyan);">✓</span> Manual Scan Dispatch (Up to 3 scans/day)</li>
+            <li style="display: flex; gap: 10px; align-items: center;"><span style="color: var(--cyan);">✓</span> JSON / CSV Vulnerability Findings Export</li>
+            <li style="display: flex; gap: 10px; align-items: center; color: var(--text-muted);"><span style="color: #475569;">✕</span> No CI/CD Pipeline Automation</li>
+            <li style="display: flex; gap: 10px; align-items: center; color: var(--text-muted);"><span style="color: #475569;">✕</span> No Side-by-Side Code Diff Fixes</li>
+          </ul>
+        </div>
+
+        <a href="{{ url_for('auth', mode='register') }}?plan=community" class="sk-pill-btn" style="width: 100%; text-align: center; justify-content: center; background: rgba(255, 255, 255, 0.08); border-color: var(--frame-border); color: var(--text-white);">
+          Get Started Free →
+        </a>
+      </div>
+
+      <!-- Pentester Pro Tier -->
+      <div class="sk-donut-card" style="padding: 36px 30px; display: flex; flex-direction: column; justify-content: space-between; border-color: var(--cyan); box-shadow: 0 0 30px rgba(0, 240, 255, 0.15); position: relative;">
+        <div style="position: absolute; top: -14px; right: 24px; background: var(--cyan); color: #000; font-family: var(--font-mono); font-size: 0.68rem; font-weight: 800; padding: 4px 12px; border-radius: 999px; letter-spacing: 0.1em; text-transform: uppercase;">
+          MOST POPULAR
+        </div>
+        <div>
+          <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--cyan); letter-spacing: 0.15em; text-transform: uppercase;">OFFENSIVE CONSULTANT</div>
+          <h3 style="font-size: 1.8rem; font-weight: 800; color: var(--text-white); margin: 8px 0 14px;">Pentester Pro</h3>
+          <div style="display: flex; align-items: baseline; gap: 6px; margin-bottom: 20px;">
+            <span class="price-val" data-monthly="49" data-annual="39" style="font-size: 2.8rem; font-weight: 900; color: var(--cyan);">$39</span>
+            <span style="color: var(--text-muted); font-size: 0.85rem;">/ month, billed <span class="billing-cycle-text">annually</span></span>
+          </div>
+          <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px; border-bottom: 1px solid var(--frame-border); padding-bottom: 20px;">
+            Full weaponized toolkit for professional penetration testers, red teamers, and bug bounty researchers.
+          </p>
+
+          <ul style="list-style: none; padding: 0; margin: 0 0 28px; display: flex; flex-direction: column; gap: 12px; font-size: 0.86rem; color: #f1f5f9;">
+            <li style="display: flex; gap: 10px; align-items: center;"><span style="color: var(--cyan);">✓</span> <strong>Unlimited</strong> Target Domain Authorizations</li>
+            <li style="display: flex; gap: 10px; align-items: center;"><span style="color: var(--cyan);">✓</span> <strong>Full Detector Suite</strong> (Blind SQLi, SSRF, IDOR, DOM XSS, CORS)</li>
+            <li style="display: flex; gap: 10px; align-items: center;"><span style="color: var(--cyan);">✓</span> <strong>Raw HTTP Request &amp; Response</strong> PoC Inspector</li>
+            <li style="display: flex; gap: 10px; align-items: center;"><span style="color: var(--cyan);">✓</span> <strong>1-Click Jira / GitHub Issue</strong> Markdown Exporter</li>
+            <li style="display: flex; gap: 10px; align-items: center;"><span style="color: var(--cyan);">✓</span> <strong>Split Code Diff</strong> Remediation Recipes (Python, Go, Node, PHP)</li>
+            <li style="display: flex; gap: 10px; align-items: center;"><span style="color: var(--cyan);">✓</span> Priority Background Celery Worker Queue</li>
+            <li style="display: flex; gap: 10px; align-items: center;"><span style="color: var(--cyan);">✓</span> Custom Fuzzing Header &amp; Cookie Payloads</li>
+          </ul>
+        </div>
+
+        <a href="{{ url_for('auth', mode='register') }}?plan=pro" class="sk-pill-btn" style="width: 100%; text-align: center; justify-content: center; background: var(--cyan); border-color: var(--cyan); color: #000; box-shadow: 0 0 20px var(--cyan-glow);">
+          Start 14-Day Free Pro Trial →
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════════ SECTION 2: FOR COMPANIES & TEAMS ════════ -->
+  <div id="sectionCompany" style="display: none;">
+    <div style="text-align: center; margin-bottom: 30px;">
+      <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--rose); letter-spacing: 0.14em; text-transform: uppercase;">
+        // STARTUPS &bull; SAAS PLATFORMS &bull; DEVSECOPS &bull; ENTERPRISE CISOS
+      </div>
+      <h2 style="font-family: var(--font-main); font-size: 1.6rem; font-weight: 800; color: var(--text-white); margin-top: 6px;">
+        Continuous DevSecOps Security, CI/CD Gates &amp; Virtual Patching
+      </h2>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-bottom: 50px;">
+
+      <!-- Team Growth Tier -->
+      <div class="sk-donut-card" style="padding: 36px 30px; display: flex; flex-direction: column; justify-content: space-between; border-color: rgba(255, 0, 51, 0.4); position: relative;">
+        <div>
+          <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--rose); letter-spacing: 0.15em; text-transform: uppercase;">GROWING BUSINESS</div>
+          <h3 style="font-size: 1.8rem; font-weight: 800; color: var(--text-white); margin: 8px 0 14px;">Team Growth</h3>
+          <div style="display: flex; align-items: baseline; gap: 6px; margin-bottom: 20px;">
+            <span class="price-val" data-monthly="199" data-annual="159" style="font-size: 2.8rem; font-weight: 900; color: var(--text-white);">$159</span>
+            <span style="color: var(--text-muted); font-size: 0.85rem;">/ month, billed <span class="billing-cycle-text">annually</span></span>
+          </div>
+          <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px; border-bottom: 1px solid var(--frame-border); padding-bottom: 20px;">
+            Designed for engineering teams needing automated CI/CD pipeline scans, regression testing, and collaborative triage.
+          </p>
+
+          <ul style="list-style: none; padding: 0; margin: 0 0 28px; display: flex; flex-direction: column; gap: 12px; font-size: 0.86rem; color: #f1f5f9;">
+            <li style="display: flex; gap: 10px; align-items: center;"><span style="color: var(--rose);">✓</span> <strong>15 Verified Target Domains</strong> (Staging + Production)</li>
+            <li style="display: flex; gap: 10px; align-items: center;"><span style="color: var(--rose);">✓</span> <strong>CI/CD Gate Action</strong> (GitHub Actions, GitLab CI, Jenkins)</li>
+            <li style="display: flex; gap: 10px; align-items: center;"><span style="color: var(--rose);">✓</span> <strong>Regression Diff Engine</strong> (Catch newly introduced bugs)</li>
+            <li style="display: flex; gap: 10px; align-items: center;"><span style="color: var(--rose);">✓</span> <strong>5 Team Seats</strong> with Role-Based Access Control (RBAC)</li>
+            <li style="display: flex; gap: 10px; align-items: center;"><span style="color: var(--rose);">✓</span> Real-Time Slack &amp; Microsoft Teams Webhook Alerts</li>
+            <li style="display: flex; gap: 10px; align-items: center;"><span style="color: var(--rose);">✓</span> Executive PDF &amp; Markdown Audit Report Studio</li>
+            <li style="display: flex; gap: 10px; align-items: center;"><span style="color: var(--rose);">✓</span> 99.9% Scanner Uptime SLA</li>
+          </ul>
+        </div>
+
+        <a href="{{ url_for('auth', mode='register') }}?plan=team" class="sk-pill-btn" style="width: 100%; text-align: center; justify-content: center; background: rgba(255, 0, 51, 0.15); border-color: var(--rose); color: var(--text-white);">
+          Launch Team Workspace →
+        </a>
+      </div>
+
+      <!-- Enterprise Shield Tier -->
+      <div class="sk-donut-card" style="padding: 36px 30px; display: flex; flex-direction: column; justify-content: space-between; border-color: var(--rose); box-shadow: 0 0 32px rgba(255, 0, 51, 0.2); position: relative;">
+        <div style="position: absolute; top: -14px; right: 24px; background: var(--rose); color: #fff; font-family: var(--font-mono); font-size: 0.68rem; font-weight: 800; padding: 4px 12px; border-radius: 999px; letter-spacing: 0.1em; text-transform: uppercase;">
+          MAXIMUM PROTECTION
+        </div>
+        <div>
+          <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--rose); letter-spacing: 0.15em; text-transform: uppercase;">MISSION CRITICAL DEFENSE</div>
+          <h3 style="font-size: 1.8rem; font-weight: 800; color: var(--text-white); margin: 8px 0 14px;">Enterprise Shield</h3>
+          <div style="display: flex; align-items: baseline; gap: 6px; margin-bottom: 20px;">
+            <span class="price-val" data-monthly="799" data-annual="649" style="font-size: 2.8rem; font-weight: 900; color: var(--rose);">$649</span>
+            <span style="color: var(--text-muted); font-size: 0.85rem;">/ month, billed <span class="billing-cycle-text">annually</span></span>
+          </div>
+          <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px; border-bottom: 1px solid var(--frame-border); padding-bottom: 20px;">
+            Complete autonomous security posture: Real-time ASGI WAF virtual patching, PCI-DSS compliance, and 24/7 emergency advisory.
+          </p>
+
+          <ul style="list-style: none; padding: 0; margin: 0 0 28px; display: flex; flex-direction: column; gap: 12px; font-size: 0.86rem; color: #f1f5f9;">
+            <li style="display: flex; gap: 10px; align-items: center;"><span style="color: var(--rose);">✓</span> <strong>Unlimited Target Domains</strong> &amp; Microservices</li>
+            <li style="display: flex; gap: 10px; align-items: center;"><span style="color: var(--rose);">✓</span> <strong>Real-Time ASGI WAF Shield</strong> &amp; 1-Click Virtual Patching</li>
+            <li style="display: flex; gap: 10px; align-items: center;"><span style="color: var(--rose);">✓</span> <strong>PCI-DSS 4.0 &amp; OWASP 2021</strong> Automated Scorecard</li>
+            <li style="display: flex; gap: 10px; align-items: center;"><span style="color: var(--rose);">✓</span> <strong>Dedicated Celery Worker &amp; Redis Cluster</strong> (Zero Queue Wait)</li>
+            <li style="display: flex; gap: 10px; align-items: center;"><span style="color: var(--rose);">✓</span> <strong>Unlimited Team Seats</strong> with Granular RBAC Permissions</li>
+            <li style="display: flex; gap: 10px; align-items: center;"><span style="color: var(--rose);">✓</span> Custom Regex Virtual Patch Sandbox with Live Matching</li>
+            <li style="display: flex; gap: 10px; align-items: center;"><span style="color: var(--rose);">✓</span> <strong>24/7 Critical Security Incident SLA</strong> (1-Hour Triage)</li>
+          </ul>
+        </div>
+
+        <a href="{{ url_for('contact') }}?plan=enterprise" class="sk-pill-btn" style="width: 100%; text-align: center; justify-content: center; background: var(--rose); border-color: var(--rose); color: #fff; box-shadow: 0 0 20px var(--red-glow);">
+          Contact Enterprise Architect →
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════════ COMPARISON MATRIX TABLE ════════ -->
+  <div class="sk-donut-card" style="padding: 36px; margin-top: 50px; overflow-x: auto;">
+    <div style="margin-bottom: 24px;">
+      <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--cyan); letter-spacing: 0.12em; text-transform: uppercase;">DETAILED CAPABILITY MATRIX</div>
+      <h3 style="font-size: 1.5rem; font-weight: 800; color: var(--text-white); margin-top: 4px;">Compare Features Across Tiers</h3>
+    </div>
+
+    <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; color: var(--text-white); min-width: 680px;">
+      <thead>
+        <tr style="border-bottom: 1px solid var(--frame-border); text-align: left;">
+          <th style="padding: 14px 16px; color: var(--text-muted); font-family: var(--font-mono); font-size: 0.75rem;">CAPABILITY</th>
+          <th style="padding: 14px 16px; font-family: var(--font-mono); font-size: 0.75rem;">COMMUNITY</th>
+          <th style="padding: 14px 16px; font-family: var(--font-mono); font-size: 0.75rem; color: var(--cyan);">PENTESTER PRO</th>
+          <th style="padding: 14px 16px; font-family: var(--font-mono); font-size: 0.75rem;">TEAM GROWTH</th>
+          <th style="padding: 14px 16px; font-family: var(--font-mono); font-size: 0.75rem; color: var(--rose);">ENTERPRISE</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+          <td style="padding: 14px 16px; font-weight: 600;">Authorized Target Domains</td>
+          <td style="padding: 14px 16px; color: var(--text-muted);">1 Domain</td>
+          <td style="padding: 14px 16px; color: var(--cyan);">Unlimited</td>
+          <td style="padding: 14px 16px;">15 Domains</td>
+          <td style="padding: 14px 16px; color: var(--rose);">Unlimited</td>
+        </tr>
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+          <td style="padding: 14px 16px; font-weight: 600;">Autonomous Fuzzing Detectors</td>
+          <td style="padding: 14px 16px; color: var(--text-muted);">Standard OWASP</td>
+          <td style="padding: 14px 16px; color: var(--cyan);">Full Advanced Fuzzing</td>
+          <td style="padding: 14px 16px;">Full Advanced Fuzzing</td>
+          <td style="padding: 14px 16px; color: var(--rose);">Full + Zero-Day Heuristics</td>
+        </tr>
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+          <td style="padding: 14px 16px; font-weight: 600;">Real-Time ASGI WAF Virtual Patching</td>
+          <td style="padding: 14px 16px; color: var(--text-muted);">—</td>
+          <td style="padding: 14px 16px; color: var(--text-muted);">—</td>
+          <td style="padding: 14px 16px;">Detect Mode</td>
+          <td style="padding: 14px 16px; color: var(--rose);">Full Enforce &amp; Block</td>
+        </tr>
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+          <td style="padding: 14px 16px; font-weight: 600;">CI/CD Security Gate (GitHub / GitLab)</td>
+          <td style="padding: 14px 16px; color: var(--text-muted);">—</td>
+          <td style="padding: 14px 16px; color: var(--cyan);">Personal Token</td>
+          <td style="padding: 14px 16px;">Automated Blocking Gate</td>
+          <td style="padding: 14px 16px; color: var(--rose);">Automated + Custom Policies</td>
+        </tr>
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+          <td style="padding: 14px 16px; font-weight: 600;">Regression Diff Engine</td>
+          <td style="padding: 14px 16px; color: var(--text-muted);">—</td>
+          <td style="padding: 14px 16px; color: var(--cyan);">Manual Run Comparison</td>
+          <td style="padding: 14px 16px;">Automated Build Diffs</td>
+          <td style="padding: 14px 16px; color: var(--rose);">Automated + PR Comments</td>
+        </tr>
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+          <td style="padding: 14px 16px; font-weight: 600;">PCI-DSS 4.0 &amp; SOC 2 Scorecards</td>
+          <td style="padding: 14px 16px; color: var(--text-muted);">—</td>
+          <td style="padding: 14px 16px; color: var(--text-muted);">—</td>
+          <td style="padding: 14px 16px;">Quarterly Scorecard</td>
+          <td style="padding: 14px 16px; color: var(--rose);">Continuous Real-Time Audit</td>
+        </tr>
+        <tr>
+          <td style="padding: 14px 16px; font-weight: 600;">SLA &amp; Advisory Response</td>
+          <td style="padding: 14px 16px; color: var(--text-muted);">Community Discord</td>
+          <td style="padding: 14px 16px; color: var(--cyan);">24h Email Triage</td>
+          <td style="padding: 14px 16px;">8h Priority Support</td>
+          <td style="padding: 14px 16px; color: var(--rose);">1h 24/7 Emergency SLA</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ════════ FAQ SECTION ════════ -->
+  <div style="margin-top: 60px; max-width: 820px; margin-left: auto; margin-right: auto;">
+    <div style="text-align: center; margin-bottom: 36px;">
+      <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--cyan); letter-spacing: 0.12em; text-transform: uppercase;">FREQUENTLY ASKED QUESTIONS</div>
+      <h3 style="font-size: 1.8rem; font-weight: 800; color: var(--text-white); margin-top: 6px;">Got Questions? We Have Answers.</h3>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+      <details class="sk-donut-card" style="padding: 20px 24px; cursor: pointer;">
+        <summary style="font-weight: 700; color: var(--text-white); font-size: 1rem; outline: none;">
+          Will the autonomous DAST scanner take down my production website?
+        </summary>
+        <p style="margin-top: 14px; font-size: 0.88rem; color: var(--text-muted); line-height: 1.65;">
+          No. AegisAppSec employs intelligent concurrency throttles, rate limit headers, and non-destructive payload verification. Our heuristics simulate attacks without dropping database tables or generating denial-of-service traffic.
+        </p>
+      </details>
+
+      <details class="sk-donut-card" style="padding: 20px 24px; cursor: pointer;">
+        <summary style="font-weight: 700; color: var(--text-white); font-size: 1rem; outline: none;">
+          How does Target Domain Verification protect from unauthorized scanning?
+        </summary>
+        <p style="margin-top: 14px; font-size: 0.88rem; color: var(--text-muted); line-height: 1.65;">
+          Before scanning is permitted, you must verify ownership of the target domain via one of three methods: adding a cryptographic DNS TXT record, hosting a verification token under <code>/.well-known/aegis-verification.txt</code>, or placing an HTML <code>&lt;meta&gt;</code> tag in your homepage. This guarantees that only authorized owners can probe targets.
+        </p>
+      </details>
+
+      <details class="sk-donut-card" style="padding: 20px 24px; cursor: pointer;">
+        <summary style="font-weight: 700; color: var(--text-white); font-size: 1rem; outline: none;">
+          Can I switch between Individual and Company plans as my team expands?
+        </summary>
+        <p style="margin-top: 14px; font-size: 0.88rem; color: var(--text-muted); line-height: 1.65;">
+          Yes! You can upgrade from Pentester Pro to Team Growth with one click in your billing console. All target authorizations, historical scan data, and custom virtual patches are seamlessly migrated.
+        </p>
+      </details>
+
+      <details class="sk-donut-card" style="padding: 20px 24px; cursor: pointer;">
+        <summary style="font-weight: 700; color: var(--text-white); font-size: 1rem; outline: none;">
+          How does the WAF Virtual Patch Studio work with the scanner?
+        </summary>
+        <p style="margin-top: 14px; font-size: 0.88rem; color: var(--text-muted); line-height: 1.65;">
+          When our DAST scanner identifies an exploitable flaw (like SQLi or SSRF), our engine can automatically generate a corresponding regex virtual patch. In Enterprise mode, you can deploy this virtual patch into the live ASGI shield in milliseconds to neutralize the exploit before your engineers write a single line of backend code.
+        </p>
+      </details>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function switchAudience(type) {
+  const indSec = document.getElementById('sectionIndividual');
+  const compSec = document.getElementById('sectionCompany');
+  const indBtn = document.getElementById('tabIndivBtn');
+  const compBtn = document.getElementById('tabCompBtn');
+
+  if (type === 'company') {
+    indSec.style.display = 'none';
+    compSec.style.display = 'block';
+    indBtn.classList.remove('active');
+    compBtn.classList.add('active');
+  } else {
+    indSec.style.display = 'block';
+    compSec.style.display = 'none';
+    indBtn.classList.add('active');
+    compBtn.classList.remove('active');
+  }
+}
+
+function toggleBillingCycle() {
+  const isAnnual = document.getElementById('billingToggle').checked;
+  const knob = document.getElementById('toggleKnob');
+  const track = document.getElementById('toggleTrack');
+  const labelMonthly = document.getElementById('labelMonthly');
+  const labelAnnual = document.getElementById('labelAnnual');
+  const prices = document.querySelectorAll('.price-val');
+  const cycleTexts = document.querySelectorAll('.billing-cycle-text');
+
+  if (isAnnual) {
+    knob.style.left = '28px';
+    track.style.borderColor = 'var(--cyan)';
+    labelMonthly.style.color = 'var(--text-muted)';
+    labelAnnual.style.color = 'var(--text-white)';
+    prices.forEach(el => {
+      el.textContent = '$' + el.getAttribute('data-annual');
+    });
+    cycleTexts.forEach(el => el.textContent = 'annually');
+  } else {
+    knob.style.left = '4px';
+    track.style.borderColor = 'var(--frame-border)';
+    labelMonthly.style.color = 'var(--text-white)';
+    labelAnnual.style.color = 'var(--text-muted)';
+    prices.forEach(el => {
+      el.textContent = '$' + el.getAttribute('data-monthly');
+    });
+    cycleTexts.forEach(el => el.textContent = 'monthly');
+  }
+}
+</script>
+{% endblock %}

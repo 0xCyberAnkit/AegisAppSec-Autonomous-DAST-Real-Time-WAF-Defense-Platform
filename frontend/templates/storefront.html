@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}CyberMart Testbed — AegisAppSec{% endblock %}
+
+{% block content %}
+<div class="sk-page-hero">
+  <div class="sk-container">
+    <div class="sk-page-eyebrow">BLACK FRIDAY TESTBED</div>
+    <h1 class="sk-page-title">
+      CYBERMART <span class="cyan">APPLICATION TESTBED</span>.
+    </h1>
+    <p class="sk-page-desc">
+      A realistic multi-tenant e-commerce platform simulating dynamic catalog search, user reviews, and cloud order processing to benchmark vulnerability scanners and WAF defenses.
+    </p>
+  </div>
+</div>
+
+<div class="sk-container" style="padding: 40px 32px 80px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <div>
+      <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--text-white);">1-Click Exploit Simulators</h2>
+      <p style="font-size: 0.85rem; color: var(--text-muted);">Trigger controlled vulnerability probes against the local testbed to observe WAF defenses.</p>
+    </div>
+    <div style="font-family: var(--f-mono); font-size: 0.75rem; color: var(--cyan);">
+      TARGET: http://127.0.0.1:8000/api/shop
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
+    <div class="sk-service-card" style="padding: 20px;">
+      <h3 style="font-size: 1.1rem; color: var(--red); margin-bottom: 8px;">1. SQL Injection Probe</h3>
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">Dispatches classic tautology into the product catalog search query.</p>
+      <code style="display: block; background: #000; color: var(--cyan); padding: 8px; border-radius: 4px; font-family: var(--f-mono); font-size: 0.7rem; margin-bottom: 12px;">
+        /api/shop/search?q=' OR '1'='1
+      </code>
+      <button class="sk-submit-btn" style="padding: 8px 16px; font-size: 0.7rem;" onclick="testStoreProbe('/api/shop/search?q=%27%20OR%20%271%27=%271')">
+        RUN SQLI PROBE
+      </button>
+    </div>
+
+    <div class="sk-service-card" style="padding: 20px;">
+      <h3 style="font-size: 1.1rem; color: var(--cyan); margin-bottom: 8px;">2. Reflected XSS Probe</h3>
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">Dispatches SVG script handler to evaluate DOM context sanitization.</p>
+      <code style="display: block; background: #000; color: var(--cyan); padding: 8px; border-radius: 4px; font-family: var(--f-mono); font-size: 0.7rem; margin-bottom: 12px;">
+        /api/shop/search?q=&lt;svg/onload=alert(1)&gt;
+      </code>
+      <button class="sk-submit-btn" style="padding: 8px 16px; font-size: 0.7rem;" onclick="testStoreProbe('/api/shop/search?q=%3Csvg/onload=alert(1)%3E')">
+        RUN XSS PROBE
+      </button>
+    </div>
+
+    <div class="sk-service-card" style="padding: 20px;">
+      <h3 style="font-size: 1.1rem; color: var(--yellow); margin-bottom: 8px;">3. SSRF Metadata Probe</h3>
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">Tests order receipt generation with an AWS IMDS metadata callback.</p>
+      <code style="display: block; background: #000; color: var(--cyan); padding: 8px; border-radius: 4px; font-family: var(--f-mono); font-size: 0.7rem; margin-bottom: 12px;">
+        callback=http://169.254.169.254
+      </code>
+      <button class="sk-submit-btn" style="padding: 8px 16px; font-size: 0.7rem;" onclick="testStoreSSRF()">
+        RUN SSRF PROBE
+      </button>
+    </div>
+  </div>
+
+  <div id="storeProbeResult" style="margin-top: 24px;"></div>
+</div>
+
+<script>
+async function testStoreProbe(endpoint) {
+  const res = document.getElementById('storeProbeResult');
+  try {
+    const r = await fetch(endpoint);
+    const data = await r.json();
+    res.innerHTML = `
+      <div style="background: rgba(0,0,0,0.6); border: 1px solid var(--frame-border); padding: 16px; border-radius: 6px; font-family: var(--f-mono); font-size: 0.75rem;">
+        <div style="color: var(--cyan); font-weight: 700; margin-bottom: 6px;">RESPONSE [HTTP ${r.status}]</div>
+        <pre style="color: ${r.status === 403 ? 'var(--red)' : '#10b981'}; margin: 0; white-space: pre-wrap;">${JSON.stringify(data, null, 2)}</pre>
+      </div>
+    `;
+  } catch (err) {
+    res.innerHTML = `<div style="color: var(--red);">Request failed: ${err.message}</div>`;
+  }
+}
+
+async function testStoreSSRF() {
+  const res = document.getElementById('storeProbeResult');
+  try {
+    const r = await fetch('/api/shop/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ item_id: 1, callback_url: 'http://169.254.169.254/latest/meta-data/' })
+    });
+    const data = await r.json();
+    res.innerHTML = `
+      <div style="background: rgba(0,0,0,0.6); border: 1px solid var(--frame-border); padding: 16px; border-radius: 6px; font-family: var(--f-mono); font-size: 0.75rem;">
+        <div style="color: var(--cyan); font-weight: 700; margin-bottom: 6px;">SSRF RESPONSE [HTTP ${r.status}]</div>
+        <pre style="color: ${r.status === 403 ? 'var(--red)' : '#10b981'}; margin: 0; white-space: pre-wrap;">${JSON.stringify(data, null, 2)}</pre>
+      </div>
+    `;
+  } catch (err) {
+    res.innerHTML = `<div style="color: var(--red);">Request failed: ${err.message}</div>`;
+  }
+}
+</script>
+{% endblock %}

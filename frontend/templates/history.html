@@ -1,0 +1,1630 @@
+{% extends "base.html" %}
+{% block title %}Scan History &amp; Vulnerability Regression Diff — AegisAppSec{% endblock %}
+
+{% block extra_head %}
+<style>
+/* ── SCAN HISTORY & REGRESSION DIFF CYBERPUNK STYLING ────────── */
+.hs-hero {
+  padding: 40px 0 28px;
+  position: relative;
+}
+
+.hs-hero-eyebrow {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--red, #ff0033);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hs-hero-eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 2px;
+  background: var(--red, #ff0033);
+  box-shadow: 0 0 8px var(--red, #ff0033);
+}
+
+.hs-hero-title {
+  font-size: 2.6rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  line-height: 1.1;
+  margin-bottom: 14px;
+}
+
+.hs-hero-title .cyan {
+  color: #00f0ff;
+  text-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+}
+
+.hs-hero-desc {
+  font-size: 0.95rem;
+  color: var(--text-muted, #94a3b8);
+  max-width: 820px;
+  line-height: 1.6;
+}
+
+/* Stats Ribbon */
+.hs-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 16px;
+  margin: 28px 0 36px;
+}
+
+.hs-stat-card {
+  background: rgba(10, 15, 28, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 16px 20px;
+  backdrop-filter: blur(14px);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.hs-stat-card:hover {
+  border-color: rgba(0, 240, 255, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  transform: translateY(-2px);
+}
+
+.hs-stat-label {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-muted, #94a3b8);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hs-stat-value {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #ffffff;
+  font-family: var(--font-mono, monospace);
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.hs-stat-sub {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-muted, #94a3b8);
+}
+
+/* Regression Diff Card */
+.hs-diff-card {
+  background: rgba(10, 15, 28, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 24px 28px;
+  margin-bottom: 36px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6), 0 0 24px rgba(255, 0, 51, 0.1);
+  backdrop-filter: blur(16px);
+  position: relative;
+}
+
+.hs-diff-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #ff0033 0%, #00f0ff 100%);
+  border-radius: 12px 12px 0 0;
+}
+
+.hs-diff-eyebrow {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  color: #00f0ff;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.hs-diff-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 16px;
+}
+
+.hs-diff-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+.hs-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hs-form-label {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted, #94a3b8);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.hs-select {
+  width: 100%;
+  background: rgba(6, 9, 19, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  color: #ffffff;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.8rem;
+  padding: 10px 14px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.hs-select:focus {
+  border-color: #00f0ff;
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.25);
+}
+
+.hs-btn-compare {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  background: #ff0033;
+  color: #ffffff;
+  border: 1px solid #ff0033;
+  padding: 0 24px;
+  height: 42px;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  box-shadow: 0 0 18px rgba(255, 0, 51, 0.4);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hs-btn-compare:hover {
+  background: #ff1a40;
+  box-shadow: 0 0 26px rgba(255, 0, 51, 0.7);
+  transform: translateY(-1px);
+}
+
+/* Diff Results Matrix */
+.hs-diff-results {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: none;
+}
+
+.hs-diff-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.hs-diff-kpi {
+  padding: 14px 18px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hs-diff-kpi.fixed {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #10b981;
+}
+
+.hs-diff-kpi.new {
+  background: rgba(255, 0, 51, 0.12);
+  border: 1px solid rgba(255, 0, 51, 0.35);
+  color: #ff0033;
+}
+
+.hs-diff-kpi.persistent {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: #f59e0b;
+}
+
+.hs-diff-kpi-val {
+  font-family: var(--font-mono, monospace);
+  font-size: 1.5rem;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hs-diff-kpi-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.9;
+}
+
+/* Diff Section Lists */
+.hs-diff-section {
+  margin-bottom: 20px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.hs-diff-sec-head {
+  padding: 12px 18px;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.78rem;
+  font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hs-diff-items {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hs-diff-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  font-size: 0.8rem;
+}
+
+.hs-diff-item-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hs-sev-pill {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.hs-sev-critical { background: rgba(255, 0, 51, 0.2); color: #ff0033; border: 1px solid rgba(255, 0, 51, 0.4); }
+.hs-sev-high     { background: rgba(249, 115, 22, 0.2); color: #f97316; border: 1px solid rgba(249, 115, 22, 0.4); }
+.hs-sev-medium   { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); }
+.hs-sev-low      { background: rgba(148, 163, 184, 0.2); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.4); }
+
+/* Table Toolbar */
+.hs-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.hs-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  max-width: 540px;
+}
+
+.hs-search-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.hs-search-input {
+  width: 100%;
+  background: rgba(8, 12, 24, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: #ffffff;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.8rem;
+  padding: 10px 14px 10px 36px;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.hs-search-input:focus {
+  border-color: #00f0ff;
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.25);
+}
+
+.hs-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted, #94a3b8);
+  pointer-events: none;
+}
+
+.hs-filter-group {
+  display: flex;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hs-filter-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #94a3b8);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+
+.hs-filter-btn:hover {
+  color: #ffffff;
+}
+
+.hs-filter-btn.active {
+  background: rgba(0, 240, 255, 0.15);
+  color: #00f0ff;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+}
+
+/* Historical Runs Table */
+.hs-table-frame {
+  background: rgba(8, 12, 24, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(16px);
+}
+
+.hs-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.hs-table th {
+  padding: 16px 20px;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-muted, #94a3b8);
+  text-transform: uppercase;
+  background: rgba(0, 0, 0, 0.4);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hs-table td {
+  padding: 18px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  vertical-align: middle;
+  font-size: 0.85rem;
+  transition: background 0.15s;
+}
+
+.hs-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.hs-scan-id {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #00f0ff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hs-copy-mini {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.7rem;
+  padding: 2px;
+}
+
+.hs-copy-mini:hover {
+  color: #ffffff;
+}
+
+.hs-target-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.hs-target-name {
+  font-weight: 700;
+  color: #ffffff;
+  font-size: 0.88rem;
+}
+
+.hs-target-url {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  color: var(--text-muted, #94a3b8);
+  text-decoration: none;
+}
+
+.hs-target-url:hover {
+  color: #00f0ff;
+  text-decoration: underline;
+}
+
+.hs-badge-complete {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.hs-actions-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hs-btn-inspect {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #00f0ff;
+  background: rgba(0, 240, 255, 0.1);
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  padding: 5px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.hs-btn-inspect:hover {
+  background: rgba(0, 240, 255, 0.25);
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
+}
+
+.hs-btn-diff-row {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #ff0033;
+  background: rgba(255, 0, 51, 0.1);
+  border: 1px solid rgba(255, 0, 51, 0.35);
+  padding: 5px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.hs-btn-diff-row:hover {
+  background: rgba(255, 0, 51, 0.25);
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(255, 0, 51, 0.3);
+}
+
+.hs-btn-rescan {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #cbd5e1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 5px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.hs-btn-rescan:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Section Navigation Tabs */
+.hs-nav-tabs {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 12px;
+}
+
+.hs-nav-tab {
+  background: rgba(10, 15, 28, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-muted, #94a3b8);
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hs-nav-tab:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.hs-nav-tab.active {
+  background: rgba(0, 240, 255, 0.12);
+  border-color: rgba(0, 240, 255, 0.5);
+  color: #00f0ff;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.25);
+}
+
+.hs-tab-badge {
+  background: rgba(255, 0, 51, 0.2);
+  color: #ff0033;
+  border: 1px solid rgba(255, 0, 51, 0.4);
+  font-size: 0.62rem;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+/* Teaser banner in History tab */
+.hs-diff-teaser-banner {
+  background: linear-gradient(90deg, rgba(10, 15, 28, 0.92) 0%, rgba(16, 24, 45, 0.92) 100%);
+  border: 1px solid rgba(0, 240, 255, 0.25);
+  border-radius: 10px;
+  padding: 14px 22px;
+  margin-bottom: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* Modal Overlay & Details Drawer - Rock Solid Highest Z-Index */
+.hs-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 18, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 99999 !important;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.hs-modal-overlay.active {
+  display: flex !important;
+}
+
+.hs-modal-card {
+  background: #090e1c;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 840px;
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: 28px 32px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.9), 0 0 35px rgba(0, 240, 255, 0.2);
+  position: relative;
+  z-index: 100000 !important;
+}
+
+.hs-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+}
+
+.hs-modal-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hs-modal-close {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #cbd5e1;
+  font-size: 1.5rem;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  pointer-events: auto !important;
+  z-index: 100001 !important;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.hs-modal-close:hover {
+  color: #ffffff;
+  background: rgba(255, 0, 51, 0.35);
+  border-color: rgba(255, 0, 51, 0.7);
+  box-shadow: 0 0 14px rgba(255, 0, 51, 0.5);
+  transform: scale(1.08);
+}
+
+.hs-status-select {
+  background: rgba(8, 12, 24, 0.95);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  color: #00f0ff;
+  border-radius: 4px;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 6px;
+  cursor: pointer;
+  outline: none;
+}
+
+.hs-status-select:focus {
+  border-color: #00f0ff;
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+}
+
+/* Findings in Modal */
+.hs-finding-card {
+  background: rgba(6, 9, 19, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 14px;
+}
+
+.hs-finding-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.hs-finding-title {
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: #ffffff;
+}
+
+.hs-finding-meta {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  color: var(--text-muted, #94a3b8);
+  margin-bottom: 10px;
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.hs-curl-box {
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  color: #38bdf8;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.hs-copy-btn {
+  background: rgba(0, 240, 255, 0.15);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  color: #00f0ff;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.hs-copy-btn:hover {
+  background: #00f0ff;
+  color: #030712;
+}
+
+/* Toast */
+.hs-toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: #090e1c;
+  border: 1px solid #00f0ff;
+  color: #ffffff;
+  padding: 14px 20px;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 240, 255, 0.3);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.8rem;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hs-toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+@media (max-width: 900px) {
+  .hs-diff-controls {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hs-hero">
+  <div class="sk-container">
+    <div class="hs-hero-eyebrow">AUDIT TRAILS &amp; REGRESSION DIFF MATRIX</div>
+    <h1 class="hs-hero-title">
+      SCAN HISTORY &amp; <span class="cyan">DIFF ENGINE</span>.
+    </h1>
+    <p class="hs-hero-desc">
+      Inspect past automated DAST runs, track vulnerability remediation velocity, and run regression diffs between releases to verify security fixes.
+    </p>
+
+    <!-- Key Metrics Ribbon -->
+    <div class="hs-stats-grid">
+      <div class="hs-stat-card">
+        <div class="hs-stat-label">Total Runs Logged <span>🕒</span></div>
+        <div class="hs-stat-value" id="kpiTotalScans">{{ scans|length if scans else 0 }}</div>
+        <div class="hs-stat-sub">Autonomous audit executions</div>
+      </div>
+      <div class="hs-stat-card">
+        <div class="hs-stat-label">Vulnerabilities Detected <span>⚡</span></div>
+        <div class="hs-stat-value" id="kpiTotalFindings" style="color: #ff0033;">
+          {{ scans|map(attribute='findings_count')|sum if scans else 0 }}
+        </div>
+        <div class="hs-stat-sub">Across all target baselines</div>
+      </div>
+      <div class="hs-stat-card">
+        <div class="hs-stat-label">Remediation Velocity <span>✓</span></div>
+        <div class="hs-stat-value" style="color: #10b981;">3 FIXED</div>
+        <div class="hs-stat-sub">Verified closed via Diff Engine</div>
+      </div>
+      <div class="hs-stat-card">
+        <div class="hs-stat-label">Regression Comparator <span>🔬</span></div>
+        <div class="hs-stat-value" style="font-size: 1.15rem; color: #00f0ff;">ACTIVE</div>
+        <div class="hs-stat-sub">CWE / Endpoint diff analyzer</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sk-container" style="padding-bottom: 80px;">
+
+  <!-- ══ SECTION NAVIGATION TABS ════════════════════════════════ -->
+  <div class="hs-nav-tabs">
+    <button type="button" class="hs-nav-tab active" id="tabBtnHistory" onclick="switchHistoryTab('history')">
+      <span>📋</span> HISTORICAL SCAN RUNS ({{ scans|length if scans else 0 }})
+    </button>
+    <button type="button" class="hs-nav-tab" id="tabBtnDiff" onclick="switchHistoryTab('diff')">
+      <span>⚡</span> REGRESSION DIFF ENGINE
+      <span class="hs-tab-badge">RELEASE AUDIT</span>
+    </button>
+  </div>
+
+  <!-- ══ REGRESSION DIFF COMPARATOR TAB VIEW ═════════════════════ -->
+  <div id="diffSectionView" class="hs-tab-content" style="display: none;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 12px;">
+      <button type="button" class="sk-btn-secondary" onclick="switchHistoryTab('history')" style="padding: 8px 18px; font-size: 0.76rem;">
+        ← Back to Scan Runs Table
+      </button>
+      <div style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">
+        Comparing two DAST runs using CWE &amp; URI delta mapping
+      </div>
+    </div>
+
+    <div class="hs-diff-card" id="diffComparatorCard">
+      <div class="hs-diff-eyebrow">// REGRESSION COMPARATOR</div>
+      <h3 class="hs-diff-title">Compare Two Scans (Baseline vs Current)</h3>
+      <div class="hs-diff-controls">
+        <div class="hs-form-group">
+          <label class="hs-form-label" for="diffBaseline">Baseline Scan (Older Run):</label>
+          <select id="diffBaseline" class="hs-select">
+            {% if scans and scans|length > 0 %}
+              {% for s in scans %}
+              <option value="{{ s.id }}" {% if s.id == 'SCAN-BASELINE-01' or loop.last %}selected{% endif %}>
+                {{ s.id }} ({{ s.findings_count }} Findings{% if s.critical_count %}, {{ s.critical_count }} Critical{% endif %} — {{ s.triggered_by }})
+              </option>
+              {% endfor %}
+            {% else %}
+              <option value="">No historical scans recorded yet</option>
+            {% endif %}
+          </select>
+        </div>
+
+        <div class="hs-form-group">
+          <label class="hs-form-label" for="diffTarget">Target Scan (Latest Run):</label>
+          <select id="diffTarget" class="hs-select">
+            {% if scans and scans|length > 0 %}
+              {% for s in scans %}
+              <option value="{{ s.id }}" {% if s.id == 'SCAN-CURRENT-02' or loop.first %}selected{% endif %}>
+                {{ s.id }} ({{ s.findings_count }} Findings{% if s.critical_count %}, {{ s.critical_count }} Critical{% endif %} — {{ s.triggered_by }})
+              </option>
+              {% endfor %}
+            {% else %}
+              <option value="">No historical scans recorded yet</option>
+            {% endif %}
+          </select>
+        </div>
+
+        <button type="button" class="hs-btn-compare" id="btnRunDiff" onclick="runDiffCompare()">
+          <span>⚡</span> RUN DIFF COMPARISON
+        </button>
+      </div>
+
+      <!-- Dynamic Diff Results Area -->
+      <div id="diffResultsArea" class="hs-diff-results">
+        <!-- Injected via JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ HISTORICAL RUNS TAB VIEW (DEFAULT ACTIVE) ════════════════ -->
+  <div id="historySectionView" class="hs-tab-content" style="display: block;">
+
+    <!-- Teaser Banner to easily switch to Diff Engine -->
+    <div class="hs-diff-teaser-banner">
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <span style="font-size: 1.5rem;">🔬</span>
+        <div>
+          <div style="font-weight: 700; color: #ffffff; font-size: 0.9rem;">Automated Vulnerability Regression Diff Engine</div>
+          <div style="font-size: 0.76rem; color: var(--text-muted);">Compare any baseline scan against a hardened release to verify remediated vulnerabilities and detect new regression bugs.</div>
+        </div>
+      </div>
+      <button type="button" class="sk-btn-secondary" onclick="switchHistoryTab('diff')" style="padding: 7px 16px; font-size: 0.74rem; white-space: nowrap;">
+        ⚡ Open Diff Engine ➔
+      </button>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="hs-toolbar">
+    <div class="hs-toolbar-left">
+      <div class="hs-search-wrap">
+        <span class="hs-search-icon">🔍</span>
+        <input type="text" id="scanSearchInput" class="hs-search-input" placeholder="Search by Scan ID, Target URL, or Trigger..." oninput="filterScans()">
+      </div>
+      <div class="hs-filter-group">
+        <button class="hs-filter-btn active" onclick="setScanFilter('ALL', this)">ALL</button>
+        <button class="hs-filter-btn" onclick="setScanFilter('FLAWS', this)">WITH FLAWS</button>
+        <button class="hs-filter-btn" onclick="setScanFilter('CLEAN', this)">CLEAN PASS</button>
+      </div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <a href="{{ url_for('scanner_console') }}" class="sk-pill-btn" style="padding: 10px 20px; font-size: 0.76rem; text-decoration: none;">
+        🚀 LAUNCH NEW SCAN
+      </a>
+    </div>
+  </div>
+
+  <div class="hs-table-frame">
+    <table class="hs-table" id="scansTable">
+      <thead>
+        <tr>
+          <th>Scan Run ID</th>
+          <th>Target Asset &amp; Endpoint</th>
+          <th>Trigger Source</th>
+          <th>Findings Breakdown</th>
+          <th>Status</th>
+          <th>Duration</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="scansTableBody">
+        {% if scans and scans|length > 0 %}
+          {% for s in scans %}
+          <tr id="scan-row-{{ s.id }}" data-has-flaws="{{ 'true' if s.findings_count > 0 else 'false' }}" data-search="{{ s.id|lower }} {{ s.target_url|lower }} {{ s.triggered_by|lower }} {{ s.target_name|lower }}">
+            <td>
+              <div class="hs-scan-id">
+                <span>{{ s.id }}</span>
+                <button type="button" class="hs-copy-mini" onclick="copyText('{{ s.id }}')" title="Copy Scan Run ID">📋</button>
+              </div>
+              <div style="font-size: 0.7rem; color: var(--text-muted); font-family: var(--font-mono); margin-top: 3px;">
+                {{ s.started_at }}
+              </div>
+            </td>
+            <td>
+              <div class="hs-target-meta">
+                <span class="hs-target-name">{{ s.target_name }}</span>
+                <a href="{{ s.target_url }}" target="_blank" rel="noopener" class="hs-target-url" title="Open target in new tab">
+                  {{ s.target_url }} ↗
+                </a>
+              </div>
+            </td>
+            <td>
+              <div style="font-size: 0.8rem; color: var(--text-body);">{{ s.triggered_by }}</div>
+            </td>
+            <td>
+              {% if s.findings_count > 0 %}
+              <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                <span style="font-weight: 800; font-family: var(--font-mono); font-size: 0.8rem; color: #ff0033;">
+                  {{ s.findings_count }} Flaw{{ 's' if s.findings_count != 1 else '' }}
+                </span>
+                {% if s.critical_count %}
+                <span class="hs-sev-pill hs-sev-critical">{{ s.critical_count }} Crit</span>
+                {% endif %}
+                {% if s.high_count %}
+                <span class="hs-sev-pill hs-sev-high">{{ s.high_count }} High</span>
+                {% endif %}
+                {% if s.medium_count %}
+                <span class="hs-sev-pill hs-sev-medium">{{ s.medium_count }} Med</span>
+                {% endif %}
+                {% if s.low_count %}
+                <span class="hs-sev-pill hs-sev-low">{{ s.low_count }} Low</span>
+                {% endif %}
+              </div>
+              {% else %}
+              <div style="color: #10b981; font-weight: 700; font-family: var(--font-mono); font-size: 0.78rem; display: flex; align-items: center; gap: 4px;">
+                <span>✓</span> 0 Vulnerabilities (Clean Pass)
+              </div>
+              {% endif %}
+            </td>
+            <td>
+              <span class="hs-badge-complete">
+                <span>●</span> {{ s.status }}
+              </span>
+            </td>
+            <td>
+              <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-muted);">
+                {{ s.duration_seconds }}s
+              </span>
+            </td>
+            <td>
+              <div class="hs-actions-wrap">
+                <button type="button" class="hs-btn-inspect" onclick="inspectScan('{{ s.id }}')" title="Inspect Findings &amp; Proof of Concept">
+                  <span>👁️</span> Inspect
+                </button>
+                <button type="button" class="hs-btn-diff-row" onclick="quickDiffScan('{{ s.id }}')" title="Compare in Regression Diff Engine">
+                  <span>⚡</span> Diff
+                </button>
+                <a href="{{ url_for('scanner_console') }}?target={{ s.target_url }}" class="hs-btn-rescan" title="Re-scan this target endpoint">
+                  <span>🚀</span> Re-Scan
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr id="emptyScanRow">
+            <td colspan="7" style="text-align: center; padding: 48px 20px; color: var(--text-muted);">
+              <div style="font-size: 2rem; margin-bottom: 12px;">🕒</div>
+              <div style="font-weight: 700; color: #ffffff; margin-bottom: 6px;">No Historical Scans Recorded</div>
+              <p style="font-size: 0.85rem; max-width: 440px; margin: 0 auto 16px;">Launch an autonomous scan from the workbench to generate historical audit records.</p>
+              <a href="{{ url_for('scanner_console') }}" class="sk-pill-btn" style="padding: 8px 18px; font-size: 0.75rem; text-decoration: none;">🚀 OPEN SCANNER WORKBENCH</a>
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
+  </div> <!-- ══ END OF historySectionView ══ -->
+
+</div> <!-- ══ END OF sk-container ══ -->
+
+<!-- ══ MODAL: INSPECT SCAN FINDINGS & EVIDENCE ═══════════════════ -->
+<div class="hs-modal-overlay" id="scanDetailsModal" onclick="closeScanInspectionModal()">
+  <div class="hs-modal-card" onclick="event.stopPropagation()">
+    <div class="hs-modal-header">
+      <div>
+        <div class="hs-modal-title">
+          <span>🔍</span> Scan Inspection: <span id="modalScanId" style="color: #00f0ff;">SCAN-ID</span>
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;" id="modalScanSub">
+          Target: <strong id="modalScanTarget" style="color: #ffffff;">http://...</strong>
+        </div>
+      </div>
+      <button type="button" class="hs-modal-close" id="btnModalCloseCross" onclick="closeScanInspectionModal()" title="Close Inspector" aria-label="Close Inspector">&times;</button>
+    </div>
+
+    <!-- Scan Metadata Bar -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 20px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); padding: 12px 16px; border-radius: 8px;">
+      <div>
+        <div style="font-size: 0.68rem; color: var(--text-muted); font-family: var(--font-mono);">STATUS</div>
+        <div style="font-size: 0.85rem; font-weight: 700; color: #10b981;" id="modalStatus">✓ COMPLETED</div>
+      </div>
+      <div>
+        <div style="font-size: 0.68rem; color: var(--text-muted); font-family: var(--font-mono);">TOTAL FINDINGS</div>
+        <div style="font-size: 0.85rem; font-weight: 700; color: #ffffff;" id="modalFindingsCount">0</div>
+      </div>
+      <div>
+        <div style="font-size: 0.68rem; color: var(--text-muted); font-family: var(--font-mono);">AVG CVSS</div>
+        <div style="font-size: 0.85rem; font-weight: 700; color: #f59e0b;" id="modalAvgCvss">0.0</div>
+      </div>
+      <div>
+        <div style="font-size: 0.68rem; color: var(--text-muted); font-family: var(--font-mono);">DURATION</div>
+        <div style="font-size: 0.85rem; font-weight: 700; color: #cbd5e1;" id="modalDuration">0.0s</div>
+      </div>
+    </div>
+
+    <!-- Findings Container -->
+    <div style="font-size: 0.78rem; font-weight: 700; font-family: var(--font-mono); color: var(--text-muted); text-transform: uppercase; margin-bottom: 12px;">
+      Verified Vulnerability Proof of Concepts:
+    </div>
+    <div id="modalFindingsList">
+      <!-- Injected via JavaScript -->
+    </div>
+
+    <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px;">
+      <button type="button" class="sk-btn-secondary" id="btnModalCloseBottom" onclick="closeScanInspectionModal()" style="padding: 10px 20px; font-size: 0.78rem;">
+        Close Inspector
+      </button>
+      <a href="#" id="modalRescanBtn" class="sk-pill-btn" style="padding: 10px 22px; font-size: 0.78rem; text-decoration: none;">
+        🚀 Re-Scan This Target
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="historyToast" class="hs-toast">
+  <span id="toastIcon">✓</span>
+  <span id="toastMsg">Action completed.</span>
+</div>
+
+<script>
+/* ── SCAN HISTORY & REGRESSION DIFF CLIENT LOGIC ──────────────── */
+let activeDiffData = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+  // If baseline and target options exist, automatically execute comparison on initial load for instant WOW effect
+  const b = document.getElementById('diffBaseline')?.value;
+  const t = document.getElementById('diffTarget')?.value;
+  if (b && t && b !== t) {
+    runDiffCompare();
+  }
+});
+
+// Run Real-Time Regression Diff Comparison
+async function runDiffCompare() {
+  const baseId = document.getElementById('diffBaseline')?.value;
+  const targetId = document.getElementById('diffTarget')?.value;
+  const btn = document.getElementById('btnRunDiff');
+  const resultsArea = document.getElementById('diffResultsArea');
+
+  if (!baseId || !targetId) {
+    alert('Please select two scan runs to compare.');
+    return;
+  }
+
+  if (baseId === targetId) {
+    resultsArea.style.display = 'block';
+    resultsArea.innerHTML = `
+      <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.35); padding: 16px; border-radius: 8px; color: #f59e0b; font-size: 0.85rem;">
+        ⚠️ <strong>Identical Scans Selected:</strong> Baseline and Target scans are identical (${baseId}). Please select two distinct runs to view remediation and regression deltas.
+      </div>
+    `;
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="hs-spinner" style="display:inline-block; width:12px; height:12px; border:2px solid #fff; border-top-color:transparent; border-radius:50%; animation:tg-spin 0.8s linear infinite;"></span> COMPUTING DIFF...';
+
+  try {
+    const res = await fetch(`/api/history/diff?base_scan_id=${encodeURIComponent(baseId)}&target_scan_id=${encodeURIComponent(targetId)}`);
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.detail || `HTTP ${res.status}`);
+    }
+
+    const data = await res.json();
+    activeDiffData = data;
+    renderDiffResults(data);
+  } catch (err) {
+    resultsArea.style.display = 'block';
+    resultsArea.innerHTML = `
+      <div style="background: rgba(255, 0, 51, 0.1); border: 1px solid rgba(255, 0, 51, 0.4); padding: 16px; border-radius: 8px; color: #ff0033; font-size: 0.85rem;">
+        ❌ <strong>Diff Computation Error:</strong> ${escapeHtml(err.message)}
+      </div>
+    `;
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span>⚡</span> RUN DIFF COMPARISON';
+  }
+}
+
+// Render Diff Results Matrix
+function renderDiffResults(data) {
+  const area = document.getElementById('diffResultsArea');
+  area.style.display = 'block';
+
+  const fixed = data.fixed_vulnerabilities || [];
+  const regressions = data.new_regressions || [];
+  const persistent = data.persistent_vulnerabilities || [];
+
+  area.innerHTML = `
+    <!-- Header Summary Banner -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+      <div>
+        <div style="font-weight: 800; color: #00f0ff; font-size: 0.95rem; font-family: var(--font-mono);">
+          ✓ REGRESSION DIFF REPORT // ${escapeHtml(data.base_scan_id)} ➔ ${escapeHtml(data.target_scan_id)}
+        </div>
+        <div style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono); margin-top: 3px;">
+          Comparing Baseline (${escapeHtml(data.base_scan_name)}) with Release (${escapeHtml(data.target_scan_name)})
+        </div>
+      </div>
+      <button type="button" class="sk-btn-secondary" onclick="exportDiffJson()" style="padding: 6px 14px; font-size: 0.72rem;">
+        📄 Export Diff JSON
+      </button>
+    </div>
+
+    <!-- 3 KPI Cards -->
+    <div class="hs-diff-metrics-grid">
+      <div class="hs-diff-kpi fixed">
+        <div class="hs-diff-kpi-val">✓ ${fixed.length}</div>
+        <div class="hs-diff-kpi-label">Remediated Flaws (Fixed)</div>
+      </div>
+      <div class="hs-diff-kpi ${regressions.length > 0 ? 'new' : 'fixed'}">
+        <div class="hs-diff-kpi-val">${regressions.length > 0 ? '⚠️ ' + regressions.length : '✓ 0'}</div>
+        <div class="hs-diff-kpi-label">${regressions.length > 0 ? 'New Regressions' : 'Zero Regressions (Pass)'}</div>
+      </div>
+      <div class="hs-diff-kpi persistent">
+        <div class="hs-diff-kpi-val">● ${persistent.length}</div>
+        <div class="hs-diff-kpi-label">Persistent Open Flaws</div>
+      </div>
+    </div>
+
+    <!-- Fixed Flaws List -->
+    ${fixed.length > 0 ? `
+      <div class="hs-diff-section">
+        <div class="hs-diff-sec-head" style="color: #10b981;">
+          <span>✓ CONFIRMED REMEDIATED VULNERABILITIES (${fixed.length})</span>
+          <span style="font-size: 0.7rem; color: var(--text-muted);">Verified Closed</span>
+        </div>
+        <div class="hs-diff-items">
+          ${fixed.map(f => `
+            <div class="hs-diff-item-row" style="border-left: 3px solid #10b981;">
+              <div class="hs-diff-item-left">
+                <span class="hs-sev-pill hs-sev-${(f.severity||'low').toLowerCase()}">${escapeHtml(f.severity)}</span>
+                <div>
+                  <div style="font-weight: 700; color: #ffffff;">${escapeHtml(f.title)}</div>
+                  <div style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted);">
+                    Endpoint: <span style="color: #00f0ff;">${escapeHtml(f.endpoint)}</span> &nbsp;|&nbsp; ${escapeHtml(f.cwe_id || '')} &nbsp;|&nbsp; CVSS: ${f.cvss_score || 'N/A'}
+                  </div>
+                </div>
+              </div>
+              <span style="color: #10b981; font-weight: 700; font-family: var(--font-mono); font-size: 0.72rem;">✓ CLOSED</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    ` : ''}
+
+    <!-- New Regressions List -->
+    ${regressions.length > 0 ? `
+      <div class="hs-diff-section" style="border-color: rgba(255,0,51,0.4);">
+        <div class="hs-diff-sec-head" style="color: #ff0033; background: rgba(255,0,51,0.06);">
+          <span>⚠️ NEW SECURITY REGRESSIONS INTRODUCED (${regressions.length})</span>
+          <span style="font-size: 0.7rem; color: #ff0033;">Requires Attention</span>
+        </div>
+        <div class="hs-diff-items">
+          ${regressions.map(f => `
+            <div class="hs-diff-item-row" style="border-left: 3px solid #ff0033;">
+              <div class="hs-diff-item-left">
+                <span class="hs-sev-pill hs-sev-${(f.severity||'low').toLowerCase()}">${escapeHtml(f.severity)}</span>
+                <div>
+                  <div style="font-weight: 700; color: #ffffff;">${escapeHtml(f.title)}</div>
+                  <div style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted);">
+                    Endpoint: <span style="color: #ff0033;">${escapeHtml(f.endpoint)}</span> &nbsp;|&nbsp; ${escapeHtml(f.cwe_id || '')} &nbsp;|&nbsp; CVSS: ${f.cvss_score || 'N/A'}
+                  </div>
+                </div>
+              </div>
+              <span style="color: #ff0033; font-weight: 700; font-family: var(--font-mono); font-size: 0.72rem;">⚠️ REGRESSION</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    ` : `
+      <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); padding: 12px 18px; border-radius: 8px; margin-bottom: 20px; font-size: 0.8rem; color: #10b981; display: flex; align-items: center; gap: 10px;">
+        <span>🛡️</span> <strong>Zero Regression Pass:</strong> No newly introduced vulnerability vectors detected between these releases.
+      </div>
+    `}
+
+    <!-- Persistent Flaws List -->
+    ${persistent.length > 0 ? `
+      <div class="hs-diff-section">
+        <div class="hs-diff-sec-head" style="color: #f59e0b;">
+          <span>● PERSISTENT UNRESOLVED VULNERABILITIES (${persistent.length})</span>
+          <span style="font-size: 0.7rem; color: var(--text-muted);">Still Present in Release</span>
+        </div>
+        <div class="hs-diff-items">
+          ${persistent.map(f => `
+            <div class="hs-diff-item-row" style="border-left: 3px solid #f59e0b;">
+              <div class="hs-diff-item-left">
+                <span class="hs-sev-pill hs-sev-${(f.severity||'low').toLowerCase()}">${escapeHtml(f.severity)}</span>
+                <div>
+                  <div style="font-weight: 700; color: #ffffff;">${escapeHtml(f.title)}</div>
+                  <div style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted);">
+                    Endpoint: <span style="color: #f59e0b;">${escapeHtml(f.endpoint)}</span> &nbsp;|&nbsp; ${escapeHtml(f.cwe_id || '')} &nbsp;|&nbsp; CVSS: ${f.cvss_score || 'N/A'}
+                  </div>
+                </div>
+              </div>
+              <span style="color: #f59e0b; font-weight: 700; font-family: var(--font-mono); font-size: 0.72rem;">● PERSISTENT</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    ` : ''}
+  `;
+}
+
+// Export Diff JSON
+function exportDiffJson() {
+  if (!activeDiffData) return;
+  const jsonStr = JSON.stringify(activeDiffData, null, 2);
+  const blob = new Blob([jsonStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `diff-${activeDiffData.base_scan_id}-vs-${activeDiffData.target_scan_id}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✓ Diff report downloaded as JSON.');
+}
+
+// Filter Scans Table
+function filterScans() {
+  const q = (document.getElementById('scanSearchInput')?.value || '').toLowerCase().trim();
+  const activeBtn = document.querySelector('.hs-filter-btn.active');
+  const filterType = activeBtn ? activeBtn.innerText.trim() : 'ALL';
+
+  const rows = document.querySelectorAll('#scansTableBody tr:not(#emptyScanRow)');
+
+  rows.forEach(r => {
+    const searchData = r.getAttribute('data-search') || '';
+    const hasFlaws = r.getAttribute('data-has-flaws') === 'true';
+
+    const matchesSearch = !q || searchData.includes(q);
+    let matchesFilter = true;
+
+    if (filterType === 'WITH FLAWS') {
+      matchesFilter = hasFlaws;
+    } else if (filterType === 'CLEAN') {
+      matchesFilter = !hasFlaws;
+    }
+
+    if (matchesSearch && matchesFilter) {
+      r.style.display = '';
+    } else {
+      r.style.display = 'none';
+    }
+  });
+}
+
+function setScanFilter(type, btn) {
+  document.querySelectorAll('.hs-filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filterScans();
+}
+
+// Tab Navigation Switcher
+function switchHistoryTab(tabName) {
+  const tabBtnHistory = document.getElementById('tabBtnHistory');
+  const tabBtnDiff = document.getElementById('tabBtnDiff');
+  const historyView = document.getElementById('historySectionView');
+  const diffView = document.getElementById('diffSectionView');
+
+  if (tabName === 'diff') {
+    tabBtnHistory?.classList.remove('active');
+    tabBtnDiff?.classList.add('active');
+    if (historyView) historyView.style.display = 'none';
+    if (diffView) diffView.style.display = 'block';
+
+    // Auto-run diff on first view if not already computed
+    if (!activeDiffData) {
+      runDiffCompare();
+    }
+  } else {
+    tabBtnDiff?.classList.remove('active');
+    tabBtnHistory?.classList.add('active');
+    if (diffView) diffView.style.display = 'none';
+    if (historyView) historyView.style.display = 'block';
+  }
+}
+
+// Quick Diff Trigger from table row
+function quickDiffScan(scanId) {
+  const targetSel = document.getElementById('diffTarget');
+  if (targetSel) {
+    targetSel.value = scanId;
+  }
+  switchHistoryTab('diff');
+  runDiffCompare();
+}
+
+// Inspect Scan Details Modal
+async function inspectScan(scanId) {
+  const modal = document.getElementById('scanDetailsModal');
+  if (!modal) return;
+  const modalScanId = document.getElementById('modalScanId');
+  const modalTarget = document.getElementById('modalScanTarget');
+  const modalStatus = document.getElementById('modalStatus');
+  const modalCount = document.getElementById('modalFindingsCount');
+  const modalAvg = document.getElementById('modalAvgCvss');
+  const modalDur = document.getElementById('modalDuration');
+  const modalList = document.getElementById('modalFindingsList');
+  const modalRescan = document.getElementById('modalRescanBtn');
+
+  modalScanId.innerText = scanId;
+  modalList.innerHTML = '<div style="padding: 24px; text-align: center; color: var(--text-muted);"><div class="hs-spinner" style="display:inline-block; width:18px; height:18px; border:2px solid #00f0ff; border-top-color:transparent; border-radius:50%; animation:tg-spin 0.8s linear infinite;"></div> Loading verified findings...</div>';
+  
+  modal.style.display = 'flex';
+  modal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+
+  try {
+    const res = await fetch(`/api/history/scans/${encodeURIComponent(scanId)}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const scan = await res.json();
+
+    modalTarget.innerText = scan.target_url;
+    modalStatus.innerText = `✓ ${scan.status}`;
+    modalCount.innerText = scan.findings_count;
+    modalAvg.innerText = scan.avg_cvss || '0.0';
+    modalDur.innerText = `${scan.duration_seconds}s`;
+    modalRescan.href = `/scanner-console?target=${encodeURIComponent(scan.target_url)}`;
+
+    if (!scan.findings || scan.findings.length === 0) {
+      modalList.innerHTML = `
+        <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); padding: 24px; border-radius: 8px; text-align: center; color: #10b981;">
+          <div style="font-size: 1.8rem; margin-bottom: 8px;">🛡️</div>
+          <div style="font-weight: 700; font-size: 0.95rem;">Clean Pass // No Vulnerabilities Discovered</div>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">All automated injection fuzzing probes passed target defenses without error leakage.</p>
+        </div>
+      `;
+      return;
+    }
+
+    modalList.innerHTML = scan.findings.map(f => {
+      const curlCmd = f.poc_curl || `curl -i '${scan.target_url}${f.endpoint}'`;
+      const sev = (f.severity || 'low').toLowerCase();
+
+      return `
+        <div class="hs-finding-card">
+          <div class="hs-finding-head">
+            <span class="hs-finding-title">${escapeHtml(f.title)}</span>
+            <span class="hs-sev-pill hs-sev-${sev}">${escapeHtml(f.severity)}</span>
+          </div>
+
+          <div class="hs-finding-meta">
+            <div><strong>Endpoint:</strong> <code>${escapeHtml(f.endpoint)}</code></div>
+            <div><strong>Parameter:</strong> <code>${escapeHtml(f.parameter || 'N/A')}</code></div>
+            <div><strong>CWE:</strong> ${escapeHtml(f.cwe_id || 'N/A')}</div>
+            <div><strong>CVSS Score:</strong> <span style="color: #ff0033; font-weight: 700;">${f.cvss_score || '0.0'}</span></div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <strong>Status:</strong>
+              <select class="hs-status-select" onchange="updateFindingStatusLive(${f.id}, this.value)">
+                <option value="OPEN" ${f.status === 'OPEN' ? 'selected' : ''}>OPEN</option>
+                <option value="RESOLVED" ${f.status === 'RESOLVED' ? 'selected' : ''}>RESOLVED</option>
+                <option value="FALSE_POSITIVE" ${f.status === 'FALSE_POSITIVE' ? 'selected' : ''}>FALSE_POSITIVE</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="hs-curl-box">
+            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 580px;">${escapeHtml(curlCmd)}</span>
+            <button type="button" class="hs-copy-btn" onclick="copySnippet('${escapeJsString(curlCmd)}', this)">
+              📋 Copy PoC
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  } catch (err) {
+    modalList.innerHTML = `
+      <div style="color: #ff0033; padding: 16px; background: rgba(255,0,51,0.1); border-radius: 8px;">
+        Failed to load scan findings: ${escapeHtml(err.message)}
+      </div>
+    `;
+  }
+}
+
+// Live Finding Status Update
+async function updateFindingStatusLive(findingId, newStatus) {
+  try {
+    const res = await fetch(`/api/history/findings/${findingId}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus })
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    showToast(`✓ Finding #${findingId} status set to ${newStatus}`);
+  } catch (err) {
+    showToast(`❌ Failed to update finding status: ${err.message}`);
+  }
+}
+
+// Robust Modal Closing Handlers
+function closeScanInspectionModal() {
+  const modal = document.getElementById('scanDetailsModal');
+  if (modal) {
+    modal.classList.remove('active');
+    modal.style.display = 'none';
+  }
+  document.body.style.overflow = '';
+}
+
+// Global alias for compatibility
+window.closeModal = function(modalId) {
+  if (modalId) {
+    const el = document.getElementById(modalId);
+    if (el) {
+      el.classList.remove('active');
+      el.classList.remove('open');
+      el.style.display = 'none';
+    }
+  }
+  closeScanInspectionModal();
+};
+
+function handleModalBackdropClick(event, modalId) {
+  if (event && event.target && event.target.id === modalId) {
+    closeScanInspectionModal();
+  }
+}
+
+// Attach Escape key listener for immediate dismissal
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeScanInspectionModal();
+  }
+});
+
+// Direct event listener binding to guarantee click handling
+document.addEventListener('DOMContentLoaded', () => {
+  const closeCross = document.getElementById('btnModalCloseCross');
+  if (closeCross) {
+    closeCross.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      closeScanInspectionModal();
+    });
+  }
+
+  const closeBottom = document.getElementById('btnModalCloseBottom');
+  if (closeBottom) {
+    closeBottom.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      closeScanInspectionModal();
+    });
+  }
+});
+
+// Copy Helper
+function copyText(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    showToast(`✓ Copied: ${text}`);
+  });
+}
+
+function copySnippet(text, btn) {
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.innerText;
+    btn.innerText = '✓ Copied!';
+    setTimeout(() => { btn.innerText = orig; }, 2000);
+  });
+}
+
+// Toast Notification
+function showToast(msg) {
+  const toast = document.getElementById('historyToast');
+  const msgEl = document.getElementById('toastMsg');
+  if (!toast || !msgEl) return;
+
+  msgEl.innerText = msg;
+  toast.classList.add('show');
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3200);
+}
+
+// Security Escape Helpers
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function escapeJsString(str) {
+  if (!str) return '';
+  return String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+}
+</script>
+{% endblock %}

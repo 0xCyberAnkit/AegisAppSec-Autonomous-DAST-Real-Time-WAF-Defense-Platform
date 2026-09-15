@@ -1,0 +1,95 @@
+version: "3.8"
+
+services:
+  # 1. MySQL Relational Database for Enterprise Persistence
+  db:
+    image: mysql:8.0
+    container_name: aegis_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: aegis_root_super_secret_2026
+      MYSQL_DATABASE: aegis_db
+      MYSQL_USER: aegis_user
+      MYSQL_PASSWORD: aegis_password_2026
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "aegis_user", "-paegis_password_2026"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - aegis_network
+
+  # 2. Redis In-Memory Message Broker & Cache
+  redis:
+    image: redis:7-alpine
+    container_name: aegis_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - aegis_network
+
+  # 3. AegisAppSec FastAPI Web Engine & Cyber Dashboard
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aegis_web
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - AEGIS_HOST=0.0.0.0
+      - AEGIS_PORT=8000
+      - DATABASE_URL=mysql+pymysql://aegis_user:aegis_password_2026@db:3306/aegis_db
+      - REDIS_URL=redis://redis:6379/0
+      - AEGIS_SECRET_KEY=aegis-enterprise-hardened-session-token-2026
+      - AEGIS_JWT_SECRET=aegis-enterprise-jwt-hyper-secret-key-2026
+    ports:
+      - "8000:8000"
+    networks:
+      - aegis_network
+
+  # 4. Celery Distributed Background Worker for Long-Running Scans
+  celery_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aegis_celery_worker
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=mysql+pymysql://aegis_user:aegis_password_2026@db:3306/aegis_db
+      - REDIS_URL=redis://redis:6379/0
+      - AEGIS_SECRET_KEY=aegis-enterprise-hardened-session-token-2026
+    command: celery -A app.worker.celery_app worker --loglevel=info --concurrency=4
+    networks:
+      - aegis_network
+
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  aegis_network:
+    driver: bridge

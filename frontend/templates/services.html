@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% block title %}Security Services — AegisAppSec | DAST, Fuzzing & Real-Time WAF{% endblock %}
+
+{% block content %}
+<div class="sk-page-hero">
+  <div class="sk-container">
+    <div class="sk-page-eyebrow">APPLICATION SECURITY SUITE</div>
+    <h1 class="sk-page-title">
+      COMPLETE <span class="cyan">SECURITY LIFECYCLE</span>.
+    </h1>
+    <p class="sk-page-desc">
+      Six integrated application security capabilities covering every phase of your software lifecycle — from initial vulnerability discovery and fuzzing to runtime edge defense and developer remediation.
+    </p>
+  </div>
+</div>
+
+<section class="sk-section">
+  <div class="sk-container">
+    <div class="sk-section-meta">
+      <span class="sk-section-label">PLATFORM CAPABILITIES</span>
+      <span class="sk-section-count">06 PRODUCTION SERVICES</span>
+    </div>
+
+    <div class="sk-services-grid">
+      {% set services = [
+        ('01','Autonomous DAST','Continuously crawl, enumerate, and analyze your web application attack surface. Discover exploitable flaws across all routes, form inputs, dynamic parameters, and API controllers automatically without static test scripts.','Dynamic Crawling','Route Mapping','Behavior Analysis','Auth Testing'),
+        ('02','Intelligent Fuzzing','Generate, mutate, and dispatch thousands of sophisticated payload permutations. Stress-test application inputs against SQL injection, cross-site scripting (XSS), command injection, and SSRF evasion vectors.','Payload Mutation','SQLi Fuzzing','XSS Vectors','SSRF Probing'),
+        ('03','Real-Time WAF Middleware','Inspect inbound HTTP traffic in real time with sub-millisecond overhead. Automatically block active exploit attempts, credential stuffing, and malicious payloads at the edge before they hit your app.','Edge Enforcement','Rule Engine','Rate Limiting','IP Reputation'),
+        ('04','API Security Testing','Discover shadow and undocumented API endpoints. Validate authentication workflows, inspect JWT tokens, and detect Broken Object Level Authorization (BOLA/IDOR) flaws across REST and GraphQL architectures.','OpenAPI Parsing','JWT Audit','BOLA Detection','GraphQL Shield'),
+        ('05','Security Intelligence','Correlate findings across continuous scans with CVSS v3.1 scoring, CWE classification, and exploitability telemetry. Prioritize critical business risks so your teams fix what truly matters first.','CVSS Scoring','Risk Ranking','CVE Correlation','Trend Analytics'),
+        ('06','Developer Remediation','Deliver security findings directly into developer workflows. Receive side-by-side code diffs, vulnerable vs secure syntax examples, automated pull request annotations, and CI/CD quality gate enforcement.','Code Diffs','Fix Guidance','PR Annotations','CI/CD Gates'),
+      ] %}
+      {% for num, title, desc, t1, t2, t3, t4 in services %}
+      <div class="sk-service-card">
+        <div class="sk-service-num">SERVICE {{ num }}</div>
+        <h3 class="sk-service-title">{{ title }}</h3>
+        <p class="sk-service-desc">{{ desc }}</p>
+        <div class="sk-service-tags">
+          <span class="sk-service-tag">{{ t1 }}</span>
+          <span class="sk-service-tag">{{ t2 }}</span>
+          <span class="sk-service-tag">{{ t3 }}</span>
+          <span class="sk-service-tag">{{ t4 }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ══ INTERACTIVE WAF RULE ENGINE PLAYGROUND ═════════════════════ -->
+<section class="sk-section" id="wafSandboxSection" style="padding-top: 0;">
+  <div class="sk-container">
+    <div class="sk-waf-sandbox-card">
+      <div class="sk-waf-sandbox-head">
+        <div>
+          <span class="sk-section-label" style="color: var(--cyan); margin-bottom: 8px;">// LIVE EDGE DEMO</span>
+          <h2 class="sk-bento-heading" style="font-size: 1.8rem; margin-bottom: 8px;">
+            Interactive WAF Rule Engine &amp; Virtual Patching Simulator
+          </h2>
+          <p style="color: var(--text-body); font-size: 0.98rem; max-width: 720px;">
+            Test malicious payload permutations against the AegisAppSec real-time inspection engine. Experience sub-millisecond edge blocking before traffic hits your backend application.
+          </p>
+        </div>
+        <div class="sk-waf-status-indicator">
+          <span class="sk-waf-dot-pulse"></span>
+          <span>EDGE WAF: ONLINE</span>
+        </div>
+      </div>
+
+      <!-- Quick Preset Vectors -->
+      <div style="margin-top: 24px;">
+        <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); font-weight: 600; letter-spacing: 0.08em;">
+          SAMPLE ATTACK VECTORS:
+        </span>
+        <div class="sk-waf-preset-row">
+          <button type="button" class="sk-chip active" onclick="loadWafPreset('sqli')">SQL Injection</button>
+          <button type="button" class="sk-chip" onclick="loadWafPreset('xss')">Cross-Site Scripting (XSS)</button>
+          <button type="button" class="sk-chip" onclick="loadWafPreset('traversal')">Path Traversal</button>
+          <button type="button" class="sk-chip" onclick="loadWafPreset('log4j')">Log4Shell / JNDI</button>
+          <button type="button" class="sk-chip" onclick="loadWafPreset('ssrf')">AWS Metadata SSRF</button>
+          <button type="button" class="sk-chip" onclick="loadWafPreset('benign')">Safe Benign Request</button>
+        </div>
+      </div>
+
+      <!-- Live Input and Test Bar -->
+      <div class="sk-waf-input-bar">
+        <div class="sk-waf-input-wrap">
+          <span class="sk-waf-method">POST /api/v2/query HTTP/1.1</span>
+          <textarea id="wafPayloadInput" class="sk-waf-textarea" rows="2" placeholder="Enter HTTP payload or parameter string to inspect...">' UNION SELECT 1, username, password_hash FROM accounts WHERE '1'='1' --</textarea>
+        </div>
+        <button type="button" class="sk-pill-btn" onclick="testWafPayload()" id="wafTestBtn" style="height: fit-content; align-self: flex-end;">
+          Inspect Request ⚡
+        </button>
+      </div>
+
+      <!-- Real-time Inspection Result Display -->
+      <div class="sk-waf-result-panel" id="wafResultPanel">
+        <div class="sk-waf-result-header">
+          <div class="sk-waf-verdict blocked" id="wafVerdict">
+            <span id="wafVerdictIcon">⛔</span>
+            <span id="wafVerdictText">BLOCKED — HTTP 403 FORBIDDEN</span>
+          </div>
+          <div class="sk-waf-latency">
+            Latency: <strong id="wafLatency">0.31 ms</strong>
+          </div>
+        </div>
+
+        <div class="sk-waf-details-grid">
+          <div class="sk-waf-detail-box">
+            <span class="sk-waf-detail-lbl">RULE SIGNATURE</span>
+            <span class="sk-waf-detail-val cyan" id="wafRuleId">AEGIS-RULE-SQLI-092</span>
+          </div>
+          <div class="sk-waf-detail-box">
+            <span class="sk-waf-detail-lbl">CWE CLASSIFICATION</span>
+            <span class="sk-waf-detail-val" id="wafCwe">CWE-89: SQL Injection</span>
+          </div>
+          <div class="sk-waf-detail-box">
+            <span class="sk-waf-detail-lbl">SEVERITY LEVEL</span>
+            <span class="sk-waf-detail-val rose" id="wafSeverity">CRITICAL (CVSS 9.8)</span>
+          </div>
+          <div class="sk-waf-detail-box">
+            <span class="sk-waf-detail-lbl">VIRTUAL PATCH STATE</span>
+            <span class="sk-waf-detail-val emerald" id="wafPatch">AUTO-ENFORCED AT EDGE</span>
+          </div>
+        </div>
+
+        <!-- Simulated Response Header -->
+        <div class="sk-waf-raw-response">
+          <div class="sk-waf-raw-lbl">HTTP RESPONSE HEADERS GENERATED BY AEGIS WAF:</div>
+          <pre id="wafRawHeaders">HTTP/1.1 403 Forbidden
+Server: AegisAppSec-Edge-WAF/2.4
+X-Aegis-Blocked: true
+X-Aegis-Rule: AEGIS-RULE-SQLI-092
+X-Aegis-Latency: 0.31ms
+Content-Type: application/json
+
+{"status": "blocked", "error": "Malicious payload detected by Aegis WAF virtual patch"}</pre>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- CTA Band -->
+<div class="sk-cta-band">
+  <div class="sk-container">
+    <div class="sk-cta-inner">
+      <div>
+        <div class="sk-section-label" style="margin-bottom: 12px;">READY TO DEPLOY AEGISAPPSEC?</div>
+        <div class="sk-cta-title">
+          CONTINUOUS DEFENSE.<br>
+          <span class="accent">ZERO SCAN BOTTLENECKS.</span>
+        </div>
+        <p class="sk-cta-sub">
+          Deploy our lightweight WAF middleware or launch an automated scan against your staging environment in minutes.
+        </p>
+      </div>
+      <div class="sk-cta-actions">
+        <a href="{{ url_for('scanner') }}" class="sk-btn-primary">
+          Launch Free Scan
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="{{ url_for('contact') }}" class="sk-btn-sec">
+          Talk to Security Advisory
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

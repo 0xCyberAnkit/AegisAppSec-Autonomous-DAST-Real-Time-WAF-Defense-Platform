@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}Contact Advisory — AegisAppSec | Technical Security Consultation{% endblock %}
+
+{% block content %}
+<div class="sk-page-hero">
+  <div class="sk-container">
+    <div class="sk-page-eyebrow">SECURITY ADVISORY &amp; SUPPORT</div>
+    <h1 class="sk-page-title">
+      LET'S TALK <span class="cyan">APPLICATION DEFENSE</span>.
+    </h1>
+    <p class="sk-page-desc">
+      Connect directly with our security engineering leads for architecture reviews, platform integrations, emergency incident triage, or enterprise vulnerability assessments.
+    </p>
+  </div>
+</div>
+
+<section class="sk-section">
+  <div class="sk-container">
+    <div class="sk-contact-grid">
+
+      <!-- Left Column: Direct Security Channels -->
+      <div class="sk-contact-info">
+        <div class="sk-section-label" style="margin-bottom: 24px; font-size: 0.72rem;">
+          DIRECT ADVISORY CHANNELS
+        </div>
+
+        <div class="sk-contact-item">
+          <div class="sk-contact-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div>
+            <div class="sk-contact-item-label">SECURITY ADVISORY EMAIL</div>
+            <div class="sk-contact-item-val">security@aegisappsec.io</div>
+            <div style="font-size: 0.78rem; color: var(--ink-muted); margin-top: 2px;">Direct inbox to senior security architects</div>
+          </div>
+        </div>
+
+        <div class="sk-contact-item">
+          <div class="sk-contact-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </div>
+          <div>
+            <div class="sk-contact-item-label">EMERGENCY SECOPS HOTLINE</div>
+            <div class="sk-contact-item-val">+1 (800) AEGIS-SEC</div>
+            <div style="font-size: 0.78rem; color: var(--ink-muted); margin-top: 2px;">24/7 coverage for active exploit incidents</div>
+          </div>
+        </div>
+
+        <div class="sk-contact-item">
+          <div class="sk-contact-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <div>
+            <div class="sk-contact-item-label">PGP ENCRYPTED COMMUNICATIONS</div>
+            <div class="sk-contact-item-val" style="font-family: var(--f-mono); font-size: 0.85rem;">FINGERPRINT: 0xAEGIS-2026-KEY-984F</div>
+            <div style="font-size: 0.78rem; color: var(--ink-muted); margin-top: 2px;">Use for confidential zero-day disclosures</div>
+          </div>
+        </div>
+
+        <div class="sk-contact-item">
+          <div class="sk-contact-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div>
+            <div class="sk-contact-item-label">GUARANTEED RESPONSE SLA</div>
+            <div class="sk-contact-item-val">Critical: &lt; 2 Hours // General: &lt; 24 Hours</div>
+            <div style="font-size: 0.78rem; color: var(--ink-muted); margin-top: 2px;">Monitored by our round-the-clock SOC engineers</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Interactive Message Form -->
+      <div class="sk-contact-form">
+        <div class="sk-section-label" style="margin-bottom: 24px; font-size: 0.72rem;">
+          TRANSMIT SECURE INQUIRY
+        </div>
+
+        {% if contact_success %}
+        <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid var(--emerald-border); padding: 18px 20px; border-radius: var(--radius-sm); color: #10b981; font-family: var(--f-mono); font-size: 0.82rem; margin-bottom: 24px; display: flex; align-items: center; gap: 12px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <div>
+            <strong>MESSAGE CONFIRMED</strong> — Thank you, {{ user_name }}. Your security inquiry has been dispatched to our SecOps advisory queue. Ticket: <strong>#SEC-{{ range(10000, 99999)|random }}</strong>
+          </div>
+        </div>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('contact') }}">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="sk-form-group">
+              <label class="sk-form-label" for="contactName">Full Name</label>
+              <input id="contactName" class="sk-form-input" name="name" type="text" placeholder="Alex Morgan" required>
+            </div>
+            <div class="sk-form-group">
+              <label class="sk-form-label" for="contactEmail">Work Email</label>
+              <input id="contactEmail" class="sk-form-input" name="email" type="email" placeholder="alex@enterprise.sec" required>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="sk-form-group">
+              <label class="sk-form-label" for="contactOrg">Organization / Team</label>
+              <input id="contactOrg" class="sk-form-input" name="company" type="text" placeholder="Acme Security Labs">
+            </div>
+            <div class="sk-form-group">
+              <label class="sk-form-label" for="contactType">Inquiry Classification</label>
+              <select id="contactType" class="sk-form-input" name="type">
+                <option>Technical Security Consultation</option>
+                <option>Platform Demo &amp; Architecture Walkthrough</option>
+                <option>Enterprise WAF Deployment</option>
+                <option>Vulnerability Disclosure / Triage</option>
+                <option>API Security &amp; Compliance Audit</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="sk-form-group">
+            <label class="sk-form-label" for="contactMsg">Security Challenge / Details</label>
+            <textarea id="contactMsg" class="sk-form-input" name="message" rows="5" placeholder="Outline your application stack, target architecture, or specific OWASP / WAF requirements..." required style="resize: vertical;"></textarea>
+          </div>
+
+          <button type="submit" class="sk-submit-btn">
+            TRANSMIT ADVISORY INQUIRY →
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VoltMart Electronics — Autonomous Target 01</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: rgba(16, 23, 38, 0.7);
+      --border: rgba(255, 255, 255, 0.08);
+      --cyan: #00f0ff;
+      --red: #ef4444;
+      --amber: #f59e0b;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      padding: 24px;
+      min-height: 100vh;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+    .logo {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--cyan);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .badge-port {
+      background: rgba(0, 240, 255, 0.12);
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .badge-vuln {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 3px;
+      margin-left: 6px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      backdrop-filter: blur(8px);
+    }
+    .card h3 {
+      font-size: 1.05rem;
+      color: #fff;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    input, textarea, button {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,0.35);
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+    }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--cyan);
+      box-shadow: 0 0 8px rgba(0, 240, 255, 0.2);
+    }
+    button {
+      background: linear-gradient(135deg, var(--cyan), #0284c7);
+      color: #030712;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.2s;
+    }
+    button:hover { opacity: 0.9; }
+    .product-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .product-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.03);
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.04);
+      font-size: 0.85rem;
+    }
+    .price { color: #10b981; font-family: 'JetBrains Mono', monospace; font-weight: 700; }
+    .footer-note {
+      margin-top: 30px;
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">
+      <span>⚡ VoltMart Tech & Security Store</span>
+    </div>
+    <div>
+      <span class="badge-port">TARGET 01 // PORT 8001</span>
+    </div>
+  </div>
+
+  <div class="grid">
+    <!-- 1. SQL Injection Card -->
+    <div class="card">
+      <h3>
+        <span>1. Product Search</span>
+        <span class="badge-vuln" style="background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid var(--red);">SQLi [CWE-89]</span>
+      </h3>
+      <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 12px;">Direct SQL query string concatenation without prepared statements.</p>
+      <form action="/search" method="GET" target="_blank">
+        <input type="text" name="q" placeholder="Try: ' OR '1'='1 -- or Laptop" value="' OR '1'='1">
+        <button type="submit">Execute Fuzz Search</button>
+      </form>
+      <div style="margin-top: 14px;">
+        <span style="font-size: 0.75rem; color: var(--muted); font-family: 'JetBrains Mono', monospace;">LIVE INVENTORY:</span>
+        <div class="product-list" style="margin-top: 8px;">
+          {% for p in products %}
+          <div class="product-row">
+            <span>{{ p.name }}</span>
+            <span class="price">${{ p.price }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Stored / Reflected XSS Card -->
+    <div class="card">
+      <h3>
+        <span>2. Customer Review Wall</span>
+        <span class="badge-vuln" style="background: rgba(245,158,11,0.15); color: var(--amber); border: 1px solid var(--amber);">XSS [CWE-79]</span>
+      </h3>
+      <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 12px;">Unescaped HTML/JavaScript execution in browser context.</p>
+      <form action="/reviews" method="POST" target="_blank">
+        <input type="text" name="author" placeholder="Author name (e.g. Hacker)" value="SecResearcher">
+        <textarea name="comment" rows="2" placeholder="Review comment">&lt;img src=x onerror=alert('VoltMart-XSS-Pwned')&gt;</textarea>
+        <button type="submit">Submit Customer Review</button>
+      </form>
+      <div style="margin-top: 14px;">
+        <span style="font-size: 0.75rem; color: var(--muted); font-family: 'JetBrains Mono', monospace;">RECENT REVIEWS:</span>
+        <div style="margin-top: 8px; font-size: 0.8rem;">
+          {% for r in reviews %}
+          <div style="background: rgba(255,255,255,0.02); padding: 6px 10px; border-radius: 4px; margin-bottom: 6px;">
+            <strong style="color: var(--cyan);">{{ r.author }}:</strong> {{ r.comment }}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. CSRF Card -->
+    <div class="card">
+      <h3>
+        <span>3. Account Settings</span>
+        <span class="badge-vuln" style="background: rgba(56,189,248,0.15); color: #38bdf8; border: 1px solid #38bdf8;">CSRF [CWE-352]</span>
+      </h3>
+      <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 12px;">State-changing action without Anti-CSRF token verification.</p>
+      <div style="background: rgba(0,0,0,0.25); padding: 8px; border-radius: 6px; margin-bottom: 10px; font-size: 0.8rem;">
+        <div>Current User: <strong style="color: #fff;">{{ account.username }}</strong></div>
+        <div>Current Email: <strong style="color: var(--cyan);">{{ account.email }}</strong></div>
+      </div>
+      <form action="/account/email" method="POST" target="_blank">
+        <input type="email" name="email" value="attacker.hijack@corp.net">
+        <button type="submit">Change Account Email (No Token)</button>
+      </form>
+    </div>
+
+    <!-- 4. IDOR Card -->
+    <div class="card">
+      <h3>
+        <span>4. Order Lookup API</span>
+        <span class="badge-vuln" style="background: rgba(0,240,255,0.15); color: var(--cyan); border: 1px solid var(--cyan);">IDOR [CWE-639]</span>
+      </h3>
+      <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 12px;">Direct object lookup without tenant ownership or authorization checks.</p>
+      <div style="display: flex; gap: 8px;">
+        <input type="number" id="orderInput" value="1" placeholder="Order ID (1, 2, 3...)">
+        <button type="button" style="width: 140px;" onclick="window.open('/api/orders/' + document.getElementById('orderInput').value)">View Order</button>
+      </div>
+      <div style="font-size: 0.72rem; color: var(--muted); margin-top: 8px;">
+        Try querying ID: <code>1</code>, <code>2</code>, or <code>3</code> to extract PII & shipping data for other users.
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    AEGIS APPSEC TARGET 01 // VOLTMART CORP // PURPOSE-BUILT FOR DAST PENETRATION TESTING
+  </div>
+</body>
+</html>

@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}AegisAppSec — Autonomous DAST Scanner &amp; Real-Time WAF{% endblock %}</title>
+  <meta name="description" content="AegisAppSec — Autonomous OWASP Top 10 scanning, intelligent payload fuzzing, real-time WAF protection, and developer remediation workflows.">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/aegis_emblem.png') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2.6.0">
+  <style>
+  /* ── TOPBAR DYNAMIC CONSOLE NAVIGATION STYLES ─────────────────── */
+  /* Topbar Container: must not clip dropdown */
+  .sk-topbar {
+    overflow: visible !important;
+  }
+  .sk-topbar-inner {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 20px !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+  }
+
+  /* Compact Brand in Console Mode */
+  .sk-has-user .sk-topbar-logo {
+    flex-shrink: 0 !important;
+    gap: 8px !important;
+  }
+  .sk-has-user .sk-topbar-brand-img {
+    width: 32px !important;
+    height: 32px !important;
+  }
+  .sk-has-user .sk-topbar-brand {
+    font-size: 1.02rem !important;
+    white-space: nowrap !important;
+  }
+  .sk-has-user .sk-topbar-tagline {
+    display: none !important;
+  }
+
+  /* Console Menu Container */
+  .sk-nav-menu.sk-nav-console {
+    gap: 3px !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    border: 1px solid rgba(255, 255, 255, 0.09) !important;
+    padding: 3px 5px !important;
+    border-radius: 999px !important;
+    backdrop-filter: blur(14px) !important;
+    -webkit-backdrop-filter: blur(14px) !important;
+    flex-shrink: 1 !important;
+    min-width: 0 !important;
+    white-space: nowrap !important;
+    display: flex !important;
+    align-items: center !important;
+    overflow: visible !important; /* CRITICAL: Must be visible so dropdown mega-menu can render! */
+  }
+
+  /* Console Menu Link */
+  .sk-nav-console .sk-menu-link {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace) !important;
+    font-size: 0.70rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.02em !important;
+    color: var(--text-muted, #94a3b8) !important;
+    padding: 4px 8px !important;
+    border-radius: 999px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    transition: all 0.18s ease !important;
+    text-decoration: none !important;
+    border: 1px solid transparent !important;
+  }
+
+  .sk-nav-console .sk-menu-link:hover {
+    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.16) !important;
+  }
+
+  .sk-nav-console .sk-menu-link.active {
+    color: #00f0ff !important;
+    background: rgba(0, 240, 255, 0.14) !important;
+    border: 1px solid rgba(0, 240, 255, 0.42) !important;
+    box-shadow: 0 0 12px rgba(0, 240, 255, 0.25) !important;
+    font-weight: 700 !important;
+  }
+
+  .sk-nav-console .sk-menu-link.active::after {
+    display: none !important;
+  }
+
+  .sk-console-icon {
+    font-size: 0.74rem !important;
+    line-height: 1 !important;
+  }
+
+  /* Right Side Toolbar in Console Mode */
+  .sk-topbar-right {
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+
+  .sk-has-user .sk-cmdk-trigger {
+    padding: 4px 8px !important;
+    gap: 5px !important;
+    font-size: 0.72rem !important;
+    border-radius: 6px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+  }
+  .sk-has-user .sk-cmdk-trigger-text {
+    display: none !important;
+  }
+
+  .sk-user-auth-wrap {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+
+  .sk-site-toggle-link {
+    font-family: var(--font-mono, monospace) !important;
+    font-size: 0.68rem !important;
+    font-weight: 600 !important;
+    color: var(--text-muted, #94a3b8) !important;
+    padding: 4px 7px !important;
+    border-radius: 6px !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+    transition: all 0.2s !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 3px !important;
+    white-space: nowrap !important;
+  }
+
+  .sk-site-toggle-link:hover {
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.22) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+  }
+
+  .sk-user-status-pill {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    padding: 4px 8px !important;
+    border-radius: 999px !important;
+    font-family: var(--font-mono, monospace) !important;
+    font-size: 0.68rem !important;
+    white-space: nowrap !important;
+  }
+
+  .sk-user-status-dot {
+    width: 6px !important;
+    height: 6px !important;
+    border-radius: 50% !important;
+    background: #10b981 !important;
+    box-shadow: 0 0 8px #10b981 !important;
+    display: inline-block !important;
+    flex-shrink: 0 !important;
+    animation: sk-status-pulse 2s infinite ease-in-out;
+  }
+
+  @keyframes sk-status-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.45; transform: scale(0.85); }
+  }
+
+  .sk-user-role-badge {
+    background: rgba(0, 240, 255, 0.15) !important;
+    color: #00f0ff !important;
+    border: 1px solid rgba(0, 240, 255, 0.35) !important;
+    padding: 1px 4px !important;
+    border-radius: 4px !important;
+    font-size: 0.58rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.05em !important;
+  }
+
+  .sk-user-name-text {
+    color: #f1f5f9 !important;
+    font-weight: 600 !important;
+    max-width: 85px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .sk-signout-link {
+    font-family: var(--font-mono, monospace) !important;
+    font-size: 0.68rem !important;
+    font-weight: 700 !important;
+    color: #ff0033 !important;
+    padding: 4px 9px !important;
+    border-radius: 6px !important;
+    border: 1px solid rgba(255, 0, 51, 0.28) !important;
+    background: rgba(255, 0, 51, 0.06) !important;
+    transition: all 0.2s !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    white-space: nowrap !important;
+  }
+
+  .sk-signout-link:hover {
+    background: rgba(255, 0, 51, 0.2) !important;
+    border-color: #ff0033 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 12px rgba(255, 0, 51, 0.4) !important;
+  }
+
+  /* Responsive Console Navigation */
+  @media (max-width: 1260px) {
+    .sk-nav-console .sk-menu-link {
+      padding: 3px 6px !important;
+      font-size: 0.67rem !important;
+      gap: 3px !important;
+    }
+    .sk-user-name-text {
+      max-width: 65px !important;
+    }
+  }
+
+  @media (max-width: 1120px) {
+    .sk-site-toggle-link {
+      display: none !important;
+    }
+    .sk-nav-console .sk-console-icon {
+      display: none !important;
+    }
+  }
+
+  @media (max-width: 980px) {
+    .sk-cmdk-trigger {
+      display: none !important;
+    }
+    .sk-user-name-text {
+      display: none !important;
+    }
+  }
+
+  /* Mobile Drawer Styling for Authenticated Console */
+  @media (max-width: 860px) {
+    .sk-nav-menu.sk-nav-console.mobile-active {
+      flex-direction: column !important;
+      border-radius: 0 !important;
+      background: rgba(6, 9, 19, 0.98) !important;
+      align-items: stretch !important;
+      max-height: 80vh !important;
+      overflow-y: auto !important;
+    }
+    .sk-nav-menu.sk-nav-console.mobile-active .sk-menu-link {
+      padding: 10px 16px !important;
+      font-size: 0.85rem !important;
+      border-radius: 8px !important;
+    }
+    .sk-nav-menu.sk-nav-console.mobile-active .sk-console-icon {
+      display: inline-block !important;
+    }
+  }
+
+  /* ── WAF SUITE DROPDOWN MEGA-MENU (CODEXSEC CYBERNETIC STYLE) ── */
+  .sk-nav-dropdown-wrap {
+    position: relative !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    overflow: visible !important;
+  }
+
+  .sk-dropdown-trigger {
+    cursor: pointer !important;
+    background: transparent !important;
+    border: none !important;
+    font-family: inherit !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+  }
+
+  .sk-dropdown-caret {
+    transition: transform 0.2s ease !important;
+    color: var(--text-muted, #94a3b8) !important;
+    flex-shrink: 0 !important;
+  }
+
+  .sk-nav-dropdown-wrap:hover .sk-dropdown-caret,
+  .sk-nav-dropdown-wrap.open .sk-dropdown-caret {
+    transform: rotate(180deg) !important;
+    color: var(--neon-cyan, #00f0ff) !important;
+  }
+
+  .sk-mega-menu {
+    display: none !important;
+    position: absolute !important;
+    top: calc(100% + 10px) !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 580px !important;
+    max-width: min(580px, 94vw) !important;
+    background: rgba(6, 10, 20, 0.98) !important;
+    backdrop-filter: blur(24px) !important;
+    -webkit-backdrop-filter: blur(24px) !important;
+    border: 1px solid rgba(0, 240, 255, 0.35) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.85), 0 0 28px rgba(0, 240, 255, 0.18) !important;
+    z-index: 99999 !important;
+    overflow: hidden !important;
+    text-align: left !important;
+    white-space: normal !important; /* CRITICAL: Break out of parent .sk-nav-console white-space: nowrap */
+  }
+
+  #offensiveDropdownWrap .sk-mega-menu {
+    left: 0 !important;
+    transform: none !important;
+    border-color: rgba(255, 0, 51, 0.35) !important;
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.85), 0 0 28px rgba(255, 0, 51, 0.14) !important;
+  }
+
+  #offensiveDropdownWrap:hover .sk-dropdown-caret,
+  #offensiveDropdownWrap.open .sk-dropdown-caret {
+    color: #ff3355 !important;
+  }
+
+  @keyframes skDropdownFadeLeft {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  #offensiveDropdownWrap:hover .sk-mega-menu,
+  #offensiveDropdownWrap.open .sk-mega-menu {
+    display: block !important;
+    animation: skDropdownFadeLeft 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  }
+
+  .sk-mega-menu::before {
+    content: '' !important;
+    position: absolute !important;
+    top: -14px !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 14px !important;
+    background: transparent !important;
+  }
+
+  @keyframes skDropdownFade {
+    from { opacity: 0; transform: translateX(-50%) translateY(-6px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+
+  .sk-nav-dropdown-wrap:hover .sk-mega-menu,
+  .sk-nav-dropdown-wrap.open .sk-mega-menu {
+    display: block !important;
+    animation: skDropdownFade 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  }
+
+  .sk-mega-menu-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 14px 20px !important;
+    background: rgba(0, 240, 255, 0.04) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    white-space: normal !important;
+  }
+
+  .sk-mega-menu-eyebrow {
+    font-family: var(--font-mono, monospace) !important;
+    font-size: 0.65rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.14em !important;
+    color: var(--neon-cyan, #00f0ff) !important;
+    margin-bottom: 2px !important;
+  }
+
+  .sk-mega-menu-title {
+    font-size: 0.88rem !important;
+    font-weight: 800 !important;
+    color: #ffffff !important;
+    letter-spacing: -0.01em !important;
+  }
+
+  .sk-mega-menu-badge {
+    font-family: var(--font-mono, monospace) !important;
+    font-size: 0.62rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.06em !important;
+    padding: 3px 8px !important;
+    border-radius: 4px !important;
+    background: rgba(16, 185, 129, 0.12) !important;
+    border: 1px solid rgba(16, 185, 129, 0.35) !important;
+    color: #10b981 !important;
+    white-space: nowrap !important;
+  }
+
+  .sk-mega-menu-grid {
+    padding: 12px 14px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    white-space: normal !important;
+  }
+
+  .sk-mega-card {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 14px !important;
+    padding: 12px 16px !important;
+    border-radius: 8px !important;
+    border: 1px solid rgba(255, 255, 255, 0.04) !important;
+    text-decoration: none !important;
+    background: rgba(255, 255, 255, 0.02) !important;
+    transition: all 0.18s ease !important;
+    white-space: normal !important;
+  }
+
+  .sk-mega-card:hover {
+    background: rgba(255, 255, 255, 0.06) !important;
+    border-color: rgba(0, 240, 255, 0.3) !important;
+    transform: translateX(3px) !important;
+  }
+
+  .sk-mega-card.active {
+    background: rgba(0, 240, 255, 0.07) !important;
+    border-color: rgba(0, 240, 255, 0.4) !important;
+  }
+
+  .sk-mega-card-num {
+    font-family: var(--font-mono, monospace) !important;
+    font-size: 0.72rem !important;
+    font-weight: 800 !important;
+    color: #64748b !important;
+    background: rgba(0, 0, 0, 0.45) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    width: 26px !important;
+    height: 26px !important;
+    border-radius: 6px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    margin-top: 2px !important;
+  }
+
+  .sk-mega-card:hover .sk-mega-card-num {
+    color: var(--neon-cyan, #00f0ff) !important;
+    border-color: rgba(0, 240, 255, 0.35) !important;
+  }
+
+  .sk-mega-card-content {
+    flex: 1 !important;
+    min-width: 0 !important;
+    white-space: normal !important;
+  }
+
+  .sk-mega-card-top {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin-bottom: 4px !important;
+  }
+
+  .sk-mega-card-title {
+    font-size: 0.85rem !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
+    white-space: normal !important;
+  }
+
+  .sk-mega-card-tag {
+    font-family: var(--font-mono, monospace) !important;
+    font-size: 0.62rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.05em !important;
+    padding: 2px 7px !important;
+    border-radius: 4px !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+  }
+
+  .sk-mega-card-tag.cyan {
+    background: rgba(0, 240, 255, 0.1) !important;
+    color: var(--neon-cyan, #00f0ff) !important;
+    border: 1px solid rgba(0, 240, 255, 0.3) !important;
+  }
+
+  .sk-mega-card-tag.emerald {
+    background: rgba(16, 185, 129, 0.1) !important;
+    color: #10b981 !important;
+    border: 1px solid rgba(16, 185, 129, 0.3) !important;
+  }
+
+  .sk-mega-card-tag.purple {
+    background: rgba(168, 85, 247, 0.1) !important;
+    color: #a855f7 !important;
+    border: 1px solid rgba(168, 85, 247, 0.3) !important;
+  }
+
+  .sk-mega-card-tag.red {
+    background: rgba(255, 0, 51, 0.1) !important;
+    color: #ff0033 !important;
+    border: 1px solid rgba(255, 0, 51, 0.3) !important;
+  }
+
+  .sk-mega-card-tag.amber {
+    background: rgba(245, 158, 11, 0.1) !important;
+    color: #f59e0b !important;
+    border: 1px solid rgba(245, 158, 11, 0.3) !important;
+  }
+
+  .sk-mega-menu-badge.red {
+    background: rgba(255, 0, 51, 0.12) !important;
+    border: 1px solid rgba(255, 0, 51, 0.35) !important;
+    color: #ff3355 !important;
+  }
+
+  #offensiveDropdownWrap .sk-mega-card:hover {
+    background: rgba(255, 0, 51, 0.05) !important;
+    border-color: rgba(255, 0, 51, 0.3) !important;
+  }
+
+  #offensiveDropdownWrap .sk-mega-card.active {
+    background: rgba(255, 0, 51, 0.07) !important;
+    border-color: rgba(255, 0, 51, 0.4) !important;
+  }
+
+  #offensiveDropdownWrap .sk-mega-card:hover .sk-mega-card-num {
+    color: #ff3355 !important;
+    border-color: rgba(255, 0, 51, 0.35) !important;
+  }
+
+  .sk-mega-card-desc {
+    font-size: 0.74rem !important;
+    color: var(--text-muted, #94a3b8) !important;
+    line-height: 1.45 !important;
+    white-space: normal !important;
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+    margin-top: 4px !important;
+  }
+
+  .sk-mega-menu-footer {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    padding: 9px 16px !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
+    font-family: var(--font-mono, monospace) !important;
+    font-size: 0.62rem !important;
+    color: #64748b !important;
+    letter-spacing: 0.05em !important;
+    white-space: normal !important;
+    text-align: center !important;
+    flex-wrap: wrap !important;
+  }
+
+  .sk-mega-sep {
+    color: rgba(255, 255, 255, 0.15) !important;
+  }
+
+  @media (max-width: 860px) {
+    .sk-nav-menu.sk-nav-console.mobile-active .sk-mega-menu {
+      position: static !important;
+      transform: none !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      border: none !important;
+      border-radius: 8px !important;
+      margin-top: 6px !important;
+      background: rgba(0, 0, 0, 0.4) !important;
+    }
+  }
+
+  /* ── ENTERPRISE ARCHITECTURAL CYBERSECURITY FOOTER STYLES ───── */
+  .sk-arch-footer {
+    border-top: 1px solid var(--frame-border, rgba(255, 255, 255, 0.08)) !important;
+    background: radial-gradient(circle at 10% 0%, rgba(0, 240, 255, 0.03), transparent 35%),
+                radial-gradient(circle at 90% 100%, rgba(255, 0, 51, 0.02), transparent 40%),
+                rgba(6, 9, 19, 0.98) !important;
+    padding: 44px 0 24px !important;
+    margin-top: auto !important;
+    position: relative !important;
+    z-index: 10 !important;
+  }
+
+  .sk-arch-footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.35) 25%, rgba(255, 0, 51, 0.35) 75%, transparent);
+  }
+
+  .sk-footer-container {
+    width: 100% !important;
+    max-width: 1360px !important;
+    margin: 0 auto !important;
+    padding: 0 32px !important;
+    box-sizing: border-box !important;
+  }
+
+  .sk-footer-grid {
+    display: grid !important;
+    grid-template-columns: 1.5fr 1fr 1fr 1.1fr !important;
+    gap: 36px !important;
+    margin-bottom: 32px !important;
+  }
+
+  @media (max-width: 1024px) {
+    .sk-footer-grid {
+      grid-template-columns: 1fr 1fr !important;
+      gap: 28px !important;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .sk-footer-grid {
+      grid-template-columns: 1fr !important;
+      gap: 24px !important;
+    }
+  }
+
+  .sk-footer-brand-col {
+    padding-right: 16px !important;
+  }
+
+  .sk-footer-brand-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .sk-footer-brand-emblem {
+    width: 26px !important;
+    height: 26px !important;
+    border-radius: 50% !important;
+    box-shadow: 0 0 12px rgba(255, 0, 51, 0.25) !important;
+  }
+
+  .sk-footer-brand-name {
+    font-size: 1.15rem !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.01em !important;
+    color: #ffffff !important;
+  }
+
+  .sk-footer-brand-mission {
+    font-size: 0.80rem !important;
+    line-height: 1.6 !important;
+    color: var(--text-muted, #94a3b8) !important;
+    margin-bottom: 16px !important;
+    max-width: 380px !important;
+  }
+
+  .sk-footer-posture-badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    background: rgba(16, 185, 129, 0.08) !important;
+    border: 1px solid rgba(16, 185, 129, 0.25) !important;
+    padding: 4px 10px !important;
+    border-radius: 4px !important;
+    font-family: var(--font-mono, monospace) !important;
+    font-size: 0.68rem !important;
+    font-weight: 700 !important;
+    color: #10b981 !important;
+    letter-spacing: 0.06em !important;
+    margin-bottom: 10px !important;
+  }
+
+  .sk-footer-pulse-dot {
+    width: 6px !important;
+    height: 6px !important;
+    border-radius: 50% !important;
+    background: #10b981 !important;
+    box-shadow: 0 0 8px #10b981 !important;
+    animation: skFooterPulse 2s infinite ease-in-out !important;
+  }
+
+  @keyframes skFooterPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.85); }
+  }
+
+  .sk-footer-telemetry {
+    font-family: var(--font-mono, monospace) !important;
+    font-size: 0.68rem !important;
+    color: #64748b !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    letter-spacing: 0.04em !important;
+    flex-wrap: wrap !important;
+  }
+
+  .sk-footer-sep {
+    color: rgba(255, 255, 255, 0.15) !important;
+  }
+
+  .sk-footer-heading {
+    font-family: var(--font-mono, monospace) !important;
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.14em !important;
+    text-transform: uppercase !important;
+    color: #ffffff !important;
+    margin-bottom: 14px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+
+  .sk-footer-heading::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 2px;
+    background: var(--cyan, #00f0ff);
+  }
+
+  .sk-footer-link-list {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 9px !important;
+  }
+
+  .sk-footer-link-list li a {
+    font-size: 0.81rem !important;
+    color: var(--text-muted, #94a3b8) !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+
+  .sk-footer-link-list li a:hover {
+    color: var(--cyan, #00f0ff) !important;
+    transform: translateX(3px) !important;
+  }
+
+  .sk-footer-ext-link {
+    color: #64748b !important;
+  }
+  .sk-footer-ext-link:hover {
+    color: var(--cyan, #00f0ff) !important;
+  }
+
+  /* Bottom sub-footer */
+  .sk-footer-bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.07) !important;
+    padding-top: 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 20px !important;
+    flex-wrap: wrap !important;
+  }
+
+  .sk-footer-copy {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 3px !important;
+    font-size: 0.76rem !important;
+    color: #64748b !important;
+  }
+
+  .sk-footer-tagline-sub {
+    font-family: var(--font-mono, monospace) !important;
+    font-size: 0.66rem !important;
+    letter-spacing: 0.06em !important;
+    color: #475569 !important;
+  }
+
+  .sk-footer-security-trust {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+  }
+
+  .sk-trust-pill {
+    font-family: var(--font-mono, monospace) !important;
+    font-size: 0.64rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.08em !important;
+    padding: 3px 8px !important;
+    border-radius: 3px !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: #64748b !important;
+  }
+
+  .sk-footer-session-area {
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  .sk-footer-user-pill {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    background: rgba(0, 0, 0, 0.4) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    padding: 4px 10px !important;
+    border-radius: 999px !important;
+    font-family: var(--font-mono, monospace) !important;
+    font-size: 0.70rem !important;
+  }
+
+  .sk-footer-user-dot {
+    width: 6px !important;
+    height: 6px !important;
+    border-radius: 50% !important;
+    background: #10b981 !important;
+  }
+
+  .sk-footer-user-role {
+    font-weight: 700 !important;
+    color: var(--cyan, #00f0ff) !important;
+    background: rgba(0, 240, 255, 0.12) !important;
+    padding: 1px 6px !important;
+    border-radius: 3px !important;
+    font-size: 0.64rem !important;
+  }
+
+  .sk-footer-user-email {
+    color: #94a3b8 !important;
+    max-width: 170px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .sk-footer-logout-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    color: #f43f5e !important;
+    text-decoration: none !important;
+    font-weight: 600 !important;
+    padding: 2px 7px !important;
+    border-radius: 4px !important;
+    transition: all 0.2s !important;
+    border: 1px solid rgba(244, 63, 94, 0.3) !important;
+    background: rgba(244, 63, 94, 0.08) !important;
+  }
+  .sk-footer-logout-btn:hover {
+    background: rgba(244, 63, 94, 0.2) !important;
+    border-color: #f43f5e !important;
+    color: #ffffff !important;
+  }
+
+  .sk-footer-auth-links {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+  }
+
+  .sk-footer-auth-btn {
+    font-family: var(--font-mono, monospace) !important;
+    font-size: 0.72rem !important;
+    font-weight: 600 !important;
+    color: var(--text-muted, #94a3b8) !important;
+    text-decoration: none !important;
+    padding: 5px 12px !important;
+    border-radius: 4px !important;
+    border: 1px solid var(--frame-border, rgba(255, 255, 255, 0.1)) !important;
+    transition: all 0.2s !important;
+  }
+  .sk-footer-auth-btn:hover {
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+  }
+  .sk-footer-auth-btn.primary {
+    background: rgba(0, 240, 255, 0.1) !important;
+    border-color: rgba(0, 240, 255, 0.35) !important;
+    color: var(--cyan, #00f0ff) !important;
+  }
+  .sk-footer-auth-btn.primary:hover {
+    background: rgba(0, 240, 255, 0.2) !important;
+    color: #ffffff !important;
+  }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="sk-body-grid {% if user %}sk-has-user{% endif %}">
+
+  <!-- ══ LEFT VERTICAL ARCHITECTURAL STRIP (Reference 1) ════════ -->
+  <aside class="sk-vertical-strip" aria-label="Sidebar strip">
+    <!-- Top Circular Icon Button with Emblem -->
+    <a href="{{ url_for('home') }}" class="sk-strip-circle-btn" title="AegisAppSec Home">
+      <img src="{{ url_for('static', filename='img/aegis_emblem.png') }}" alt="Aegis" class="sk-strip-emblem-img">
+    </a>
+
+    <!-- Rotated Vertical Typography -->
+    <div class="sk-strip-vertical-text">
+      <span>aegis.appsec</span>
+      <span class="sk-strip-sep">/</span>
+      <span class="sk-strip-sub">autonomous.dast.waf</span>
+    </div>
+
+    <!-- Bottom Circular Technical Badge -->
+    <div class="sk-strip-bottom-badge" title="Security Status: Enforcing">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        <circle cx="12" cy="12" r="2.5" fill="currentColor"></circle>
+      </svg>
+    </div>
+  </aside>
+
+  <!-- ══ MAIN CONTENT WRAPPER ═══════════════════════════════════ -->
+  <div class="sk-main-canvas">
+
+    <!-- Top Navigation Bar -->
+    <header class="sk-topbar">
+      <div class="sk-topbar-inner">
+        <!-- Official Logo with Emblem & Tagline -->
+        <a href="{{ url_for('home') }}" class="sk-topbar-logo" title="AegisAppSec — Find. Prove. Fix. Defend.">
+          <img src="{{ url_for('static', filename='img/aegis_emblem.png') }}" alt="AegisAppSec Logo" class="sk-topbar-brand-img">
+          <div class="sk-topbar-brand-wrap">
+            <span class="sk-topbar-brand">Aegis<span class="sk-brand-red">AppSec</span></span>
+            <span class="sk-topbar-tagline">FIND. PROVE. FIX. DEFEND.</span>
+          </div>
+        </a>
+
+        <!-- Center Navigation Menu: Dynamic Public vs Authenticated Console -->
+        <nav class="sk-nav-menu {% if user %}sk-nav-console{% endif %}" id="navLinks" {% if not user %}style="gap: 28px;"{% endif %}>
+          {% if user %}
+          <!-- Dropdown Mega-Menu: Offensive Security Suite -->
+          <div class="sk-nav-dropdown-wrap" id="offensiveDropdownWrap">
+            <button type="button" class="sk-menu-link sk-dropdown-trigger {% if page in ['scanner_console', 'targets', 'history', 'storefront'] %}active{% endif %}" id="offensiveDropdownBtn" onclick="toggleOffensiveDropdown(event)" title="AegisAppSec Offensive DAST &amp; Attack Simulation Suite" aria-expanded="false" aria-haspopup="true">
+              <span class="sk-console-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg></span>
+              <span>Offensive Suite</span>
+              <svg class="sk-dropdown-caret" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="sk-mega-menu" id="offensiveMegaMenu" role="menu">
+              <div class="sk-mega-menu-header" style="background: rgba(255, 0, 51, 0.04) !important;">
+                <div>
+                  <div class="sk-mega-menu-eyebrow" style="color: #ff3355 !important;">AEGIS OFFENSIVE ATTACK SUITE</div>
+                  <div class="sk-mega-menu-title">Autonomous DAST &amp; Scope Recon</div>
+                </div>
+                <span class="sk-mega-menu-badge red">[DAST // ARMED]</span>
+              </div>
+              <div class="sk-mega-menu-grid">
+                <a href="{{ url_for('scanner_console') }}" class="sk-mega-card {% if page=='scanner_console' %}active{% endif %}" role="menuitem">
+                  <div class="sk-mega-card-num">01</div>
+                  <div class="sk-mega-card-content">
+                    <div class="sk-mega-card-top">
+                      <span class="sk-mega-card-title">Autonomous DAST Scanner Console</span>
+                      <span class="sk-mega-card-tag red">[LIVE FUZZER]</span>
+                    </div>
+                    <div class="sk-mega-card-desc">
+                      Multi-vector crawler, async vulnerability discovery &amp; live payload telemetry radar.
+                    </div>
+                  </div>
+                </a>
+                <a href="{{ url_for('targets') }}" class="sk-mega-card {% if page=='targets' %}active{% endif %}" role="menuitem">
+                  <div class="sk-mega-card-num">02</div>
+                  <div class="sk-mega-card-content">
+                    <div class="sk-mega-card-top">
+                      <span class="sk-mega-card-title">Target Perimeter &amp; Scope Manager</span>
+                      <span class="sk-mega-card-tag emerald">[IN-SCOPE]</span>
+                    </div>
+                    <div class="sk-mega-card-desc">
+                      Configure authorized CIDR boundaries, apex domains &amp; DNS authorization tokens.
+                    </div>
+                  </div>
+                </a>
+                <a href="{{ url_for('history') }}" class="sk-mega-card {% if page=='history' %}active{% endif %}" role="menuitem">
+                  <div class="sk-mega-card-num">03</div>
+                  <div class="sk-mega-card-content">
+                    <div class="sk-mega-card-top">
+                      <span class="sk-mega-card-title">Scan History &amp; Regression Diff</span>
+                      <span class="sk-mega-card-tag purple">[DIFF // REPLAY]</span>
+                    </div>
+                    <div class="sk-mega-card-desc">
+                      Temporal vulnerability delta tracking, audit logs &amp; curl exploit payload replays.
+                    </div>
+                  </div>
+                </a>
+                <a href="{{ url_for('storefront') }}" class="sk-mega-card {% if page=='storefront' %}active{% endif %}" role="menuitem">
+                  <div class="sk-mega-card-num">04</div>
+                  <div class="sk-mega-card-content">
+                    <div class="sk-mega-card-top">
+                      <span class="sk-mega-card-title">CyberMart Vulnerable Target Sandbox</span>
+                      <span class="sk-mega-card-tag amber">[TESTBED]</span>
+                    </div>
+                    <div class="sk-mega-card-desc">
+                      OWASP JuiceShop style simulated vulnerable target app for live exploit PoC verification.
+                    </div>
+                  </div>
+                </a>
+              </div>
+              <div class="sk-mega-menu-footer">
+                <span>MULTI-VECTOR ASYNC CRAWLER</span>
+                <span class="sk-mega-sep">/</span>
+                <span>OWASP TOP 10 AUTOMATED COVERAGE</span>
+              </div>
+            </div>
+          </div>
+          <!-- Dropdown Mega-Menu: WAF Defense Suite -->
+          <div class="sk-nav-dropdown-wrap" id="wafDropdownWrap">
+            <button type="button" class="sk-menu-link sk-dropdown-trigger {% if page in ['waf', 'waf_radar', 'platform_hardening', 'virtual_patching'] %}active{% endif %}" id="wafDropdownBtn" onclick="toggleWafDropdown(event)" title="AegisShield Defensive Runtime Suite &amp; Virtual Patching" aria-expanded="false" aria-haspopup="true">
+              <span class="sk-console-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="8 11 12 15 16 11"/></svg></span>
+              <span>WAF Defense</span>
+              <svg class="sk-dropdown-caret" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="sk-mega-menu" id="wafMegaMenu" role="menu">
+              <div class="sk-mega-menu-header">
+                <div>
+                  <div class="sk-mega-menu-eyebrow">AEGIS DEFENSIVE RUNTIME SUITE</div>
+                  <div class="sk-mega-menu-title">ASGI Shield &amp; Hardening</div>
+                </div>
+                <span class="sk-mega-menu-badge">[ASGI // ACTIVE]</span>
+              </div>
+              <div class="sk-mega-menu-grid">
+                <a href="{{ url_for('waf') }}" class="sk-mega-card {% if page in ['waf', 'waf_radar'] %}active{% endif %}" role="menuitem">
+                  <div class="sk-mega-card-num">01</div>
+                  <div class="sk-mega-card-content">
+                    <div class="sk-mega-card-top">
+                      <span class="sk-mega-card-title">Real-Time WAF Shield &amp; Threat Radar</span>
+                      <span class="sk-mega-card-tag cyan">[LIVE RADAR]</span>
+                    </div>
+                    <div class="sk-mega-card-desc">
+                      Autonomous ASGI attack mitigation, mode toggles (OFF, DETECT, BLOCK, SANITIZE) &amp; live interception stream.
+                    </div>
+                  </div>
+                </a>
+                <a href="{{ url_for('platform_hardening') }}" class="sk-mega-card {% if page=='platform_hardening' %}active{% endif %}" role="menuitem">
+                  <div class="sk-mega-card-num">02</div>
+                  <div class="sk-mega-card-content">
+                    <div class="sk-mega-card-top">
+                      <span class="sk-mega-card-title">Platform Hardening Middleware Studio</span>
+                      <span class="sk-mega-card-tag emerald">[ENFORCED]</span>
+                    </div>
+                    <div class="sk-mega-card-desc">
+                      Inspect 8 HTTP security headers (HSTS, CSP, XFO), anti-SSRF CIDR guardrails &amp; server cloaking.
+                    </div>
+                  </div>
+                </a>
+                <a href="{{ url_for('virtual_patching') }}" class="sk-mega-card {% if page=='virtual_patching' %}active{% endif %}" role="menuitem">
+                  <div class="sk-mega-card-num">03</div>
+                  <div class="sk-mega-card-content">
+                    <div class="sk-mega-card-top">
+                      <span class="sk-mega-card-title">Virtual Patching &amp; Exploit Sandbox</span>
+                      <span class="sk-mega-card-tag purple">[HOT-RELOAD]</span>
+                    </div>
+                    <div class="sk-mega-card-desc">
+                      Deploy emergency zero-day regex rules &amp; simulate exploit payloads with 1-click testbed presets.
+                    </div>
+                  </div>
+                </a>
+              </div>
+              <div class="sk-mega-menu-footer">
+                <span>SUB-MILLISECOND INJECTION LATENCY</span>
+                <span class="sk-mega-sep">/</span>
+                <span>ZERO DOWNTIME DYNAMIC REGEX FILTERING</span>
+              </div>
+            </div>
+          </div>
+          <a href="{{ url_for('compliance') }}" class="sk-menu-link {% if page=='compliance' %}active{% endif %}" title="OWASP Top 10 &amp; PCI-DSS 4.0 Compliance Matrix">
+            <span class="sk-console-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></span> Compliance
+          </a>
+          <a href="{{ url_for('remediation') }}" class="sk-menu-link {% if page=='remediation' %}active{% endif %}" title="Developer Remediation Studio &amp; Insecure vs Secure Code Diffs">
+            <span class="sk-console-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></span> Remediation
+          </a>
+          <a href="{{ url_for('report') }}" class="sk-menu-link {% if page=='report' %}active{% endif %}" title="Executive Audit Report Studio &amp; Export">
+            <span class="sk-console-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span> Reports
+          </a>
+          <a href="{{ url_for('team') }}" class="sk-menu-link {% if page=='team' %}active{% endif %}" title="Enterprise Team Roster &amp; RBAC Access Controls">
+            <span class="sk-console-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> Team
+          </a>
+          <a href="{{ url_for('apikeys') }}" class="sk-menu-link {% if page=='apikeys' %}active{% endif %}" title="CI/CD Pipeline Automation &amp; API Keys">
+            <span class="sk-console-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21 2-2 2m-6 6 7 7-3 3-7-7m-4 4L2 14l6-6 6 6-4 4z"/></svg></span> API Keys
+          </a>
+          {% else %}
+          <!-- Public Platform Navigation -->
+          <a href="{{ url_for('home') }}"    class="sk-menu-link {% if page=='home'    %}active{% endif %}">Home</a>
+          <a href="{{ url_for('scanner') }}" class="sk-menu-link {% if page=='scanner' %}active{% endif %}">Scanner</a>
+          <a href="{{ url_for('services') }}" class="sk-menu-link {% if page=='services' %}active{% endif %}">Services</a>
+          <a href="{{ url_for('pricing') }}" class="sk-menu-link {% if page=='pricing' %}active{% endif %}">Pricing</a>
+          <a href="{{ url_for('about') }}"   class="sk-menu-link {% if page=='about'   %}active{% endif %}">About</a>
+          <a href="{{ url_for('contact') }}" class="sk-menu-link {% if page=='contact' %}active{% endif %}">Contact</a>
+          {% endif %}
+        </nav>
+
+        <!-- Right Side Actions -->
+        <div class="sk-topbar-right">
+          <!-- Command Palette Trigger -->
+          <button type="button" class="sk-cmdk-trigger" onclick="openCommandPalette()" title="Command Palette (Ctrl + K)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <span class="sk-cmdk-trigger-text">Search commands...</span>
+            <kbd class="sk-cmdk-kbd">Ctrl K</kbd>
+          </button>
+
+          {% if user %}
+          <div class="sk-user-auth-wrap">
+            <!-- Quick Portal Toggle -->
+            <a href="{{ url_for('home') }}" class="sk-site-toggle-link" title="Visit Public Landing Page">
+              Portal ↗
+            </a>
+
+            <!-- Operator Status Pill -->
+            <div class="sk-user-status-pill">
+              <span class="sk-user-status-dot"></span>
+              <span class="sk-user-role-badge">{{ (user.role or 'OP')|upper }}</span>
+              <span class="sk-user-name-text">{{ user.full_name or user.email }}</span>
+            </div>
+
+            <!-- Sign Out -->
+            <a href="{{ url_for('logout') }}" class="sk-signout-link" title="Sign out and terminate session">Sign Out</a>
+          </div>
+          {% else %}
+          <a href="{{ url_for('auth', mode='login') }}" class="sk-signin-link">Sign In</a>
+          <a href="{{ url_for('auth', mode='register') }}" class="sk-pill-btn">
+            Sign Up Free
+          </a>
+          {% endif %}
+          <button class="sk-hamburger-btn" id="mobileMenuBtn" aria-label="Toggle Navigation">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Page Injection -->
+    <main class="sk-page-body">
+      {% block content %}{% endblock %}
+    </main>
+
+    <!-- ══ ENTERPRISE ARCHITECTURAL CYBERSECURITY FOOTER ════════════ -->
+    <footer class="sk-arch-footer">
+      <div class="sk-footer-container">
+        <!-- Top Multi-Column Grid -->
+        <div class="sk-footer-grid">
+          <!-- Col 1: Brand & Security Telemetry -->
+          <div class="sk-footer-col sk-footer-brand-col">
+            <div class="sk-footer-brand-header">
+              <img src="{{ url_for('static', filename='img/aegis_emblem.png') }}" alt="AegisAppSec" class="sk-footer-brand-emblem">
+              <span class="sk-footer-brand-name">Aegis<span class="sk-brand-red">AppSec</span></span>
+            </div>
+            <p class="sk-footer-brand-mission">
+              Autonomous DAST intelligence &amp; real-time ASGI Web Application Firewall. Continuous vulnerability discovery, active proof generation, and regulatory compliance attestation.
+            </p>
+            <!-- Operational Posture Badge -->
+            <div class="sk-footer-posture-badge">
+              <span class="sk-footer-pulse-dot"></span>
+              <span>SYS.ENFORCING // NIST-CSF ALIGNED</span>
+            </div>
+            <div class="sk-footer-telemetry">
+              <span>ENGINE: v2.6.0</span>
+              <span class="sk-footer-sep">/</span>
+              <span>DAST: ACTIVE</span>
+              <span class="sk-footer-sep">/</span>
+              <span>WAF: BLOCKING</span>
+            </div>
+          </div>
+
+          <!-- Col 2: Platform & Scanners -->
+          <div class="sk-footer-col">
+            <div class="sk-footer-heading">Platform</div>
+            <ul class="sk-footer-link-list">
+              <li><a href="{{ url_for('scanner_console') if user else url_for('scanner') }}">Autonomous DAST Scanner</a></li>
+              <li><a href="{{ url_for('targets') if user else url_for('scanner') }}">Target Governance &amp; DNS</a></li>
+              <li><a href="{{ url_for('history') if user else url_for('scanner') }}">Scan History &amp; Regressions</a></li>
+              <li><a href="{{ url_for('waf') if user else url_for('services') }}">ASGI WAF Threat Radar</a></li>
+              <li><a href="{{ url_for('platform_hardening') if user else url_for('services') }}">Platform Hardening Studio</a></li>
+              <li><a href="{{ url_for('virtual_patching') if user else url_for('services') }}">Virtual Patching &amp; Sandbox</a></li>
+              <li><a href="{{ url_for('remediation') }}">Developer Remediation Studio</a></li>
+              <li><a href="{{ url_for('storefront') }}">CyberMart Injection Sandbox</a></li>
+            </ul>
+          </div>
+
+          <!-- Col 3: Compliance & Standards -->
+          <div class="sk-footer-col">
+            <div class="sk-footer-heading">Compliance &amp; Audit</div>
+            <ul class="sk-footer-link-list">
+              <li><a href="{{ url_for('compliance') }}">Regulatory Scorecard</a></li>
+              <li><a href="{{ url_for('compliance') }}">OWASP Top 10 (2021)</a></li>
+              <li><a href="{{ url_for('compliance') }}">PCI-DSS v4.0 Attestation</a></li>
+              <li><a href="{{ url_for('compliance') }}">SOC 2 Type II Controls</a></li>
+              <li><a href="{{ url_for('apikeys') if user else url_for('auth', mode='login') }}">CI/CD Automation &amp; API Keys</a></li>
+              <li><a href="{{ url_for('report') if user else url_for('auth', mode='login') }}">Executive SARIF Reports</a></li>
+            </ul>
+          </div>
+
+          <!-- Col 4: Enterprise & Advisory -->
+          <div class="sk-footer-col">
+            <div class="sk-footer-heading">Enterprise &amp; Trust</div>
+            <ul class="sk-footer-link-list">
+              <li><a href="{{ url_for('home') }}">Platform Overview</a></li>
+              <li><a href="{{ url_for('services') }}">Application Security Suite</a></li>
+              <li><a href="{{ url_for('pricing') }}">Enterprise Licensing</a></li>
+              <li><a href="{{ url_for('about') }}">Platform Architecture</a></li>
+              <li><a href="{{ url_for('team') if user else url_for('about') }}">SecOps Team &amp; RBAC</a></li>
+              <li><a href="{{ url_for('contact') }}">Enterprise Advisory SLA</a></li>
+              <li>
+                <a href="https://owasp.org/www-project-top-ten/" target="_blank" rel="noopener" class="sk-footer-ext-link">
+                  <span>OWASP Official Standard</span>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Bottom Sub-Footer Bar -->
+        <div class="sk-footer-bottom">
+          <div class="sk-footer-copy">
+            <span>&copy; 2026 AegisAppSec Platform Inc. All rights reserved.</span>
+            <span class="sk-footer-tagline-sub">Zero-Trust Cloud Application Security &amp; Automated DAST.</span>
+          </div>
+
+          <div class="sk-footer-security-trust">
+            <span class="sk-trust-pill">TLS 1.3 ENFORCED</span>
+            <span class="sk-trust-pill">AES-256 GCM</span>
+            <span class="sk-trust-pill">ZERO TELEMETRY RETENTION</span>
+          </div>
+
+          <div class="sk-footer-session-area">
+            {% if user %}
+            <div class="sk-footer-user-pill">
+              <span class="sk-footer-user-dot"></span>
+              <span class="sk-footer-user-role">{{ (user.role or 'OP')|upper }}</span>
+              <span class="sk-footer-user-email">{{ user.email }}</span>
+              <a href="{{ url_for('logout') }}" class="sk-footer-logout-btn" title="Sign Out Session">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                <span>Sign Out</span>
+              </a>
+            </div>
+            {% else %}
+            <div class="sk-footer-auth-links">
+              <a href="{{ url_for('auth', mode='login') }}" class="sk-footer-auth-btn">Sign In</a>
+              <a href="{{ url_for('auth', mode='register') }}" class="sk-footer-auth-btn primary">Sign Up Free</a>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- ══ COMMAND PALETTE MODAL (Ctrl + K) ═══════════════════════ -->
+  <div class="sk-cmdk-overlay" id="commandPalette" style="display: none;" onclick="handleCmdkBackdrop(event)">
+    <div class="sk-cmdk-box" onclick="event.stopPropagation()">
+      <div class="sk-cmdk-search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="sk-cmdk-search-icon">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="cmdkInput" class="sk-cmdk-input" placeholder="Type a command, action, or navigate..." autocomplete="off" spellcheck="false">
+        <kbd class="sk-cmdk-esc-badge" onclick="closeCommandPalette()">ESC</kbd>
+      </div>
+
+      <div class="sk-cmdk-body" id="cmdkBody">
+        {% if user %}
+        <!-- Section: Console & Governance (Authenticated Operators Only) -->
+        <div class="sk-cmdk-group">
+          <div class="sk-cmdk-group-title">Console &amp; Governance</div>
+          <div class="sk-cmdk-item" data-action="nav" data-url="{{ url_for('scanner_console') }}">
+            <div class="sk-cmdk-item-left">
+              <span class="sk-cmdk-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+              <span class="sk-cmdk-item-label">Autonomous DAST Scanner Console</span>
+            </div>
+            <span class="sk-cmdk-badge">/scanner-console</span>
+          </div>
+          <div class="sk-cmdk-item" data-action="nav" data-url="{{ url_for('targets') }}">
+            <div class="sk-cmdk-item-left">
+              <span class="sk-cmdk-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span>
+              <span class="sk-cmdk-item-label">Target Governance &amp; DNS Authorization</span>
+            </div>
+            <span class="sk-cmdk-badge">/targets</span>
+          </div>
+          <div class="sk-cmdk-item" data-action="nav" data-url="{{ url_for('history') }}">
+            <div class="sk-cmdk-item-left">
+              <span class="sk-cmdk-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20v-6M6 20V10M18 20V4"/></svg></span>
+              <span class="sk-cmdk-item-label">Scan History &amp; Regression Engine</span>
+            </div>
+            <span class="sk-cmdk-badge">/history</span>
+          </div>
+          <div class="sk-cmdk-item" data-action="nav" data-url="{{ url_for('compliance') }}">
+            <div class="sk-cmdk-item-left">
+              <span class="sk-cmdk-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></span>
+              <span class="sk-cmdk-item-label">OWASP Top 10 &amp; PCI-DSS 4.0 Compliance</span>
+            </div>
+            <span class="sk-cmdk-badge">/compliance</span>
+          </div>
+          <div class="sk-cmdk-item" data-action="nav" data-url="{{ url_for('waf') }}">
+            <div class="sk-cmdk-item-left">
+              <span class="sk-cmdk-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="8 11 12 15 16 11"/></svg></span>
+              <span class="sk-cmdk-item-label">Real-Time ASGI WAF Shield &amp; Threat Radar</span>
+            </div>
+            <span class="sk-cmdk-badge">/waf</span>
+          </div>
+          <div class="sk-cmdk-item" data-action="nav" data-url="{{ url_for('platform_hardening') }}">
+            <div class="sk-cmdk-item-left">
+              <span class="sk-cmdk-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+              <span class="sk-cmdk-item-label">Platform Hardening Middleware Studio</span>
+            </div>
+            <span class="sk-cmdk-badge">/platform-hardening</span>
+          </div>
+          <div class="sk-cmdk-item" data-action="nav" data-url="{{ url_for('virtual_patching') }}">
+            <div class="sk-cmdk-item-left">
+              <span class="sk-cmdk-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></span>
+              <span class="sk-cmdk-item-label">WAF Virtual Patching &amp; Exploit Sandbox</span>
+            </div>
+            <span class="sk-cmdk-badge">/virtual-patching</span>
+          </div>
+          <div class="sk-cmdk-item" data-action="nav" data-url="{{ url_for('team') }}">
+            <div class="sk-cmdk-item-left">
+              <span class="sk-cmdk-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+              <span class="sk-cmdk-item-label">Team Roster &amp; RBAC Access Matrix</span>
+            </div>
+            <span class="sk-cmdk-badge">/team</span>
+          </div>
+          <div class="sk-cmdk-item" data-action="nav" data-url="{{ url_for('apikeys') }}">
+            <div class="sk-cmdk-item-left">
+              <span class="sk-cmdk-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21 2-2 2m-6 6 7 7-3 3-7-7m-4 4L2 14l6-6 6 6-4 4z"/></svg></span>
+              <span class="sk-cmdk-item-label">CI/CD Pipeline Automation &amp; API Keys</span>
+            </div>
+            <span class="sk-cmdk-badge">/apikeys</span>
+          </div>
+          <div class="sk-cmdk-item" data-action="nav" data-url="{{ url_for('report') }}">
+            <div class="sk-cmdk-item-left">
+              <span class="sk-cmdk-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
+              <span class="sk-cmdk-item-label">Executive Report Export Studio</span>
+            </div>
+            <span class="sk-cmdk-badge">/report</span>
+          </div>
+          <div class="sk-cmdk-item" data-action="nav" data-url="{{ url_for('storefront') }}">
+            <div class="sk-cmdk-item-left">
+              <span class="sk-cmdk-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>
+              <span class="sk-cmdk-item-label">CyberMart Black Friday Target Testbed</span>
+            </div>
+            <span class="sk-cmdk-badge">/storefront</span>
+          </div>
+          <div class="sk-cmdk-item" data-action="nav" data-url="{{ url_for('remediation') }}">
+            <div class="sk-cmdk-item-left">
+              <span class="sk-cmdk-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></span>
+              <span class="sk-cmdk-item-label">Developer Remediation Studio &amp; Code Diffs</span>
+            </div>
+            <span class="sk-cmdk-badge">/remediation</span>
+          </div>
+        </div>
+
+        <!-- Section: Operator Quick Actions -->
+        <div class="sk-cmdk-group">
+          <div class="sk-cmdk-group-title">Console Actions</div>
+          <div class="sk-cmdk-item" data-action="run-scan">
+            <div class="sk-cmdk-item-left">
+              <span class="sk-cmdk-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg></span>
+              <span class="sk-cmdk-item-label">Launch Autonomous DAST Scan</span>
+            </div>
+            <span class="sk-cmdk-badge action">Action</span>
+          </div>
+          <div class="sk-cmdk-item" data-action="nav" data-url="{{ url_for('waf') }}">
+            <div class="sk-cmdk-item-left">
+              <span class="sk-cmdk-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+              <span class="sk-cmdk-item-label">Open Interactive WAF Rule Sandbox</span>
+            </div>
+            <span class="sk-cmdk-badge action">Action</span>
+          </div>
+          <div class="sk-cmdk-item" data-action="export-sarif">
+            <div class="sk-cmdk-item-left">
+              <span class="sk-cmdk-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>
+              <span class="sk-cmdk-item-label">Export Scan Findings as SARIF / JSON</span>
+            </div>
+            <span class="sk-cmdk-badge action">Export</span>
+          </div>
+          <div class="sk-cmdk-item" data-action="nav" data-url="{{ url_for('logout') }}">
+            <div class="sk-cmdk-item-left">
+              <span class="sk-cmdk-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span>
+              <span class="sk-cmdk-item-label">Sign Out Active Session</span>
+            </div>
+            <span class="sk-cmdk-badge" style="color: var(--red); border-color: var(--red-border);">Logout</span>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Section: Platform Public Navigation (Always Available) -->
+        <div class="sk-cmdk-group">
+          <div class="sk-cmdk-group-title">Platform Navigation</div>
+          <div class="sk-cmdk-item" data-action="nav" data-url="{{ url_for('home') }}">
+            <div class="sk-cmdk-item-left">
+              <span class="sk-cmdk-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+              <span class="sk-cmdk-item-label">Platform Overview &amp; Architecture</span>
+            </div>
+            <span class="sk-cmdk-badge">/</span>
+          </div>
+          <div class="sk-cmdk-item" data-action="nav" data-url="{{ url_for('scanner') }}">
+            <div class="sk-cmdk-item-left">
+              <span class="sk-cmdk-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
+              <span class="sk-cmdk-item-label">DAST Security Console &amp; Scanner Tech</span>
+            </div>
+            <span class="sk-cmdk-badge">/scanner</span>
+          </div>
+          <div class="sk-cmdk-item" data-action="nav" data-url="{{ url_for('services') }}">
+            <div class="sk-cmdk-item-left">
+              <span class="sk-cmdk-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+              <span class="sk-cmdk-item-label">Application Security Suite &amp; WAF Sandbox</span>
+            </div>
+            <span class="sk-cmdk-badge">/services</span>
+          </div>
+          <div class="sk-cmdk-item" data-action="nav" data-url="{{ url_for('pricing') }}">
+            <div class="sk-cmdk-item-left">
+              <span class="sk-cmdk-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="6 2 18 2 22 8 12 22 2 8 6 2"/></svg></span>
+              <span class="sk-cmdk-item-label">Pricing Plans (Individual &amp; Enterprise)</span>
+            </div>
+            <span class="sk-cmdk-badge">/pricing</span>
+          </div>
+          <div class="sk-cmdk-item" data-action="nav" data-url="{{ url_for('about') }}">
+            <div class="sk-cmdk-item-left">
+              <span class="sk-cmdk-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span>
+              <span class="sk-cmdk-item-label">About Engineering &amp; Architecture</span>
+            </div>
+            <span class="sk-cmdk-badge">/about</span>
+          </div>
+          <div class="sk-cmdk-item" data-action="nav" data-url="{{ url_for('contact') }}">
+            <div class="sk-cmdk-item-left">
+              <span class="sk-cmdk-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span>
+              <span class="sk-cmdk-item-label">Contact &amp; Advisory SLA</span>
+            </div>
+            <span class="sk-cmdk-badge">/contact</span>
+          </div>
+          {% if not user %}
+          <div class="sk-cmdk-item" data-action="nav" data-url="{{ url_for('auth', mode='login') }}">
+            <div class="sk-cmdk-item-left">
+              <span class="sk-cmdk-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+              <span class="sk-cmdk-item-label">Operator Authentication (Sign In)</span>
+            </div>
+            <span class="sk-cmdk-badge">/auth</span>
+          </div>
+          <div class="sk-cmdk-item" data-action="nav" data-url="{{ url_for('auth', mode='register') }}">
+            <div class="sk-cmdk-item-left">
+              <span class="sk-cmdk-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+              <span class="sk-cmdk-item-label">Create Enterprise Workspace</span>
+            </div>
+            <span class="sk-cmdk-badge">Register</span>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Section: Security Standards -->
+        <div class="sk-cmdk-group">
+          <div class="sk-cmdk-group-title">Security References</div>
+          <div class="sk-cmdk-item" data-action="ext" data-url="https://owasp.org/www-project-top-ten/">
+            <div class="sk-cmdk-item-left">
+              <span class="sk-cmdk-icon">↗</span>
+              <span class="sk-cmdk-item-label">OWASP Top 10 Official Standard</span>
+            </div>
+            <span class="sk-cmdk-badge ext">External</span>
+          </div>
+          <div class="sk-cmdk-item" data-action="ext" data-url="https://cwe.mitre.org/top25/">
+            <div class="sk-cmdk-item-left">
+              <span class="sk-cmdk-icon">↗</span>
+              <span class="sk-cmdk-item-label">MITRE Top 25 Most Dangerous Weaknesses</span>
+            </div>
+            <span class="sk-cmdk-badge ext">External</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sk-cmdk-footer">
+        <div class="sk-cmdk-hint">
+          <kbd>↑</kbd> <kbd>↓</kbd> <span>Navigate</span>
+        </div>
+        <div class="sk-cmdk-hint">
+          <kbd>↵</kbd> <span>Select</span>
+        </div>
+        <div class="sk-cmdk-hint">
+          <kbd>ESC</kbd> <span>Close</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}?v=2.6.2"></script>
+  <script>
+  function toggleWafDropdown(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    var offWrap = document.getElementById('offensiveDropdownWrap');
+    if (offWrap) {
+      offWrap.classList.remove('open');
+      var offBtn = document.getElementById('offensiveDropdownBtn');
+      if (offBtn) offBtn.setAttribute('aria-expanded', 'false');
+    }
+    var wrap = document.getElementById('wafDropdownWrap');
+    if (!wrap) return;
+    wrap.classList.toggle('open');
+    var btn = document.getElementById('wafDropdownBtn');
+    if (btn) {
+      btn.setAttribute('aria-expanded', wrap.classList.contains('open') ? 'true' : 'false');
+    }
+  }
+
+  function toggleOffensiveDropdown(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    var wafWrap = document.getElementById('wafDropdownWrap');
+    if (wafWrap) {
+      wafWrap.classList.remove('open');
+      var wafBtn = document.getElementById('wafDropdownBtn');
+      if (wafBtn) wafBtn.setAttribute('aria-expanded', 'false');
+    }
+    var wrap = document.getElementById('offensiveDropdownWrap');
+    if (!wrap) return;
+    wrap.classList.toggle('open');
+    var btn = document.getElementById('offensiveDropdownBtn');
+    if (btn) {
+      btn.setAttribute('aria-expanded', wrap.classList.contains('open') ? 'true' : 'false');
+    }
+  }
+
+  document.addEventListener('click', function(e) {
+    var wafWrap = document.getElementById('wafDropdownWrap');
+    if (wafWrap && !wafWrap.contains(e.target)) {
+      wafWrap.classList.remove('open');
+      var btn = document.getElementById('wafDropdownBtn');
+      if (btn) btn.setAttribute('aria-expanded', 'false');
+    }
+    var offWrap = document.getElementById('offensiveDropdownWrap');
+    if (offWrap && !offWrap.contains(e.target)) {
+      offWrap.classList.remove('open');
+      var offBtn = document.getElementById('offensiveDropdownBtn');
+      if (offBtn) offBtn.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      var wafWrap = document.getElementById('wafDropdownWrap');
+      if (wafWrap) {
+        wafWrap.classList.remove('open');
+        var btn = document.getElementById('wafDropdownBtn');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+      }
+      var offWrap = document.getElementById('offensiveDropdownWrap');
+      if (offWrap) {
+        offWrap.classList.remove('open');
+        var offBtn = document.getElementById('offensiveDropdownBtn');
+        if (offBtn) offBtn.setAttribute('aria-expanded', 'false');
+      }
+    }
+  });
+  </script>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

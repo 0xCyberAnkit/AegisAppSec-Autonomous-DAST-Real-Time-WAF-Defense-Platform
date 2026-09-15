@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AegisAppSec // Autonomous DAST & Real-Time WAF Defense Platform</title>
+  <meta name="description" content="Autonomous web application security analyzer, OWASP Top 10 dynamic vulnerability detection engine, and real-time WAF shield.">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
+</head>
+<body>
+
+  <!-- Top Cyber Navigation Bar -->
+  <header class="cyber-navbar">
+    <div class="brand-section">
+      <img src="/assets/logo.svg" alt="AegisAppSec Logo" width="36" height="36">
+      <div>
+        <div class="brand-title">AEGIS // APPSEC</div>
+      </div>
+      <span class="brand-badge">DAST & WAF ENGINE v1.0</span>
+    </div>
+
+    <!-- Live Defense Shield Controls -->
+    <div class="nav-center">
+      <div class="shield-mode-control">
+        <span class="mode-label">WAF Shield:</span>
+        <button class="mode-btn active-off" data-mode="OFF" title="Vulnerable Mode: All attacks pass to target">OFF</button>
+        <button class="mode-btn" data-mode="DETECT" title="Detection Mode: Log telemetry without blocking">DETECT</button>
+        <button class="mode-btn" data-mode="BLOCK" title="Block Mode: Immediate HTTP 403 rejection">BLOCK</button>
+        <button class="mode-btn" data-mode="SANITIZE" title="Sanitize Mode: Contextual encoding & parameter cleaning">SANITIZE</button>
+      </div>
+
+      <div class="status-pill">
+        <div class="pulse-dot"></div>
+        <span>ENGINE: ONLINE</span>
+      </div>
+
+      <!-- User Profile & Auth Section -->
+      <div id="navbar-user-section" style="margin-left: 14px;"></div>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="cyber-tabs" aria-label="Main Navigation">
+    <button class="tab-btn" data-tab="targets">🎯 Targets & Governance</button>
+    <button class="tab-btn active" data-tab="scanner">⚡ DAST Scanner</button>
+    <button class="tab-btn" data-tab="vulnerabilities">🔍 Vulnerabilities & PoC</button>
+    <button class="tab-btn" data-tab="history">📜 Scan History & Diff</button>
+    <button class="tab-btn" data-tab="waf">🛡️ WAF Radar & Shield</button>
+    <button class="tab-btn" data-tab="waf-rules">🧩 Virtual Patch Studio</button>
+    <button class="tab-btn" data-tab="compliance">📋 Compliance & Audit</button>
+    <button class="tab-btn" data-tab="team">👥 Team & RBAC</button>
+    <button class="tab-btn" data-tab="apikeys">🔑 CI/CD & API Keys</button>
+    <button class="tab-btn" data-tab="report">📑 Report Studio</button>
+    <button class="tab-btn" data-tab="auth">🔐 Identity & IAM</button>
+    <button class="tab-btn" data-tab="storefront">🛒 CyberMart Testbed</button>
+    <button class="tab-btn" data-tab="remediation">🛠️ Remediation Hub</button>
+  </nav>
+
+  <!-- Main Viewport -->
+  <main class="main-content">
+
+    <!-- Global Telemetry HUD -->
+    <section class="hud-grid" aria-label="Security Metrics HUD">
+      <div class="hud-card">
+        <div class="hud-title">ACTIVE THREAT LEVEL</div>
+        <div class="hud-val" id="hud-threat-level" style="color: var(--neon-green);">LOW</div>
+        <div class="hud-sub">Dynamic Heuristic Assessment</div>
+      </div>
+      <div class="hud-card">
+        <div class="hud-title">VULNERABILITIES FOUND</div>
+        <div class="hud-val" id="hud-vulns-found" style="color: var(--neon-red);">0</div>
+        <div class="hud-sub">OWASP Top 10 Confirmed</div>
+      </div>
+      <div class="hud-card">
+        <div class="hud-title">ATTACKS INTERCEPTED</div>
+        <div class="hud-val" id="hud-blocked" style="color: var(--neon-cyan);">0</div>
+        <div class="hud-sub">Blocked / Sanitized by Shield</div>
+      </div>
+      <div class="hud-card">
+        <div class="hud-title">TOTAL REQUESTS INSPECTED</div>
+        <div class="hud-val" id="hud-inspected">0</div>
+        <div class="hud-sub">Real-Time ASGI Pipeline</div>
+      </div>
+    </section>
+
+    <!-- TAB 0: Targets & Governance Workbench -->
+    <section id="tab-targets" class="tab-panel">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <div>
+          <h2 style="font-size: 20px; font-weight: 800;">Target Domain Governance & Ownership Verification</h2>
+          <p style="font-size: 13px; color: var(--text-muted);">
+            Manage authorized domains. Prove ownership via DNS TXT, HTML &lt;meta&gt;, or HTTP /.well-known/ to authorize automated DAST scans.
+          </p>
+        </div>
+        <button class="cyber-btn primary" id="btn-register-target">＋ Register Target Domain</button>
+      </div>
+
+      <div class="table-container">
+        <table class="cyber-table">
+          <thead>
+            <tr>
+              <th>Target Name & Domain</th>
+              <th>Base Endpoint URL</th>
+              <th>Method</th>
+              <th>Authorization Status</th>
+              <th>Verified Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="targets-table-body">
+            <tr>
+              <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 20px;">Loading registered targets...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TAB 1: DAST Scanner Workbench -->
+    <section id="tab-scanner" class="tab-panel active">
+      <div class="scanner-grid">
+        
+        <!-- Config Panel -->
+        <div class="config-panel">
+          <div class="panel-heading">
+            <span>DAST Scan Parameters</span>
+            <span style="font-size: 11px; color: var(--neon-green);">● Anti-SSRF Guardrails ON</span>
+          </div>
+
+          <div class="input-group">
+            <label class="input-label" for="verified-targets-dropdown">Select From Verified Targets:</label>
+            <select id="verified-targets-dropdown" class="cyber-select" style="width: 100%; margin-bottom: 8px;" onchange="document.getElementById('scan-target-url').value = this.value">
+              <option value="http://127.0.0.1:8001" selected>Target 01: VoltMart E-Commerce Store (127.0.0.1:8001)</option>
+              <option value="http://127.0.0.1:8002">Target 02: ApexBank Treasury &amp; FX API (127.0.0.1:8002)</option>
+              <option value="http://127.0.0.1:8003">Target 03: PulseHealth Hospital EHR (127.0.0.1:8003)</option>
+              <option value="http://127.0.0.1:8004">Target 04: CloudOps Infrastructure Console (127.0.0.1:8004)</option>
+              <option value="http://127.0.0.1:8000/api/shop">Aegis Built-in Storefront (127.0.0.1:8000)</option>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label class="input-label" for="scan-target-url">Target URL / Base Endpoint:</label>
+            <input type="text" id="scan-target-url" class="cyber-input" value="http://127.0.0.1:8000/api/shop">
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
+              Target endpoint probed by autonomous asynchronous detectors.
+            </div>
+          </div>
+
+          <div class="input-group">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <label class="input-label" style="margin-bottom: 0;">Active Vulnerability Modules:</label>
+              <span id="index-module-count" style="font-family: var(--font-mono, monospace); font-size: 11px; color: var(--neon-cyan);">15 / 15 Detectors</span>
+            </div>
+            <div class="checkbox-list" style="max-height: 240px; overflow-y: auto; padding-right: 6px; border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 8px; background: rgba(0,0,0,0.2);">
+              <label class="checkbox-item">
+                <input type="checkbox" class="module-checkbox" value="sqli" checked>
+                <span>SQL Injection (SQLi) <small style="color: var(--neon-red);">[CWE-89]</small></span>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" class="module-checkbox" value="xss" checked>
+                <span>Cross-Site Scripting (XSS) <small style="color: var(--neon-amber);">[CWE-79]</small></span>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" class="module-checkbox" value="cmdi" checked>
+                <span>OS Command Injection (CMDi) <small style="color: var(--neon-red);">[CWE-78]</small></span>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" class="module-checkbox" value="ssrf" checked>
+                <span>Server-Side Request Forgery (SSRF) <small style="color: var(--neon-purple);">[CWE-918]</small></span>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" class="module-checkbox" value="csrf" checked>
+                <span>Cross-Site Request Forgery (CSRF) <small style="color: var(--neon-blue);">[CWE-352]</small></span>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" class="module-checkbox" value="idor" checked>
+                <span>Insecure Direct Object Reference (IDOR) <small style="color: var(--neon-cyan);">[CWE-639]</small></span>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" class="module-checkbox" value="path_traversal" checked>
+                <span>Path Traversal / LFI <small style="color: #f43f5e;">[CWE-22]</small></span>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" class="module-checkbox" value="open_redirect" checked>
+                <span>Unvalidated Open Redirect <small style="color: #eab308;">[CWE-601]</small></span>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" class="module-checkbox" value="broken_auth" checked>
+                <span>Broken Authentication <small style="color: #ec4899;">[CWE-287]</small></span>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" class="module-checkbox" value="misconfig" checked>
+                <span>Security Misconfiguration <small style="color: #94a3b8;">[CWE-16]</small></span>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" class="module-checkbox" value="cors" checked>
+                <span>CORS Misconfiguration <small style="color: #06b6d4;">[CWE-942]</small></span>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" class="module-checkbox" value="xxe" checked>
+                <span>XML External Entity (XXE) <small style="color: #f97316;">[CWE-611]</small></span>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" class="module-checkbox" value="deserialization" checked>
+                <span>Insecure Deserialization <small style="color: #8b5cf6;">[CWE-502]</small></span>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" class="module-checkbox" value="info_disclosure" checked>
+                <span>Sensitive Data Exposure <small style="color: #10b981;">[CWE-200]</small></span>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" class="module-checkbox" value="outdated_components" checked>
+                <span>Outdated Dependencies <small style="color: #84cc16;">[CWE-1104]</small></span>
+              </label>
+            </div>
+          </div>
+
+          <button id="btn-launch-scan" class="btn-launch">
+            <span>🚀 Launch Autonomous DAST Scan</span>
+          </button>
+        </div>
+
+        <!-- Console & Execution Matrix -->
+        <div class="console-panel">
+          <div class="console-header">
+            <div>
+              <span style="font-size: 13px; font-weight: 700; color: var(--neon-cyan);">LIVE EXECUTION MATRIX</span>
+              <span style="font-size: 11px; color: var(--text-muted); margin-left: 8px;">(WebSocket Stream)</span>
+            </div>
+            <button id="btn-clear-logs" style="background: transparent; border: 1px solid var(--border-subtle); color: var(--text-muted); padding: 3px 8px; border-radius: 4px; font-size: 11px; cursor: pointer;">
+              Clear Console
+            </button>
+          </div>
+
+          <div class="progress-bar-container">
+            <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 700;">
+              <span>SCAN PROGRESS</span>
+              <span id="scan-progress-label">0%</span>
+            </div>
+            <div class="progress-track">
+              <div id="scan-progress-fill" class="progress-fill"></div>
+            </div>
+          </div>
+
+          <div id="terminal-logs" class="terminal-logs">
+            <div class="log-entry">
+              <span class="log-time">[00:00:00]</span>
+              <span class="log-level-START">[READY]</span>
+              <span class="log-msg">AegisAppSec Autonomous DAST Engine initialized. Select target and click Launch.</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TAB 2: Vulnerability Triage & PoC Inspector -->
+    <section id="tab-vulnerabilities" class="tab-panel">
+      <div class="vuln-filter-bar">
+        <button class="filter-chip active" data-filter="ALL">All Severities</button>
+        <button class="filter-chip" data-filter="CRITICAL">Critical</button>
+        <button class="filter-chip" data-filter="HIGH">High</button>
+        <button class="filter-chip" data-filter="MEDIUM">Medium</button>
+        <button class="filter-chip" data-filter="LOW">Low</button>
+      </div>
+
+      <div id="vuln-cards-grid" class="vuln-cards-grid">
+        <!-- Injected via vulnerabilities.js -->
+      </div>
+    </section>
+
+    <!-- TAB: Scan History & Diff Tracker -->
+    <section id="tab-history" class="tab-panel">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <div>
+          <h2 style="font-size: 20px; font-weight: 800;">Scan History & Vulnerability Regression Tracker</h2>
+          <p style="font-size: 13px; color: var(--text-muted);">
+            Audit historical DAST scans, track remediation velocity, and calculate regressions between deployments.
+          </p>
+        </div>
+        <button class="cyber-btn sm" id="btn-refresh-history">↺ Refresh Scans</button>
+      </div>
+
+      <!-- Regression Diff Comparator Bar -->
+      <div class="store-card" style="margin-bottom: 20px;">
+        <div style="font-size: 14px; font-weight: 700; margin-bottom: 8px;">Compare Scans for Regression Analysis</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: flex-end;">
+          <div>
+            <label class="input-label" for="diff-base-scan">Baseline Scan (Older):</label>
+            <select id="diff-base-scan" class="cyber-select" style="width: 100%;"></select>
+          </div>
+          <div>
+            <label class="input-label" for="diff-target-scan">Comparison Scan (Newer):</label>
+            <select id="diff-target-scan" class="cyber-select" style="width: 100%;"></select>
+          </div>
+          <button class="cyber-btn primary" id="btn-run-scan-diff">Calculate Regression Diff</button>
+        </div>
+        <div id="diff-results-container" style="margin-top: 14px;"></div>
+      </div>
+
+      <!-- Historical Scans Table -->
+      <div class="table-container">
+        <table class="cyber-table">
+          <thead>
+            <tr>
+              <th>Scan ID</th>
+              <th>Target & Endpoint</th>
+              <th>Status</th>
+              <th>Findings Severity</th>
+              <th>Avg CVSS</th>
+              <th>Execution Time</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="history-table-body">
+            <tr>
+              <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 20px;">Loading historical scans...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TAB 3: Aegis-Shield WAF Telemetry -->
+    <section id="tab-waf" class="tab-panel">
+      <div class="waf-layout">
+        <div class="threat-stream-box">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-subtle); padding-bottom: 12px;">
+            <div>
+              <div style="font-size: 16px; font-weight: 700;">Real-Time Attack Interception Stream</div>
+              <div style="font-size: 12px; color: var(--text-secondary);">Live telemetry from ASGI defensive inspection pipeline</div>
+            </div>
+            <button id="btn-clear-waf-metrics" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-subtle); color: var(--text-secondary); padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer;">
+              Reset Counters
+            </button>
+          </div>
+
+          <table class="threat-table">
+            <thead>
+              <tr>
+                <th>TIMESTAMP</th>
+                <th>CLIENT IP</th>
+                <th>ENDPOINT</th>
+                <th>ATTACK TYPE</th>
+                <th>EVASION DETECTION</th>
+                <th>ACTION</th>
+              </tr>
+            </thead>
+            <tbody id="waf-events-tbody">
+              <!-- Injected via waf_monitor.js -->
+            </tbody>
+          </table>
+        </div>
+
+        <div>
+          <!-- Attack Breakdown Card -->
+          <div class="threat-stream-box" style="margin-bottom: 20px;">
+            <div style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">Attacks by Category</div>
+            <div id="waf-attack-breakdown">
+              <!-- Injected via waf_monitor.js -->
+            </div>
+          </div>
+
+          <!-- Active Inspection Rules -->
+          <div class="threat-stream-box">
+            <div style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">Active Heuristic Rules</div>
+            <div id="waf-rules-list" style="max-height: 280px; overflow-y: auto;">
+              <!-- Injected via waf_monitor.js -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: CyberMart E-Commerce Storefront (Target Testbed) -->
+    <section id="tab-storefront" class="tab-panel">
+      <div id="store-waf-banner" style="padding: 12px 18px; border: 1px solid var(--neon-red); background: rgba(15, 23, 42, 0.8); border-radius: 8px; font-size: 13px; font-weight: 700; color: var(--neon-red); margin-bottom: 20px;">
+        ⚠️ WAF OFF: Target is in vulnerable mode. Injections will execute!
+      </div>
+
+      <div class="storefront-container">
+        <div>
+          <div class="store-card" style="margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <div>
+                <h2 style="font-size: 18px; font-weight: 800;">CyberMart Black Friday Mega Sale</h2>
+                <div style="font-size: 12px; color: var(--text-secondary);">Enterprise Flash Sale E-Commerce Platform Target</div>
+              </div>
+              <button id="btn-reset-store-db" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-subtle); color: var(--text-secondary); padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer;">
+                ↺ Reset Store DB
+              </button>
+            </div>
+
+            <!-- Product Search Form (SQLi Target) -->
+            <div class="input-group">
+              <label class="input-label" for="store-search-input">Product Catalog Search (Vulnerable to SQLi):</label>
+              <div style="display: flex; gap: 8px;">
+                <input type="text" id="store-search-input" class="cyber-input" placeholder="Search laptops, TVs, phones...">
+                <button id="store-search-btn" class="btn-poc" style="flex: 0 0 100px;">Search</button>
+              </div>
+            </div>
+
+            <!-- Catalog Listing -->
+            <div id="shop-products-grid" class="product-catalog-grid">
+              <!-- Injected via storefront.js -->
+            </div>
+          </div>
+
+          <!-- Reviews Form (XSS Target) & Media Fetcher (SSRF Target) -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <!-- Review Submission (XSS) -->
+            <div class="store-card">
+              <div style="font-size: 14px; font-weight: 700; margin-bottom: 10px;">Post Product Review (XSS Target)</div>
+              <textarea id="review-comment-input" class="cyber-input" rows="3" placeholder="Leave your review feedback..."></textarea>
+              <button id="btn-submit-review" class="btn-poc" style="width: 100%; margin-top: 8px;">Submit Review</button>
+            </div>
+
+            <!-- Image/Webhook Previewer (SSRF) -->
+            <div class="store-card">
+              <div style="font-size: 14px; font-weight: 700; margin-bottom: 10px;">Fetch External Preview (SSRF Target)</div>
+              <input type="text" id="ssrf-url-input" class="cyber-input" placeholder="http://example.com/image.png">
+              <button id="btn-fetch-ssrf" class="btn-poc" style="width: 100%; margin-top: 8px;">Fetch Remote URL</button>
+            </div>
+          </div>
+
+          <!-- CSRF & IDOR Quick Actions -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+            <div class="store-card">
+              <div style="font-size: 14px; font-weight: 700; margin-bottom: 6px;">Loyalty Point Transfer (CSRF Target)</div>
+              <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">Executes state-changing transaction without anti-CSRF token verification.</div>
+              <button id="btn-test-csrf" class="btn-poc" style="width: 100%;">Transfer 250 Points to Attacker</button>
+            </div>
+
+            <div class="store-card">
+              <div style="font-size: 14px; font-weight: 700; margin-bottom: 6px;">Order Receipt Viewer (IDOR Target)</div>
+              <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">Direct object lookup without tenant ownership check.</div>
+              <div style="display: flex; gap: 8px;">
+                <input type="number" id="idor-order-id" class="cyber-input" value="2" style="width: 80px;">
+                <button id="btn-test-idor" class="btn-poc" style="flex: 1;">Inspect Order Record</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Exploit Tester Presets & Live Response Terminal -->
+        <div>
+          <div class="attack-presets-box">
+            <div style="font-size: 14px; font-weight: 800; color: var(--neon-red); margin-bottom: 12px;">
+              💥 1-Click Exploit Simulator
+            </div>
+            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 14px;">
+              Click to fire weaponized test payloads and observe the response under different WAF modes:
+            </div>
+
+            <button class="preset-btn" onclick="window.Storefront.injectSearchPayload('\' OR 1=1 --')">
+              <span>SQLi: Tautological Full Dump</span>
+              <span>⚡</span>
+            </button>
+            <button class="preset-btn" onclick="window.Storefront.injectSearchPayload('1\' UNION SELECT 999, \'AEGIS_EXPLOIT\', \'admin\', 99.99, \'LEAK\' --')">
+              <span>SQLi: UNION Column Extraction</span>
+              <span>⚡</span>
+            </button>
+            <button class="preset-btn" onclick="window.Storefront.injectSearchPayload('1\'/**/OR/**/\'1\'=\'1\'/**/--')">
+              <span>SQLi: Inline Comment WAF Bypass</span>
+              <span>⚡</span>
+            </button>
+            <button class="preset-btn" onclick="window.Storefront.injectReviewPayload('<script>alert(\'aegis-xss\')<\/script>')">
+              <span>XSS: Raw Script Tag Injection</span>
+              <span>⚡</span>
+            </button>
+            <button class="preset-btn" onclick="window.Storefront.injectReviewPayload('<img src=x onerror=alert(1)>')">
+              <span>XSS: Image OnError Handler</span>
+              <span>⚡</span>
+            </button>
+            <button class="preset-btn" onclick="window.Storefront.injectSSRFPayload('http://169.254.169.254/latest/meta-data/iam/security-credentials/')">
+              <span>SSRF: AWS Cloud Metadata Probe</span>
+              <span>⚡</span>
+            </button>
+            <button class="preset-btn" onclick="window.Storefront.injectSSRFPayload('http://127.0.0.1:8000/internal-admin')">
+              <span>SSRF: Internal Loopback Admin</span>
+              <span>⚡</span>
+            </button>
+          </div>
+
+          <!-- Server Response Output Box -->
+          <div class="store-card" style="margin-top: 20px;">
+            <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">RAW SERVER RESPONSE:</div>
+            <pre id="store-response-output" style="background: #000; color: #10b981; padding: 12px; border-radius: 6px; font-family: var(--font-mono); font-size: 11px; height: 260px; overflow-y: auto; white-space: pre-wrap; word-break: break-all;">
+// Target response will display here...
+            </pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: Developer Remediation Hub -->
+    <section id="tab-remediation" class="tab-panel">
+      <div class="remediation-tabs">
+        <button class="rem-tab active" data-cwe="CWE-89">SQL Injection (CWE-89)</button>
+        <button class="rem-tab" data-cwe="CWE-79">Cross-Site Scripting (CWE-79)</button>
+        <button class="rem-tab" data-cwe="CWE-918">SSRF (CWE-918)</button>
+        <button class="rem-tab" data-cwe="CWE-352">CSRF (CWE-352)</button>
+        <button class="rem-tab" data-cwe="CWE-639">IDOR (CWE-639)</button>
+      </div>
+
+      <div class="threat-stream-box">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 14px;">
+          <div>
+            <h2 id="rem-title" style="font-size: 20px; font-weight: 800;">SQL Injection (CWE-89)</h2>
+            <div style="font-size: 13px; color: var(--neon-cyan); margin-top: 4px;" id="rem-owasp">A03:2021-Injection</div>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="filter-chip lang-btn active" data-lang="python">Python</button>
+            <button class="filter-chip lang-btn" data-lang="nodejs">Node.js</button>
+            <button class="filter-chip lang-btn" data-lang="php">PHP</button>
+            <button class="filter-chip lang-btn" data-lang="go">Go</button>
+          </div>
+        </div>
+
+        <p id="rem-desc" style="font-size: 14px; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.6;"></p>
+
+        <div style="margin-bottom: 24px;">
+          <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 10px; color: var(--neon-green);">
+            Recommended Defense & Hardening Checklist:
+          </h3>
+          <ul id="rem-checklist" style="list-style: none; padding-left: 0; font-size: 13px;"></ul>
+        </div>
+
+        <!-- Before vs. After Code Comparison -->
+        <div class="code-diff-container">
+          <div class="diff-box diff-box-vuln">
+            <div class="diff-title">
+              <span style="color: var(--neon-red);">❌ VULNERABLE CODE (BEFORE)</span>
+            </div>
+            <pre id="diff-vuln-code" class="diff-code"></pre>
+          </div>
+
+          <div class="diff-box diff-box-secure">
+            <div class="diff-title">
+              <span style="color: var(--neon-green);">✅ SECURE REFACTORED CODE (AFTER)</span>
+            </div>
+            <pre id="diff-secure-code" class="diff-code"></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 6: Executive Report -->
+    <!-- TAB 6: Compliance & Audit Frameworks -->
+    <section id="tab-compliance" class="tab-panel">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div>
+          <h2 style="font-size: 20px; font-weight: 800;">Continuous Compliance & Regulatory Audit Posture</h2>
+          <p style="font-size: 13px; color: var(--text-muted);">
+            Real-time automated compliance auditing against OWASP Top 10 (2021), PCI-DSS 4.0, and SOC 2 Trust Criteria.
+          </p>
+        </div>
+        <button class="cyber-btn sm" id="btn-refresh-compliance">↺ Recalculate Posture</button>
+      </div>
+
+      <!-- Compliance Metrics HUD -->
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px;">
+        <div class="hud-card">
+          <div class="hud-title">OVERALL COMPLIANCE SCORE</div>
+          <div class="hud-val" id="compliance-score-val" style="color: var(--neon-cyan);">--%</div>
+          <div class="hud-sub">Aggregated Regulatory Criteria</div>
+        </div>
+        <div class="hud-card">
+          <div class="hud-title">REGULATORY AUDIT POSTURE</div>
+          <div class="hud-val" id="compliance-posture-pill" style="font-size: 18px; margin-top: 6px;">EVALUATING</div>
+          <div class="hud-sub">Risk Status Breakdown</div>
+        </div>
+        <div class="hud-card">
+          <div class="hud-title">ACTIVE AUDIT BLOCKERS</div>
+          <div class="hud-val" id="compliance-flaws-count" style="color: var(--neon-red);">-- Active</div>
+          <div class="hud-sub">CWEs Requiring Engineering Fix</div>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+        <!-- OWASP Top 10 -->
+        <div>
+          <h3 style="font-size: 16px; font-weight: 700; color: var(--neon-cyan); margin-bottom: 12px;">OWASP Top 10 (2021) Web Application Security</h3>
+          <div id="owasp-compliance-grid">
+            <div style="color: var(--text-muted);">Loading OWASP compliance checklist...</div>
+          </div>
+        </div>
+
+        <!-- PCI-DSS 4.0 -->
+        <div>
+          <h3 style="font-size: 16px; font-weight: 700; color: var(--neon-green); margin-bottom: 12px;">PCI-DSS v4.0 Payment Card Industry Standard</h3>
+          <div id="pci-compliance-grid">
+            <div style="color: var(--text-muted);">Loading PCI-DSS compliance checklist...</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 7: CI/CD & API Keys -->
+    <section id="tab-apikeys" class="tab-panel">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div>
+          <h2 style="font-size: 20px; font-weight: 800;">CI/CD Headless API Keys & Alert Webhooks</h2>
+          <p style="font-size: 13px; color: var(--text-muted);">
+            Automate security gates inside GitHub Actions, GitLab CI, or Jenkins. Get real-time Slack/Teams alerts on High/Critical flaws.
+          </p>
+        </div>
+        <button class="cyber-btn primary" id="btn-create-apikey">＋ Generate Scoped API Key</button>
+      </div>
+
+      <!-- Active API Keys Table -->
+      <div class="store-card" style="margin-bottom: 24px;">
+        <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 12px;">Active Enterprise API Keys</h3>
+        <div class="table-container">
+          <table class="cyber-table">
+            <thead>
+              <tr>
+                <th>Key Name</th>
+                <th>Token Prefix</th>
+                <th>Role</th>
+                <th>Created Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="apikeys-table-body">
+              <tr>
+                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 16px;">Loading API keys...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Webhooks Integration Section -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+        <div class="store-card">
+          <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 12px;">Add Slack / Teams / SIEM Webhook</h3>
+          <form id="new-webhook-form">
+            <div class="input-group">
+              <label class="input-label" for="webhook-name">Webhook Destination Name:</label>
+              <input type="text" id="webhook-name" class="cyber-input" placeholder="e.g. #security-alerts-slack" required>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="webhook-url">Webhook HTTPS Endpoint URL:</label>
+              <input type="url" id="webhook-url" class="cyber-input" placeholder="https://hooks.slack.com/services/..." required>
+            </div>
+            <button type="submit" class="cyber-btn primary" style="width: 100%; margin-top: 10px;">Connect Webhook</button>
+          </form>
+        </div>
+
+        <div class="store-card">
+          <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 12px;">Connected Webhook Channels</h3>
+          <div class="table-container">
+            <table class="cyber-table">
+              <thead>
+                <tr>
+                  <th>Channel</th>
+                  <th>URL</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="webhooks-table-body">
+                <tr>
+                  <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 16px;">Loading webhooks...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB: WAF Virtual Patching Studio -->
+    <section id="tab-waf-rules" class="tab-panel">
+      <div style="margin-bottom: 20px;">
+        <h2 style="font-size: 20px; font-weight: 800;">WAF Virtual Patching Studio // Zero-Day Mitigation</h2>
+        <p style="font-size: 13px; color: var(--text-muted);">
+          Deploy real-time regex virtual patches to instantly neutralize zero-day exploits and critical vulnerabilities before backend code patches are compiled.
+        </p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
+        <!-- Left: Deploy New Virtual Patch Form -->
+        <div class="hud-card" style="padding: 20px;">
+          <h3 style="font-size: 15px; font-weight: 800; margin-bottom: 14px; color: var(--neon-cyan);">
+            ⚡ Deploy New Virtual Patch Rule
+          </h3>
+          <form id="create-virtual-patch-form">
+            <div class="input-group">
+              <label class="input-label" for="patch-name">Virtual Patch Title:</label>
+              <input type="text" id="patch-name" class="cyber-input" placeholder="e.g. VP-CVE-2024-SQLi-Search" required>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="patch-pattern">Regular Expression Pattern (PCRE):</label>
+              <input type="text" id="patch-pattern" class="cyber-input" placeholder="e.g. (?i)(sleep\s*\(\s*\d+\s*\)|waitfor\s+delay)" required>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="patch-action">Defensive Action:</label>
+              <select id="patch-action" class="cyber-select">
+                <option value="BLOCK">BLOCK (HTTP 403 Forbidden)</option>
+                <option value="DETECT">DETECT & LOG (Telemetry Only)</option>
+                <option value="SANITIZE">SANITIZE (Strip Malicious Input)</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="patch-desc">Context / Vulnerability Reference:</label>
+              <input type="text" id="patch-desc" class="cyber-input" placeholder="e.g. Temporary shield for CWE-89 finding #FIND-001">
+            </div>
+            <div id="create-patch-status" style="font-size: 12px; margin-bottom: 8px;"></div>
+            <button type="submit" class="cyber-btn primary" style="width: 100%;">🚀 Deploy Virtual Patch to WAF</button>
+          </form>
+        </div>
+
+        <!-- Right: Interactive Sandbox / Simulator -->
+        <div class="hud-card" style="padding: 20px;">
+          <h3 style="font-size: 15px; font-weight: 800; margin-bottom: 14px; color: var(--neon-purple);">
+            🧪 Live Virtual Patch Simulator & Sandbox
+          </h3>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+            Test malicious test vectors against active virtual patches in real-time to verify interception rules before live deployment.
+          </p>
+          <div class="input-group">
+            <label class="input-label" for="test-payload-input">Test Attack Vector / Payload:</label>
+            <textarea id="test-payload-input" class="cyber-input" rows="3" placeholder="e.g. 1' UNION SELECT username, password FROM users-- or ${jndi:ldap://evil}"></textarea>
+          </div>
+          <button id="btn-test-payload" class="cyber-btn secondary" style="width: 100%;">▶ Run Interception Simulation</button>
+          <div id="test-payload-result"></div>
+        </div>
+      </div>
+
+      <!-- Active Virtual Patches Table -->
+      <div class="table-container">
+        <h3 style="font-size: 15px; font-weight: 800; margin-bottom: 12px;">Active Enterprise Virtual Patches</h3>
+        <table class="cyber-table">
+          <thead>
+            <tr>
+              <th>Patch Name & Purpose</th>
+              <th>Regex Inspection Pattern</th>
+              <th>Action</th>
+              <th>Status</th>
+              <th>Deployed</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="custom-rules-table-body">
+            <tr>
+              <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 20px;">Loading active virtual patches...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TAB: Team & RBAC Governance -->
+    <section id="tab-team" class="tab-panel">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div>
+          <h2 style="font-size: 20px; font-weight: 800;">Enterprise Team & Role-Based Access Control (RBAC)</h2>
+          <p style="font-size: 13px; color: var(--text-muted);">
+            Manage security team members, offensive red teamers, and software engineering collaborators with strict least-privilege roles.
+          </p>
+        </div>
+        <button class="cyber-btn primary" id="btn-open-invite-modal">＋ Invite Collaborator</button>
+      </div>
+
+      <div class="table-container" style="margin-bottom: 28px;">
+        <h3 style="font-size: 15px; font-weight: 800; margin-bottom: 12px;">Active Organization Roster</h3>
+        <table class="cyber-table">
+          <thead>
+            <tr>
+              <th>Collaborator Name</th>
+              <th>Designated RBAC Role</th>
+              <th>Status</th>
+              <th>2FA Security</th>
+              <th>Last Active</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="team-table-body">
+            <tr>
+              <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 20px;">Loading team roster...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- RBAC Capabilities Matrix -->
+      <div class="table-container">
+        <h3 style="font-size: 15px; font-weight: 800; margin-bottom: 12px;">Role-Based Security Capability Matrix</h3>
+        <div id="rbac-matrix-container">Loading capability matrix...</div>
+      </div>
+    </section>
+
+    <!-- TAB: Executive & Technical Report Studio -->
+    <section id="tab-report" class="tab-panel">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 14px;">
+        <div>
+          <h2 style="font-size: 20px; font-weight: 800;">Executive & Technical Report Studio</h2>
+          <p style="font-size: 13px; color: var(--text-muted);">
+            Generate C-level risk summaries, OWASP Top 10 compliance scorecards, and developer markdown bug tickets.
+          </p>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <a href="/api/reports/export/html" target="_blank" class="cyber-btn primary" style="text-decoration: none;">
+            🖨️ View & Print (HTML / PDF)
+          </a>
+          <a href="/api/reports/export/json" target="_blank" class="cyber-btn secondary" style="text-decoration: none;">
+            💾 Download JSON
+          </a>
+          <a href="/api/reports/export/csv" target="_blank" class="cyber-btn secondary" style="text-decoration: none;">
+            📊 Export CSV
+          </a>
+          <button id="btn-export-markdown" class="cyber-btn secondary">
+            📋 Copy Markdown
+          </button>
+          <button id="btn-refresh-report-preview" class="cyber-btn secondary">
+            🔄 Refresh
+          </button>
+        </div>
+      </div>
+
+      <div id="report-live-preview-box">
+        <div style="text-align: center; color: var(--text-muted); padding: 30px;">Loading report preview...</div>
+      </div>
+    </section>
+
+    <!-- TAB: Identity & IAM Portal -->
+    <section id="tab-auth" class="tab-panel">
+      <div style="margin-bottom: 20px;">
+        <h2 style="font-size: 20px; font-weight: 800;">Enterprise Identity & Access Management (IAM)</h2>
+        <p style="font-size: 13px; color: var(--text-muted);">
+          Manage your verified operator identity, switch role personas, enforce authentication policies, and inspect active sessions.
+        </p>
+      </div>
+
+      <!-- Active Profile Card -->
+      <div id="auth-page-profile-container"></div>
+
+      <!-- Persona Switcher -->
+      <div class="hud-card" style="padding: 20px; margin-bottom: 24px;">
+        <div style="font-size: 13px; font-weight: 800; text-transform: uppercase; color: var(--neon-cyan); margin-bottom: 12px;">
+          ⚡ Fast Persona Simulator // Switch Operational Role:
+        </div>
+        <div class="demo-role-grid">
+          <div class="page-role-btn demo-role-btn" data-role="admin">
+            <div style="font-size: 24px;">🛡️</div>
+            <div style="font-size: 13px; font-weight: bold; margin-top: 4px;">SecOps Lead / Admin</div>
+            <div style="font-size: 11px; color: var(--text-muted);">Domain governance, API keys, compliance</div>
+          </div>
+          <div class="page-role-btn demo-role-btn" data-role="pentester">
+            <div style="font-size: 24px;">⚡</div>
+            <div style="font-size: 13px; font-weight: bold; margin-top: 4px;">Offensive Pentester</div>
+            <div style="font-size: 11px; color: var(--text-muted);">DAST scans, cURL exploit PoCs, CVSS triage</div>
+          </div>
+          <div class="page-role-btn demo-role-btn" data-role="developer">
+            <div style="font-size: 24px;">🛠️</div>
+            <div style="font-size: 13px; font-weight: bold; margin-top: 4px;">AppSec Developer</div>
+            <div style="font-size: 11px; color: var(--text-muted);">Secure code remediation, virtual patch review</div>
+          </div>
+        </div>
+        <div id="auth-page-status" style="font-size: 12px; margin-top: 10px; font-weight: bold;"></div>
+      </div>
+
+      <!-- In-Page Sign In & Registration Panels -->
+      <div class="hud-card" style="padding: 24px; max-width: 650px; margin: 0 auto;">
+        <div class="auth-tabs">
+          <button class="page-auth-tab auth-tab-btn active" data-form="page-login-box">Sign In Existing Account</button>
+          <button class="page-auth-tab auth-tab-btn" data-form="page-reg-box">Register Organization / Pentester</button>
+        </div>
+
+        <div id="page-login-box" class="page-auth-panel auth-form-panel active">
+          <form id="page-login-form">
+            <div class="input-group">
+              <label class="input-label" for="page-login-email">Corporate Email:</label>
+              <input type="email" id="page-login-email" class="cyber-input" value="admin@aegisappsec.io" required>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="page-login-password">Password:</label>
+              <input type="password" id="page-login-password" class="cyber-input" value="Admin@Aegis2026!" required>
+            </div>
+            <div id="page-login-status" style="font-size: 12px; margin-bottom: 10px;"></div>
+            <button type="submit" class="cyber-btn primary" style="width: 100%;">Authenticate Session</button>
+          </form>
+        </div>
+
+        <div id="page-reg-box" class="page-auth-panel auth-form-panel">
+          <form id="page-register-form">
+            <div class="input-group">
+              <label class="input-label" for="page-reg-name">Full Name / Operator Handle:</label>
+              <input type="text" id="page-reg-name" class="cyber-input" placeholder="e.g. Jordan Smith" required>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="page-reg-email">Corporate / Pentester Email:</label>
+              <input type="email" id="page-reg-email" class="cyber-input" placeholder="e.g. jordan@secops.io" required>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="page-reg-password">Password:</label>
+              <input type="password" id="page-reg-password" class="cyber-input" placeholder="Min 8 characters" required>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="page-reg-company">Organization / Company Name:</label>
+              <input type="text" id="page-reg-company" class="cyber-input" placeholder="e.g. Acme Cyber Security Inc">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="page-reg-role">Designated Role Profile:</label>
+              <select id="page-reg-role" class="cyber-select">
+                <option value="pentester">Individual Pentester / Red Teamer</option>
+                <option value="admin">Enterprise SecOps Administrator</option>
+                <option value="developer">Application Developer</option>
+              </select>
+            </div>
+            <div id="page-reg-status" style="font-size: 12px; margin-bottom: 10px;"></div>
+            <button type="submit" class="cyber-btn primary" style="width: 100%;">Create Account & Activate Tier</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 1. Proof-of-Concept Exploit Modal -->
+  <div id="poc-modal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+            <span id="poc-modal-sev" class="severity-pill sev-critical">CRITICAL</span>
+            <span id="poc-modal-cvss" style="font-size: 13px; font-family: var(--font-mono); font-weight: bold; color: var(--neon-cyan);"></span>
+          </div>
+          <h2 id="poc-modal-title" style="font-size: 18px; font-weight: 800;"></h2>
+        </div>
+        <button id="btn-close-poc-modal" class="btn-close-modal" aria-label="Close modal">&times;</button>
+      </div>
+
+      <div style="margin-bottom: 16px; font-size: 13px;">
+        <p><strong>Vulnerable Target Endpoint:</strong> <code id="poc-modal-endpoint"></code></p>
+        <p style="margin-top: 6px;"><strong>Attack Payload Injected:</strong> <code id="poc-modal-payload" style="color: var(--neon-amber);"></code></p>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; margin-bottom: 6px;">
+        <span style="font-size: 12px; font-weight: bold; color: var(--neon-cyan);">Reproducible Proof-of-Concept Command:</span>
+        <button id="btn-copy-curl" class="copy-btn">📋 Copy cURL Command</button>
+      </div>
+      <pre id="poc-modal-curl" style="background: #000; color: #38bdf8; padding: 12px; border-radius: 6px; font-family: var(--font-mono); font-size: 12px; overflow-x: auto;"></pre>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px;">
+        <div>
+          <div style="font-size: 12px; font-weight: bold; color: var(--text-muted); margin-bottom: 4px;">RAW HTTP REQUEST:</div>
+          <pre id="poc-modal-req" style="background: #000; color: #e2e8f0; padding: 10px; border-radius: 6px; font-size: 11px; max-height: 200px; overflow-y: auto; font-family: var(--font-mono); white-space: pre-wrap;"></pre>
+        </div>
+        <div>
+          <div style="font-size: 12px; font-weight: bold; color: var(--text-muted); margin-bottom: 4px;">RAW HTTP RESPONSE DIFF:</div>
+          <pre id="poc-modal-resp" style="background: #000; color: #10b981; padding: 10px; border-radius: 6px; font-size: 11px; max-height: 200px; overflow-y: auto; font-family: var(--font-mono); white-space: pre-wrap;"></pre>
+        </div>
+      </div>
+
+      <div style="margin-top: 20px; background: rgba(16, 185, 129, 0.1); border-left: 3px solid var(--neon-green); padding: 12px; border-radius: 6px;">
+        <div style="font-size: 12px; font-weight: bold; color: var(--neon-green); margin-bottom: 4px;">Developer Remediation:</div>
+        <p id="poc-modal-remediation" style="font-size: 13px; color: #d1fae5; line-height: 1.5;"></p>
+        <button id="btn-jump-remediation" class="btn-poc" style="margin-top: 10px; width: auto; padding: 6px 14px;">
+          🛠️ View Multi-Language Secure Code Patch
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Auth & Identity Modal -->
+  <div id="auth-modal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-card" style="max-width: 520px;">
+      <div class="modal-header">
+        <div>
+          <h2 style="font-size: 18px; font-weight: 800;">Enterprise Identity & Access</h2>
+          <div style="font-size: 12px; color: var(--text-muted);">Sign in or switch operator personas</div>
+        </div>
+        <button id="auth-close-btn" class="btn-close-modal">&times;</button>
+      </div>
+
+      <!-- Quick 1-Click Persona Selector -->
+      <div class="demo-personas-box">
+        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--neon-cyan);">⚡ Quick Switch Operator Persona:</div>
+        <div class="demo-role-grid">
+          <div class="demo-role-btn" data-role="admin">
+            <div style="font-size: 18px;">🛡️</div>
+            <div style="font-size: 11px; font-weight: bold;">SecOps Lead</div>
+            <div style="font-size: 9px; color: var(--text-muted);">Admin Role</div>
+          </div>
+          <div class="demo-role-btn" data-role="pentester">
+            <div style="font-size: 18px;">⚡</div>
+            <div style="font-size: 11px; font-weight: bold;">Red Teamer</div>
+            <div style="font-size: 9px; color: var(--text-muted);">Pentester</div>
+          </div>
+          <div class="demo-role-btn" data-role="developer">
+            <div style="font-size: 18px;">🛠️</div>
+            <div style="font-size: 11px; font-weight: bold;">AppSec Dev</div>
+            <div style="font-size: 9px; color: var(--text-muted);">Developer</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab-btn active" data-form="login-panel">Sign In</button>
+        <button class="auth-tab-btn" data-form="register-panel">Register Organization</button>
+      </div>
+
+      <div id="login-panel" class="auth-form-panel active">
+        <form id="login-form">
+          <div class="input-group">
+            <label class="input-label" for="login-email">Corporate Email:</label>
+            <input type="email" id="login-email" class="cyber-input" value="admin@aegisappsec.io" required>
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="login-password">Password:</label>
+            <input type="password" id="login-password" class="cyber-input" value="Admin@Aegis2026!" required>
+          </div>
+          <div id="login-status" style="font-size: 12px; margin-bottom: 10px;"></div>
+          <button type="submit" class="cyber-btn primary" style="width: 100%;">Sign In</button>
+        </form>
+      </div>
+
+      <div id="register-panel" class="auth-form-panel">
+        <form id="register-form">
+          <div class="input-group">
+            <label class="input-label" for="reg-name">Full Name:</label>
+            <input type="text" id="reg-name" class="cyber-input" placeholder="e.g. Jordan Smith" required>
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="reg-email">Email Address:</label>
+            <input type="email" id="reg-email" class="cyber-input" placeholder="jordan@company.com" required>
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="reg-password">Password:</label>
+            <input type="password" id="reg-password" class="cyber-input" placeholder="••••••••" required>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="input-group">
+              <label class="input-label" for="reg-role">Account Role:</label>
+              <select id="reg-role" class="cyber-select" style="width: 100%;">
+                <option value="pentester">Security Pentester</option>
+                <option value="admin">SecOps Admin</option>
+                <option value="developer">AppSec Developer</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="reg-company">Organization:</label>
+              <input type="text" id="reg-company" class="cyber-input" placeholder="e.g. Acme Corp">
+            </div>
+          </div>
+          <div id="reg-status" style="font-size: 12px; margin-bottom: 10px;"></div>
+          <button type="submit" class="cyber-btn primary" style="width: 100%;">Create Account</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Register Target Domain Modal -->
+  <div id="register-target-modal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-card" style="max-width: 500px;">
+      <div class="modal-header">
+        <h2 style="font-size: 18px; font-weight: 800;">Register Target Domain</h2>
+        <button id="close-target-modal-btn" class="btn-close-modal">&times;</button>
+      </div>
+      <form id="new-target-form">
+        <div class="input-group">
+          <label class="input-label" for="target-name">Target Friendly Name:</label>
+          <input type="text" id="target-name" class="cyber-input" placeholder="e.g. CyberMart Production Gateway" required>
+        </div>
+        <div class="input-group">
+          <label class="input-label" for="target-domain">Target Hostname / Domain:</label>
+          <input type="text" id="target-domain" class="cyber-input" placeholder="e.g. api.cybermart.com" required>
+        </div>
+        <div class="input-group">
+          <label class="input-label" for="target-base-url">Base Scan Endpoint URL:</label>
+          <input type="url" id="target-base-url" class="cyber-input" placeholder="https://api.cybermart.com/api" required>
+        </div>
+        <div class="input-group">
+          <label class="input-label" for="target-verify-method">Verification Method:</label>
+          <select id="target-verify-method" class="cyber-select" style="width: 100%;">
+            <option value="HTTP_WELL_KNOWN">HTTP Well-Known File (/.well-known/aegis-verification.txt)</option>
+            <option value="HTML_META">HTML &lt;meta&gt; Tag on Homepage</option>
+            <option value="DNS_TXT">DNS TXT Record (@)</option>
+          </select>
+        </div>
+        <div id="target-reg-status" style="font-size: 12px; margin-bottom: 10px;"></div>
+        <button type="submit" class="cyber-btn primary" style="width: 100%;">Register & Get Verification Token</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4. Domain Ownership Verification Wizard Modal -->
+  <div id="verification-modal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-card" style="max-width: 560px;">
+      <div class="modal-header">
+        <div>
+          <h2 style="font-size: 18px; font-weight: 800;">Domain Ownership Verification</h2>
+          <div style="font-size: 12px; color: var(--text-muted);">
+            Target: <span id="verify-target-name" style="color: var(--neon-cyan); font-weight: bold;"></span> (<span id="verify-target-domain"></span>)
+          </div>
+        </div>
+        <button id="close-verify-modal-btn" class="btn-close-modal">&times;</button>
+      </div>
+
+      <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">YOUR CRYPTOGRAPHIC VERIFICATION TOKEN:</div>
+      <div class="code-box" id="verify-token-val" style="font-size: 14px; font-weight: bold; color: var(--neon-green);"></div>
+
+      <div id="verify-instructions-body" style="margin-top: 14px; font-size: 13px;"></div>
+
+      <div id="verify-check-status" style="font-size: 12px; margin-top: 12px; min-height: 18px; font-weight: bold;"></div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+        <button class="cyber-btn primary" id="btn-run-verify-check">✓ Check & Verify Domain Now</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Historical Scan Detail Modal -->
+  <div id="history-detail-modal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-card" style="max-width: 800px;">
+      <div class="modal-header">
+        <div>
+          <h2 id="history-modal-title" style="font-size: 18px; font-weight: 800;">Audit Log</h2>
+          <div id="history-modal-target" style="font-size: 12px; color: var(--text-muted); font-family: monospace;"></div>
+        </div>
+        <button id="close-history-modal-btn" class="btn-close-modal">&times;</button>
+      </div>
+      <div id="history-modal-findings" style="max-height: 60vh; overflow-y: auto;"></div>
+    </div>
+  </div>
+
+  <!-- 6. API Key Generation Modal -->
+  <div id="apikey-modal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-card" style="max-width: 580px;">
+      <div class="modal-header">
+        <h2 style="font-size: 18px; font-weight: 800;">Generate CI/CD API Key</h2>
+        <button id="close-apikey-modal-btn" class="btn-close-modal">&times;</button>
+      </div>
+      <form id="new-apikey-form">
+        <div class="input-group">
+          <label class="input-label" for="apikey-name">Key Identifier / Integration Name:</label>
+          <input type="text" id="apikey-name" class="cyber-input" placeholder="e.g. GitHub Actions Staging Pipeline" required>
+        </div>
+        <div class="input-group">
+          <label class="input-label" for="apikey-role">Permission Role:</label>
+          <select id="apikey-role" class="cyber-select" style="width: 100%;">
+            <option value="ci_cd_runner">CI/CD Runner (Trigger Scans & Fetch Reports)</option>
+            <option value="admin">Full Admin Operator</option>
+          </select>
+        </div>
+        <button type="submit" class="cyber-btn primary" style="width: 100%;">Generate Token</button>
+      </form>
+
+      <div id="apikey-created-section" style="display: none; margin-top: 16px;">
+        <div style="font-size: 12px; font-weight: 700; color: var(--neon-green); margin-bottom: 4px;">✓ Copy your new API Token:</div>
+        <div style="display: flex; gap: 8px;">
+          <div id="raw-apikey-display" class="code-box" style="flex: 1; margin: 0;"></div>
+          <button id="btn-copy-raw-key" class="copy-btn">📋 Copy</button>
+        </div>
+        <div style="font-size: 11px; color: var(--neon-amber); margin-top: 6px;">
+          ⚠️ Make sure to copy your API key now. You will not be able to see it again.
+        </div>
+        <div style="font-size: 12px; font-weight: bold; color: var(--text-muted); margin-top: 14px; margin-bottom: 4px;">
+          GITHUB ACTIONS STEP SNIPPET:
+        </div>
+        <pre id="cicd-snippet-display" style="background: #000; color: #38bdf8; padding: 10px; border-radius: 6px; font-family: var(--font-mono); font-size: 11px; overflow-x: auto; white-space: pre-wrap;"></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Invite Team Collaborator Modal -->
+  <div id="invite-team-modal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-card" style="max-width: 480px;">
+      <div class="modal-header">
+        <div>
+          <h2 style="font-size: 18px; font-weight: 800;">Invite Enterprise Collaborator</h2>
+          <div style="font-size: 12px; color: var(--text-muted);">Assign least-privilege RBAC role</div>
+        </div>
+        <button id="btn-close-invite-modal" class="btn-close-modal">&times;</button>
+      </div>
+
+      <form id="invite-team-form">
+        <div class="input-group">
+          <label class="input-label" for="invite-name">Full Name:</label>
+          <input type="text" id="invite-name" class="cyber-input" placeholder="e.g. Rachel Adams" required>
+        </div>
+        <div class="input-group">
+          <label class="input-label" for="invite-email">Corporate Email Address:</label>
+          <input type="email" id="invite-email" class="cyber-input" placeholder="e.g. rachel@enterprise.org" required>
+        </div>
+        <div class="input-group">
+          <label class="input-label" for="invite-role">Designated Role:</label>
+          <select id="invite-role" class="cyber-select">
+            <option value="pentester">Offensive Security / Pentester</option>
+            <option value="developer">AppSec Software Engineer</option>
+            <option value="admin">SecOps Administrator</option>
+          </select>
+        </div>
+        <div id="invite-status" style="font-size: 12px; margin-bottom: 10px;"></div>
+        <button type="submit" class="cyber-btn primary" style="width: 100%;">Dispatch Invitation</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- JavaScript Controllers -->
+  <script src="/js/app.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/auth_page.js"></script>
+  <script src="/js/targets.js"></script>
+  <script src="/js/history.js"></script>
+  <script src="/js/compliance.js"></script>
+  <script src="/js/team.js"></script>
+  <script src="/js/waf_rules.js"></script>
+  <script src="/js/reports_page.js"></script>
+  <script src="/js/apikeys.js"></script>
+  <script src="/js/scanner.js"></script>
+  <script src="/js/vulnerabilities.js"></script>
+  <script src="/js/poc_viewer.js"></script>
+  <script src="/js/waf_monitor.js"></script>
+  <script src="/js/storefront.js"></script>
+  <script src="/js/remediation.js"></script>
+</body>
+</html>

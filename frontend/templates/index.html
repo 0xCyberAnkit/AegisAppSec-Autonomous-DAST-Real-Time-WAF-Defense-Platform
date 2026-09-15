@@ -1,0 +1,376 @@
+{% extends "base.html" %}
+{% block title %}AegisAppSec — Autonomous DAST Scanner &amp; Real-Time WAF{% endblock %}
+
+{% block content %}
+
+<!-- ══ ATMOSPHERIC CHROMATIC AURORA GLOW (From Reference Images) ══ -->
+<div class="sk-aurora-glow" aria-hidden="true"></div>
+<div class="sk-aurora-glow-secondary" aria-hidden="true"></div>
+
+<!-- ══ SECTION 1: HERO BENTO GRID (Reference 2) ═══════════════ -->
+<section class="sk-bento-hero-section">
+  <div class="sk-bento-frame">
+
+    <!-- Top Block: Logo Glyph & Main Headline -->
+    <div class="sk-bento-top">
+      <div class="sk-bento-glyph">
+        <img src="{{ url_for('static', filename='img/aegis_emblem.png') }}" alt="AegisAppSec Emblem" class="sk-bento-emblem-img">
+      </div>
+
+      <div class="sk-bento-hero-content">
+        <div class="sk-hero-tagline-badge">
+          <span class="sk-tag-glow-dot"></span>
+          <span>FIND. PROVE. FIX. DEFEND.</span>
+        </div>
+        <h1 class="sk-bento-hero-title">
+          Autonomous security from scratch
+        </h1>
+        <p class="sk-bento-hero-sub">
+          All autonomous DAST scanning and real-time WAF defense resources are available.
+        </p>
+      </div>
+    </div>
+
+    <!-- Middle Bento Row: 3 Columns -->
+    <div class="sk-bento-columns">
+
+      <!-- Column 1: Guide / Scanner -->
+      <div class="sk-bento-col col-guide">
+        <div class="sk-bento-label">GUIDE // SCANNER</div>
+        <h2 class="sk-bento-heading">
+          Start reading and doing your research on what AppSec is.
+        </h2>
+        <p class="sk-bento-desc">
+          This will give you an understanding of how autonomous DAST crawling and fuzzing discovers exploitable weaknesses across your entire application stack.
+        </p>
+        <a href="{{ url_for('scanner') }}" class="sk-bento-arrow-link" title="Launch Scanner Console">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <line x1="7" y1="17" x2="17" y2="7"></line>
+            <polyline points="7 7 17 7 17 17"></polyline>
+          </svg>
+        </a>
+      </div>
+
+      <!-- Column 2: Downloads / WAF -->
+      <div class="sk-bento-col col-downloads">
+        <div class="sk-bento-label">MIDDLEWARE // WAF</div>
+        <h2 class="sk-bento-heading">
+          Explore tools and find the defenses you like.
+        </h2>
+        <p class="sk-bento-desc">
+          Deploy zero-latency virtual patching to block SQL injection, SSRF, and XSS exploits before code fixes ship.
+        </p>
+
+        <!-- Tool Badges (Matching Reference 2 icon pills) -->
+        <div class="sk-bento-badges-row">
+          <span class="sk-bento-pill-icon" title="Cloudflare Edge WAF">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+            <span>Cloudflare</span>
+          </span>
+          <span class="sk-bento-pill-icon" title="Amazon Web Services">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            <span>AWS</span>
+          </span>
+          <span class="sk-bento-pill-icon" title="Docker Container Security">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            <span>Docker</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Column 3: Links & Standards -->
+      <div class="sk-bento-col col-links">
+        <div class="sk-bento-label">VERIFIED COVERAGE</div>
+        <h2 class="sk-bento-heading">
+          Audit against security standards right now!
+        </h2>
+
+        <!-- Standards / Integrations List (Reference 2 layout) -->
+        <div class="sk-standards-list">
+          <a href="{{ url_for('services') }}" class="sk-standard-item">
+            <div class="sk-std-brand">
+              <span class="sk-std-dot"></span>
+              <strong>OWASP Top 10</strong>
+            </div>
+            <span class="sk-std-url">owasp.org ↗</span>
+          </a>
+
+          <a href="{{ url_for('services') }}" class="sk-standard-item">
+            <div class="sk-std-brand">
+              <span class="sk-std-dot"></span>
+              <strong>MITRE CWE-89</strong>
+            </div>
+            <span class="sk-std-url">cwe.mitre.org ↗</span>
+          </a>
+
+          <a href="{{ url_for('about') }}" class="sk-standard-item">
+            <div class="sk-std-brand">
+              <span class="sk-std-dot"></span>
+              <strong>SOC2 Type II</strong>
+            </div>
+            <span class="sk-std-url">compliance.sec ↗</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ SECTION 2: NUMBERED FEATURE SLICES (Reference 1) ════════ -->
+<section class="sk-slices-section">
+  <div class="sk-slices-header">
+    <span class="sk-slices-tag">// CAPABILITIES</span>
+    <h2 class="sk-slices-main-title">Core Security Architecture</h2>
+  </div>
+
+  <div class="sk-slices-list">
+
+    <!-- Row 01: Spacing / Autonomous DAST -->
+    <div class="sk-slice-row" id="slice-1">
+      <div class="sk-slice-main" onclick="toggleSlice(1)">
+        <div class="sk-slice-num">01</div>
+        <div class="sk-slice-content">
+          <h3 class="sk-slice-title">Autonomous DAST</h3>
+          <p class="sk-slice-desc">
+            Use our autonomous crawling and endpoint discovery engine to map every route, form input, and API controller across your entire application.
+          </p>
+        </div>
+        <button type="button" class="sk-slice-circle-btn" aria-label="Expand Autonomous DAST">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Expandable Drawer -->
+      <div class="sk-slice-drawer" id="drawer-1">
+        <div class="sk-drawer-content">
+          <div class="sk-drawer-grid">
+            <div class="sk-drawer-box">
+              <span class="sk-box-label">AUTONOMOUS CRAWLER STATUS</span>
+              <div class="sk-box-val green">● ACTIVE RECONNAISSANCE</div>
+              <p class="sk-box-text">Recursively analyzes single-page apps (SPAs), GraphQL endpoints, and REST APIs without manual scripts.</p>
+            </div>
+            <div class="sk-drawer-box">
+              <span class="sk-box-label">ENDPOINT COVERAGE</span>
+              <div class="sk-box-val">100% ROUTE MAPPING</div>
+              <p class="sk-box-text">Automatically handles session authentication, CSRF tokens, and complex stateful workflows.</p>
+            </div>
+          </div>
+          <div style="margin-top: 18px;">
+            <a href="{{ url_for('scanner') }}" class="sk-pill-btn">Launch Live Scanner Now →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 02: Fonts / Intelligent Fuzzing -->
+    <div class="sk-slice-row" id="slice-2">
+      <div class="sk-slice-main" onclick="toggleSlice(2)">
+        <div class="sk-slice-num">02</div>
+        <div class="sk-slice-content">
+          <h3 class="sk-slice-title">Intelligent Fuzzing</h3>
+          <p class="sk-slice-desc">
+            Synthesize and dynamically mutate 1,000+ evasion attack payloads to uncover edge cases, blind injections, and zero-day weaknesses that static tools miss.
+          </p>
+        </div>
+        <button type="button" class="sk-slice-circle-btn" aria-label="Expand Intelligent Fuzzing">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Expandable Drawer -->
+      <div class="sk-slice-drawer" id="drawer-2">
+        <div class="sk-drawer-content">
+          <div class="sk-drawer-grid">
+            <div class="sk-drawer-box">
+              <span class="sk-box-label">PAYLOAD MUTATION ENGINE</span>
+              <div class="sk-box-val cyan">1,000+ DYNAMIC VECTORS</div>
+              <p class="sk-box-text">Tests SQLi, NoSQLi, command execution, and SSRF using multi-encoding evasion techniques.</p>
+            </div>
+            <div class="sk-drawer-box">
+              <span class="sk-box-label">LATENCY &amp; RESPONSE ANALYSIS</span>
+              <div class="sk-box-val">TIMING DIFFERENTIALS</div>
+              <p class="sk-box-text">Detects blind time-based vulnerabilities with sub-millisecond precision analysis.</p>
+            </div>
+          </div>
+          <div style="margin-top: 18px;">
+            <a href="{{ url_for('services') }}" class="sk-pill-btn">View Fuzzing Specifications →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 03: Icons / Real-Time WAF -->
+    <div class="sk-slice-row" id="slice-3">
+      <div class="sk-slice-main" onclick="toggleSlice(3)">
+        <div class="sk-slice-num">03</div>
+        <div class="sk-slice-content">
+          <h3 class="sk-slice-title">Real-Time WAF</h3>
+          <p class="sk-slice-desc">
+            Enforce sub-millisecond request inspection and automated virtual patching in live production traffic before developers push code updates.
+          </p>
+        </div>
+        <button type="button" class="sk-slice-circle-btn" aria-label="Expand Real-Time WAF">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Expandable Drawer -->
+      <div class="sk-slice-drawer" id="drawer-3">
+        <div class="sk-drawer-content">
+          <div class="sk-drawer-grid">
+            <div class="sk-drawer-box">
+              <span class="sk-box-label">EDGE ENFORCEMENT OVERHEAD</span>
+              <div class="sk-box-val green">&lt; 1.2ms LATENCY</div>
+              <p class="sk-box-text">Lightweight asynchronous proxy middleware that filters malicious traffic without impacting user experience.</p>
+            </div>
+            <div class="sk-drawer-box">
+              <span class="sk-box-label">VIRTUAL PATCHING</span>
+              <div class="sk-box-val">ZERO-DAY SHIELD</div>
+              <p class="sk-box-text">Instantly neutralizes discovered vulnerabilities while your engineers write and test production patches.</p>
+            </div>
+          </div>
+          <div style="margin-top: 18px;">
+            <a href="{{ url_for('services') }}" class="sk-pill-btn">Explore WAF Integration →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 04: Dev Remediation -->
+    <div class="sk-slice-row" id="slice-4">
+      <div class="sk-slice-main" onclick="toggleSlice(4)">
+        <div class="sk-slice-num">04</div>
+        <div class="sk-slice-content">
+          <h3 class="sk-slice-title">Developer Remediation</h3>
+          <p class="sk-slice-desc">
+            Transform security findings into actionable pull-request annotations, side-by-side code diffs, and exact fix guidance that developers can merge immediately.
+          </p>
+        </div>
+        <button type="button" class="sk-slice-circle-btn" aria-label="Expand Developer Remediation">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Expandable Drawer -->
+      <div class="sk-slice-drawer" id="drawer-4">
+        <div class="sk-drawer-content">
+          <div class="sk-drawer-grid">
+            <div class="sk-drawer-box">
+              <span class="sk-box-label">CODE-LEVEL GUIDANCE</span>
+              <div class="sk-box-val cyan">DIFF ANNOTATIONS</div>
+              <p class="sk-box-text">Provides exact lines of vulnerable code paired with secure, framework-native remediations.</p>
+            </div>
+            <div class="sk-drawer-box">
+              <span class="sk-box-label">CI/CD INTEGRATION</span>
+              <div class="sk-box-val">QUALITY GATES</div>
+              <p class="sk-box-text">Integrates directly into GitHub Actions, GitLab CI, and Jenkins to block exploitable commits.</p>
+            </div>
+          </div>
+          <div style="margin-top: 18px;">
+            <a href="{{ url_for('services') }}" class="sk-pill-btn">View Sample Code Diffs →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ SECTION 3: STATS STRIP ═════════════════════════════════ -->
+<section class="sk-arch-stats-section">
+  <div class="sk-arch-stats-grid">
+    <div class="sk-arch-stat-cell">
+      <div class="sk-arch-stat-num">10<span>+</span></div>
+      <div class="sk-arch-stat-label">OWASP Top 10 Categories Covered</div>
+    </div>
+    <div class="sk-arch-stat-cell">
+      <div class="sk-arch-stat-num">24<span>/</span>7</div>
+      <div class="sk-arch-stat-label">Real-Time WAF Enforcement</div>
+    </div>
+    <div class="sk-arch-stat-cell">
+      <div class="sk-arch-stat-num">1K<span>+</span></div>
+      <div class="sk-arch-stat-label">Intelligent Attack Payloads</div>
+    </div>
+    <div class="sk-arch-stat-cell">
+      <div class="sk-arch-stat-num">∞</div>
+      <div class="sk-arch-stat-label">Continuous Security Scanning Loop</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SECTION 4: OWASP TOP 10 COVERAGE MATRIX ════════════════ -->
+<section class="sk-owasp-section">
+  <div class="sk-slices-header" style="margin-bottom: 32px;">
+    <span class="sk-slices-tag">// SECURITY COVERAGE</span>
+    <h2 class="sk-slices-main-title">Built Around the OWASP Top 10</h2>
+    <p style="color: var(--ink-muted); font-size: 1.05rem; margin-top: 8px;">
+      Every scan systematically probes, verifies, and reports against all 10 critical web application risk categories.
+    </p>
+  </div>
+
+  <div class="sk-owasp-arch-table">
+    {% for item in owasp_list %}
+    <div class="sk-owasp-arch-row">
+      <div class="sk-owasp-arch-id">A{{ item.id }}:2021</div>
+      <div class="sk-owasp-arch-name">{{ item.title }}</div>
+      <div class="sk-owasp-arch-desc">{{ item.desc }}</div>
+      <div class="sk-owasp-arch-tag {% if item.id in ['01','03','10'] %}crit{% else %}high{% endif %}">
+        {% if item.id in ['01','03','10'] %}
+          ● CRITICAL
+        {% else %}
+          ▲ HIGH
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div style="margin-top: 36px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+    <a href="{{ url_for('scanner') }}" class="sk-pill-btn" style="padding: 14px 28px; font-size: 0.95rem;">
+      Audit Your Web Application Now →
+    </a>
+    <a href="{{ url_for('contact') }}" class="sk-signin-link" style="font-size: 0.95rem; font-weight: 600;">
+      Schedule Technical Advisory
+    </a>
+  </div>
+</section>
+
+<!-- ══ SECTION 5: FINAL CTA BAND ══════════════════════════════ -->
+<section class="sk-arch-cta-wrap">
+  <div class="sk-arch-cta-box">
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+      <img src="{{ url_for('static', filename='img/aegis_emblem.png') }}" alt="Aegis" style="width: 38px; height: 38px; border-radius: 50%; box-shadow: 0 0 16px var(--red-glow); border: 1px solid var(--red-border);">
+      <div class="sk-bento-label" style="margin-bottom: 0;">FIND. PROVE. FIX. DEFEND. // GET STARTED</div>
+    </div>
+    <h2 class="sk-bento-hero-title" style="font-size: clamp(32px, 3.8vw, 48px); margin-bottom: 14px;">
+      Secure every endpoint. Stop attacks in real time.
+    </h2>
+    <p class="sk-bento-hero-sub" style="margin-bottom: 32px; max-width: 640px;">
+      Launch an autonomous security scan in under 60 seconds with zero agent installation.
+    </p>
+    <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+      <a href="{{ url_for('scanner') }}" class="sk-pill-btn" style="padding: 14px 32px; font-size: 1rem;">
+        Launch Free Scanner Console
+      </a>
+      <a href="{{ url_for('contact') }}" class="sk-signin-link" style="font-size: 0.95rem; font-weight: 600;">
+        Contact Security Team →
+      </a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

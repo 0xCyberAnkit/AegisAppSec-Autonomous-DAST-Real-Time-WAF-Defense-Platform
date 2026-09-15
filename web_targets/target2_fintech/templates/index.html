@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ApexBank Treasury & Markets — Autonomous Target 02</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070c14;
+      --card-bg: rgba(13, 20, 36, 0.75);
+      --border: rgba(255, 255, 255, 0.08);
+      --emerald: #10b981;
+      --purple: #a855f7;
+      --pink: #ec4899;
+      --yellow: #eab308;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      padding: 24px;
+      min-height: 100vh;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+    .logo {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--emerald);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .badge-port {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid var(--emerald);
+      color: var(--emerald);
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .badge-vuln {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 3px;
+      margin-left: 6px;
+    }
+    .ticker {
+      display: flex;
+      gap: 16px;
+      background: rgba(0,0,0,0.3);
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      margin-bottom: 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      backdrop-filter: blur(8px);
+    }
+    .card h3 {
+      font-size: 1.05rem;
+      color: #fff;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,0.35);
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+    }
+    input:focus {
+      outline: none;
+      border-color: var(--emerald);
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.2);
+    }
+    button {
+      background: linear-gradient(135deg, var(--emerald), #059669);
+      color: #030712;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.2s;
+    }
+    button:hover { opacity: 0.9; }
+    .acc-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.03);
+      padding: 8px 12px;
+      border-radius: 6px;
+      margin-bottom: 6px;
+      font-size: 0.85rem;
+    }
+    .footer-note {
+      margin-top: 30px;
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">
+      <span>🏛️ ApexBank Corporate & Treasury Portal</span>
+    </div>
+    <div>
+      <span class="badge-port">TARGET 02 // PORT 8002</span>
+    </div>
+  </div>
+
+  <div class="ticker">
+    {% for pair, val in fx_rates.items() %}
+    <div><span>{{ pair }}:</span> <strong style="color: var(--emerald);">{{ val }}</strong></div>
+    {% endfor %}
+  </div>
+
+  <div class="grid">
+    <!-- 1. SSRF Card -->
+    <div class="card">
+      <h3>
+        <span>1. Outbound Webhook Dispatch</span>
+        <span class="badge-vuln" style="background: rgba(168,85,247,0.15); color: var(--purple); border: 1px solid var(--purple);">SSRF [CWE-918]</span>
+      </h3>
+      <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 12px;">Unrestricted server-side HTTP request dispatch to internal or cloud addresses.</p>
+      <form action="/api/webhooks/test" method="POST" target="_blank">
+        <input type="text" name="url" placeholder="http://169.254.169.254/latest/meta-data/" value="http://169.254.169.254/latest/meta-data/">
+        <button type="submit">Dispatch Webhook (Test SSRF)</button>
+      </form>
+      <div style="font-size: 0.72rem; color: var(--muted); margin-top: 6px;">
+        Also test: <code>/api/fx/feed?source=http://127.0.0.1:8000/api/shop</code>
+      </div>
+    </div>
+
+    <!-- 2. Broken Authentication Card -->
+    <div class="card">
+      <h3>
+        <span>2. Treasury Portal Login</span>
+        <span class="badge-vuln" style="background: rgba(236,72,153,0.15); color: var(--pink); border: 1px solid var(--pink);">AUTH [CWE-287]</span>
+      </h3>
+      <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 12px;">Default credentials (admin:admin) & predictable static session cookies.</p>
+      {% if user %}
+      <div style="background: rgba(16,185,129,0.15); border: 1px solid var(--emerald); padding: 10px; border-radius: 6px; font-size: 0.8rem; margin-bottom: 10px;">
+        <div>Status: <strong style="color: var(--emerald);">AUTHENTICATED</strong></div>
+        <div>User: <strong>{{ user.username }}</strong> ({{ user.role }})</div>
+        <div>Session Token: <code>apex_session_master_admin</code></div>
+      </div>
+      {% else %}
+      <form action="/api/login" method="POST" target="_blank">
+        <input type="text" name="username" value="admin" placeholder="Username">
+        <input type="password" name="password" value="admin" placeholder="Password">
+        <button type="submit">Authenticate Session</button>
+      </form>
+      {% endif %}
+    </div>
+
+    <!-- 3. Open Redirect Card -->
+    <div class="card">
+      <h3>
+        <span>3. Single Sign-On Redirect</span>
+        <span class="badge-vuln" style="background: rgba(234,179,8,0.15); color: var(--yellow); border: 1px solid var(--yellow);">REDIRECT [CWE-601]</span>
+      </h3>
+      <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 12px;">Unvalidated external URL redirect used for phishing & credential harvesting.</p>
+      <form action="/redirect" method="GET" target="_blank">
+        <input type="text" name="url" value="https://attacker-phishing-portal.com">
+        <button type="submit">Follow Redirect &rarr;</button>
+      </form>
+    </div>
+
+    <!-- 4. Sensitive Data Exposure Card -->
+    <div class="card">
+      <h3>
+        <span>4. Debug Diagnostics API</span>
+        <span class="badge-vuln" style="background: rgba(16,185,129,0.15); color: var(--emerald); border: 1px solid var(--emerald);">INFO [CWE-200]</span>
+      </h3>
+      <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 12px;">Diagnostic endpoint dumping live database connection strings & cryptographic keys.</p>
+      <button type="button" onclick="window.open('/api/debug/system')">View System Debug Dump</button>
+      <div style="margin-top: 14px;">
+        <span style="font-size: 0.75rem; color: var(--muted); font-family: 'JetBrains Mono', monospace;">TREASURY LEDGER:</span>
+        <div style="margin-top: 8px;">
+          {% for acc_num, data in accounts.items() %}
+          <div class="acc-row">
+            <span>{{ acc_num }} ({{ data.owner }})</span>
+            <strong style="color: var(--emerald); font-family: 'JetBrains Mono', monospace;">${{ "{:,.2f}".format(data.balance) }}</strong>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    AEGIS APPSEC TARGET 02 // APEXBANK TREASURY // PURPOSE-BUILT FOR DAST PENETRATION TESTING
+  </div>
+</body>
+</html>

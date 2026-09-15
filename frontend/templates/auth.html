@@ -1,0 +1,783 @@
+{% extends "base.html" %}
+{% block title %}Security Console Access — AegisAppSec | Individual & Enterprise Gateway{% endblock %}
+
+{% block extra_head %}
+<style>
+/* ══ DEDICATED AUTHENTICATION GATEWAY STYLES ═══════════════════ */
+.sk-auth-wrap {
+  min-height: calc(100vh - 160px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  position: relative;
+}
+
+.sk-auth-card {
+  width: 100%;
+  max-width: 520px;
+  background: rgba(9, 13, 24, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 40px 36px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6), 0 0 40px rgba(255, 0, 51, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.sk-auth-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #ff0033, #00f0ff, transparent);
+}
+
+.sk-auth-header {
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+}
+
+.sk-auth-badge {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--red, #ff0033);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.sk-auth-title {
+  font-family: var(--font-main, 'Inter', sans-serif);
+  font-size: 1.85rem;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+
+.sk-auth-title span {
+  color: var(--red, #ff0033);
+  text-shadow: 0 0 16px rgba(255, 0, 51, 0.4);
+}
+
+.sk-auth-sub {
+  font-size: 0.84rem;
+  color: var(--text-muted, #64748b);
+  margin-top: 6px;
+}
+
+/* Plan Track Switcher (Individual vs Company) */
+.sk-plan-track-switcher {
+  display: flex;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 4px;
+  gap: 4px;
+  margin-bottom: 18px;
+}
+
+.sk-plan-track-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #64748b);
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 10px 8px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.sk-plan-track-btn.active.individual {
+  background: rgba(0, 240, 255, 0.12);
+  color: #00f0ff;
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.2);
+}
+
+.sk-plan-track-btn.active.company {
+  background: rgba(255, 0, 51, 0.14);
+  color: #ffffff;
+  border: 1px solid rgba(255, 0, 51, 0.35);
+  box-shadow: 0 0 14px rgba(255, 0, 51, 0.2);
+}
+
+/* Mode Tabs (Sign In vs Register) */
+.sk-auth-tabs {
+  display: flex;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+  padding: 4px;
+  gap: 4px;
+  margin-bottom: 22px;
+}
+
+.sk-auth-tab {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #64748b);
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 9px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.sk-auth-tab.active {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Track Information Banner */
+.sk-track-badge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.68rem;
+  margin-bottom: 18px;
+}
+
+.sk-track-badge.individual {
+  background: rgba(0, 240, 255, 0.06);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  color: #00f0ff;
+}
+
+.sk-track-badge.company {
+  background: rgba(255, 0, 51, 0.08);
+  border: 1px solid rgba(255, 0, 51, 0.25);
+  color: #ff3366;
+}
+
+/* Demo Pills */
+.sk-demo-pills {
+  background: rgba(0, 240, 255, 0.04);
+  border: 1px solid rgba(0, 240, 255, 0.15);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 20px;
+}
+
+.sk-demo-pills-label {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.65rem;
+  color: #00f0ff;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sk-demo-pills-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.sk-demo-pill-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-white, #ffffff);
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+
+.sk-demo-pill-btn:hover {
+  background: rgba(0, 240, 255, 0.15);
+  border-color: #00f0ff;
+  color: #00f0ff;
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.25);
+}
+
+/* Form Elements */
+.sk-form-group {
+  margin-bottom: 16px;
+}
+
+.sk-form-label {
+  display: block;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-body, #94a3b8);
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+
+.sk-form-input, .sk-form-select {
+  width: 100%;
+  background: rgba(2, 5, 14, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 11px 13px;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.84rem;
+  color: #ffffff;
+  transition: all 0.2s;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.sk-form-input:focus, .sk-form-select:focus {
+  border-color: #ff0033;
+  box-shadow: 0 0 12px rgba(255, 0, 51, 0.35);
+  background: rgba(4, 8, 20, 0.95);
+}
+
+.sk-submit-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #ff0033;
+  color: #ffffff;
+  font-family: var(--font-main, 'Inter', sans-serif);
+  font-size: 0.92rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  padding: 13px 20px;
+  border-radius: 8px;
+  border: 1px solid #ff2255;
+  box-shadow: 0 0 20px rgba(255, 0, 51, 0.35);
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 6px;
+}
+
+.sk-submit-btn:hover {
+  background: #ff2255;
+  box-shadow: 0 0 30px rgba(255, 0, 51, 0.5);
+  transform: translateY(-1px);
+}
+
+.sk-submit-btn.cyan {
+  background: #00f0ff;
+  color: #050814;
+  border-color: #38bdf8;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.35);
+}
+
+.sk-submit-btn.cyan:hover {
+  background: #38bdf8;
+  box-shadow: 0 0 30px rgba(0, 240, 255, 0.5);
+}
+
+/* Divider & SSO */
+.sk-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 20px 0 14px;
+  color: var(--text-dim, #475569);
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+}
+
+.sk-divider::before, .sk-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.sk-divider:not(:empty)::before { margin-right: 12px; }
+.sk-divider:not(:empty)::after { margin-left: 12px; }
+
+.sk-sso-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.sk-sso-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-body, #94a3b8);
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.sk-sso-btn:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Password Strength Meter */
+.sk-strength-bar {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.sk-strength-fill {
+  height: 100%;
+  width: 0;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+
+.sk-switch-footer {
+  text-align: center;
+  margin-top: 18px;
+  font-size: 0.8rem;
+  color: var(--text-muted, #64748b);
+}
+
+.sk-switch-link {
+  color: var(--cyan, #00f0ff);
+  cursor: pointer;
+  text-decoration: underline;
+  margin-left: 4px;
+  font-weight: 600;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sk-auth-wrap">
+  <div class="sk-auth-card">
+    <!-- Emblem -->
+    <div style="text-align: center; margin-bottom: 18px;">
+      <img src="{{ url_for('static', filename='img/aegis_emblem.png') }}" alt="AegisAppSec" style="width: 64px; height: 64px; border-radius: 50%; border: 1px solid rgba(255, 0, 51, 0.35); box-shadow: 0 0 24px rgba(255, 0, 51, 0.3);">
+    </div>
+
+    <!-- Header -->
+    <div class="sk-auth-header">
+      <div class="sk-auth-badge" id="authGatewayBadge">// AUTHENTICATION GATEWAY</div>
+      <h1 class="sk-auth-title" id="authTitle">
+        SECURITY <span>CONSOLE</span>
+      </h1>
+      <p class="sk-auth-sub" id="authSub">
+        FIND. PROVE. FIX. DEFEND. — Select your plan track to access platform controls.
+      </p>
+    </div>
+
+    <!-- Error Alert -->
+    {% if auth_error %}
+    <div id="authAlertBox" style="background: rgba(244, 63, 94, 0.12); border: 1px solid rgba(244, 63, 94, 0.35); padding: 12px 14px; border-radius: 8px; font-family: var(--font-mono, monospace); font-size: 0.78rem; color: #f43f5e; margin-bottom: 18px; display: flex; align-items: center; gap: 10px;">
+      <span style="font-size: 1.1rem; line-height: 1;">⚠</span>
+      <span>{{ auth_error }}</span>
+    </div>
+    {% endif %}
+
+    <!-- Target Redirect Banner -->
+    {% if next_url %}
+    <div style="background: rgba(0, 240, 255, 0.08); border: 1px solid rgba(0, 240, 255, 0.3); padding: 12px 14px; border-radius: 8px; font-family: var(--font-mono, monospace); font-size: 0.74rem; color: #00f0ff; margin-bottom: 18px; display: flex; align-items: center; gap: 10px;">
+      <span style="font-size: 1.1rem;">🔒</span>
+      <div>
+        <strong style="color: #ffffff;">AUTHENTICATION REQUIRED</strong> — Sign in to access <code style="color: #00f0ff; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">{{ next_url }}</code>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- ══ PLAN TRACK SWITCHER (Individuals vs Companies) ══════ -->
+    <div class="sk-plan-track-switcher">
+      <button type="button" class="sk-plan-track-btn individual {% if auth_plan != 'company' %}active{% endif %}" id="trackIndivBtn" onclick="switchPlanTrack('individual')">
+        <span>👤</span> FOR INDIVIDUALS &amp; PENTESTERS
+      </button>
+      <button type="button" class="sk-plan-track-btn company {% if auth_plan == 'company' %}active{% endif %}" id="trackCompBtn" onclick="switchPlanTrack('company')">
+        <span>🏢</span> FOR COMPANIES &amp; TEAMS
+      </button>
+    </div>
+
+    <!-- ══ SUB-TABS: SIGN IN vs CREATE WORKSPACE ═══════════════ -->
+    <div class="sk-auth-tabs">
+      <button type="button" class="sk-auth-tab {% if auth_mode != 'register' %}active{% endif %}" id="tabLoginBtn" onclick="switchAuthTab('login')">
+        SIGN IN
+      </button>
+      <button type="button" class="sk-auth-tab {% if auth_mode == 'register' %}active{% endif %}" id="tabRegisterBtn" onclick="switchAuthTab('register')">
+        CREATE WORKSPACE
+      </button>
+    </div>
+
+    <!-- Track Status Badge -->
+    <div class="sk-track-badge {% if auth_plan == 'company' %}company{% else %}individual{% endif %}" id="trackBadge">
+      <span id="trackBadgeText">
+        {% if auth_plan == 'company' %}
+          🏢 COMPANY TRACK // Team Growth &amp; Enterprise Shield
+        {% else %}
+          👤 INDIVIDUAL TRACK // Free Community &amp; Pentester Pro
+        {% endif %}
+      </span>
+      <span style="opacity: 0.8;" id="trackBadgeSub">
+        {% if auth_plan == 'company' %}14-Day Free Trial{% else %}Instant Access{% endif %}
+      </span>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- 1. LOGIN FORM                                               -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <form id="loginForm" method="POST" action="{{ url_for('auth') }}" {% if auth_mode == 'register' %}style="display:none;"{% endif %}>
+      <input type="hidden" name="auth_mode" value="login">
+      <input type="hidden" name="auth_plan" id="loginAuthPlan" value="{{ auth_plan }}">
+      <input type="hidden" name="next" value="{{ next_url }}">
+
+      <!-- Quick 1-Click Demo Personas -->
+      <div class="sk-demo-pills" id="demoPillsBox">
+        <div class="sk-demo-pills-label">
+          <span>⚡</span> <span>1-CLICK DEMO CREDENTIALS:</span>
+        </div>
+        <div class="sk-demo-pills-row" id="indivPills" {% if auth_plan == 'company' %}style="display:none;"{% endif %}>
+          <button type="button" class="sk-demo-pill-btn" onclick="fillDemo('pentester@aegisappsec.io', 'Pentester@2026!')">Pentester Pro (Red Team)</button>
+          <button type="button" class="sk-demo-pill-btn" onclick="fillDemo('dev@aegisappsec.io', 'DevAppSec@2026!')">AppSec Developer</button>
+        </div>
+        <div class="sk-demo-pills-row" id="compPills" {% if auth_plan != 'company' %}style="display:none;"{% endif %}>
+          <button type="button" class="sk-demo-pill-btn" onclick="fillDemo('admin@aegisappsec.io', 'AegisSec2026!#')">Enterprise SecOps Admin</button>
+          <button type="button" class="sk-demo-pill-btn" onclick="fillDemo('pentester@aegisappsec.io', 'Pentester@2026!')">Team Pentester</button>
+        </div>
+      </div>
+
+      <div class="sk-form-group">
+        <label class="sk-form-label" for="loginEmail" id="loginEmailLabel">
+          {% if auth_plan == 'company' %}Corporate Work Email{% else %}Operator Email{% endif %}
+        </label>
+        <input id="loginEmail" class="sk-form-input" name="email" type="email" placeholder="operator@enterprise.sec" value="{% if auth_plan == 'company' %}admin@aegisappsec.io{% else %}pentester@aegisappsec.io{% endif %}" required autocomplete="email">
+      </div>
+
+      <div class="sk-form-group">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <label class="sk-form-label" for="loginPwd" style="margin-bottom: 0;">Security Passphrase</label>
+          <button type="button" onclick="togglePwd('loginPwd', this)" style="background: none; border: none; color: #00f0ff; cursor: pointer; font-size: 0.72rem; font-family: var(--font-mono, monospace); font-weight: 600;">SHOW</button>
+        </div>
+        <input id="loginPwd" class="sk-form-input" name="password" type="password" placeholder="Enter password" value="{% if auth_plan == 'company' %}AegisSec2026!#{% else %}Pentester@2026!{% endif %}" required autocomplete="current-password">
+      </div>
+
+      <button type="submit" id="loginSubmitBtn" class="sk-submit-btn {% if auth_plan != 'company' %}cyan{% endif %}">
+        {% if auth_plan == 'company' %}AUTHENTICATE WORKSPACE →{% else %}AUTHENTICATE OPERATOR →{% endif %}
+      </button>
+
+      <!-- Enterprise SSO Row (Shown for Company track) -->
+      <div id="companySsoSection" {% if auth_plan != 'company' %}style="display:none;"{% endif %}>
+        <div class="sk-divider">ENTERPRISE FEDERATION</div>
+        <div class="sk-sso-row">
+          <button type="button" class="sk-sso-btn" onclick="simulateSSO('OKTA')">OKTA SAML 2.0</button>
+          <button type="button" class="sk-sso-btn" onclick="simulateSSO('GITHUB')">GITHUB SEC</button>
+        </div>
+      </div>
+
+      <div class="sk-switch-footer">
+        Need a new account? <span class="sk-switch-link" onclick="switchAuthTab('register')">Create workspace</span>
+      </div>
+    </form>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- 2. REGISTER FORM                                            -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <form id="registerForm" method="POST" action="{{ url_for('auth') }}" {% if auth_mode != 'register' %}style="display:none;"{% endif %}>
+      <input type="hidden" name="auth_mode" value="register">
+      <input type="hidden" name="auth_plan" id="regAuthPlan" value="{{ auth_plan }}">
+      <input type="hidden" name="next" value="{{ next_url }}">
+
+      <!-- Full Name -->
+      <div class="sk-form-group">
+        <label class="sk-form-label" for="regName" id="regNameLabel">
+          {% if auth_plan == 'company' %}Full Name &amp; Title{% else %}Full Name{% endif %}
+        </label>
+        <input id="regName" class="sk-form-input" name="name" type="text" placeholder="{% if auth_plan == 'company' %}Sarah Connor (SecOps Lead){% else %}Alex Vance{% endif %}" required autocomplete="name">
+      </div>
+
+      <!-- Field unique to Individual Pentester: Security Handle / Hacker Alias -->
+      <div class="sk-form-group" id="indivHandleGroup" {% if auth_plan == 'company' %}style="display:none;"{% endif %}>
+        <label class="sk-form-label" for="regHandle">Security Alias / Bug Bounty Handle <span style="color: var(--text-dim); font-size: 0.65rem;">(Optional)</span></label>
+        <input id="regHandle" class="sk-form-input" name="handle" type="text" placeholder="@zero_day_hunter">
+      </div>
+
+      <!-- Email -->
+      <div class="sk-form-group">
+        <label class="sk-form-label" for="regEmail" id="regEmailLabel">
+          {% if auth_plan == 'company' %}Corporate Work Email{% else %}Consultant / Pentester Email{% endif %}
+        </label>
+        <input id="regEmail" class="sk-form-input" name="email" type="email" placeholder="{% if auth_plan == 'company' %}lead@company.sec{% else %}researcher@sec.lab{% endif %}" required autocomplete="email">
+      </div>
+
+      <!-- Fields unique to Company: Org Name & Team Size -->
+      <div id="companyFieldsGroup" {% if auth_plan != 'company' %}style="display:none;"{% endif %}>
+        <div class="sk-form-group">
+          <label class="sk-form-label" for="regOrg">Company / Organization Name</label>
+          <input id="regOrg" class="sk-form-input" name="org" type="text" placeholder="Acme Cyber Defense Corp">
+        </div>
+
+        <div class="sk-form-group">
+          <label class="sk-form-label" for="regTeamSize">Engineering &amp; Security Team Size</label>
+          <select id="regTeamSize" class="sk-form-select" name="team_size">
+            <option value="1-10">1 – 10 Engineers (Startup / Seed)</option>
+            <option value="11-50" selected>11 – 50 Engineers (Team Growth)</option>
+            <option value="50-250">50 – 250 Engineers (Enterprise)</option>
+            <option value="250+">250+ Engineers (Global Hyperscale)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="sk-form-group">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <label class="sk-form-label" for="regPwd" style="margin-bottom: 0;">Create Master Passphrase</label>
+          <button type="button" onclick="togglePwd('regPwd', this)" style="background: none; border: none; color: #00f0ff; cursor: pointer; font-size: 0.72rem; font-family: var(--font-mono, monospace); font-weight: 600;">SHOW</button>
+        </div>
+        <input id="regPwd" class="sk-form-input" name="password" type="password" placeholder="Minimum 8 characters" required oninput="evalStrength(this.value)" autocomplete="new-password">
+        <div class="sk-strength-bar"><div class="sk-strength-fill" id="strengthFill"></div></div>
+        <div id="strengthLabel" style="font-family: var(--font-mono, monospace); font-size: 0.68rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 6px; color: #64748b;"></div>
+      </div>
+
+      <button type="submit" id="regSubmitBtn" class="sk-submit-btn {% if auth_plan != 'company' %}cyan{% endif %}">
+        {% if auth_plan == 'company' %}INITIALIZE ENTERPRISE TENANT →{% else %}CREATE INDIVIDUAL ACCOUNT →{% endif %}
+      </button>
+
+      <div class="sk-switch-footer">
+        Already have an account? <span class="sk-switch-link" onclick="switchAuthTab('login')">Sign in</span>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+let currentPlan = '{{ auth_plan }}';
+let currentMode = '{{ auth_mode }}';
+
+function switchPlanTrack(plan) {
+  currentPlan = plan;
+  
+  // Track button styles
+  const indivBtn = document.getElementById('trackIndivBtn');
+  const compBtn = document.getElementById('trackCompBtn');
+  const badge = document.getElementById('trackBadge');
+  const badgeText = document.getElementById('trackBadgeText');
+  const badgeSub = document.getElementById('trackBadgeSub');
+  
+  // Form hidden plan inputs
+  document.getElementById('loginAuthPlan').value = plan;
+  document.getElementById('regAuthPlan').value = plan;
+
+  // Individual vs Company elements
+  const indivHandle = document.getElementById('indivHandleGroup');
+  const compFields = document.getElementById('companyFieldsGroup');
+  const compSso = document.getElementById('companySsoSection');
+  const indivPills = document.getElementById('indivPills');
+  const compPills = document.getElementById('compPills');
+  const loginSubmit = document.getElementById('loginSubmitBtn');
+  const regSubmit = document.getElementById('regSubmitBtn');
+  const loginEmailLabel = document.getElementById('loginEmailLabel');
+  const regEmailLabel = document.getElementById('regEmailLabel');
+  const regNameLabel = document.getElementById('regNameLabel');
+
+  if (plan === 'company') {
+    indivBtn.classList.remove('active');
+    compBtn.classList.add('active');
+    badge.className = 'sk-track-badge company';
+    badgeText.textContent = '🏢 COMPANY TRACK // Team Growth & Enterprise Shield';
+    badgeSub.textContent = '14-Day Free Trial';
+
+    // Toggle fields
+    if (indivHandle) indivHandle.style.display = 'none';
+    if (compFields) compFields.style.display = 'block';
+    if (compSso) compSso.style.display = 'block';
+    if (indivPills) indivPills.style.display = 'none';
+    if (compPills) compPills.style.display = 'flex';
+
+    if (loginSubmit) {
+      loginSubmit.textContent = 'AUTHENTICATE WORKSPACE →';
+      loginSubmit.classList.remove('cyan');
+    }
+    if (regSubmit) {
+      regSubmit.textContent = 'INITIALIZE ENTERPRISE TENANT →';
+      regSubmit.classList.remove('cyan');
+    }
+    if (loginEmailLabel) loginEmailLabel.textContent = 'Corporate Work Email';
+    if (regEmailLabel) regEmailLabel.textContent = 'Corporate Work Email';
+    if (regNameLabel) regNameLabel.innerHTML = 'Full Name &amp; Job Title';
+
+    // Update login defaults for company
+    document.getElementById('loginEmail').value = 'admin@aegisappsec.io';
+    document.getElementById('loginPwd').value = 'AegisSec2026!#';
+  } else {
+    compBtn.classList.remove('active');
+    indivBtn.classList.add('active');
+    badge.className = 'sk-track-badge individual';
+    badgeText.textContent = '👤 INDIVIDUAL TRACK // Free Community & Pentester Pro';
+    badgeSub.textContent = 'Instant Access';
+
+    // Toggle fields
+    if (indivHandle) indivHandle.style.display = 'block';
+    if (compFields) compFields.style.display = 'none';
+    if (compSso) compSso.style.display = 'none';
+    if (indivPills) indivPills.style.display = 'flex';
+    if (compPills) compPills.style.display = 'none';
+
+    if (loginSubmit) {
+      loginSubmit.textContent = 'AUTHENTICATE OPERATOR →';
+      loginSubmit.classList.add('cyan');
+    }
+    if (regSubmit) {
+      regSubmit.textContent = 'CREATE INDIVIDUAL ACCOUNT →';
+      regSubmit.classList.add('cyan');
+    }
+    if (loginEmailLabel) loginEmailLabel.textContent = 'Operator Email';
+    if (regEmailLabel) regEmailLabel.textContent = 'Consultant / Pentester Email';
+    if (regNameLabel) regNameLabel.innerHTML = 'Full Name';
+
+    // Update login defaults for individual
+    document.getElementById('loginEmail').value = 'pentester@aegisappsec.io';
+    document.getElementById('loginPwd').value = 'Pentester@2026!';
+  }
+
+  // Update URL state
+  try {
+    const url = new URL(window.location);
+    url.searchParams.set('plan', plan);
+    window.history.replaceState({}, '', url);
+  } catch (e) {}
+}
+
+function switchAuthTab(mode) {
+  currentMode = mode;
+  const loginForm = document.getElementById('loginForm');
+  const registerForm = document.getElementById('registerForm');
+  const loginBtn = document.getElementById('tabLoginBtn');
+  const registerBtn = document.getElementById('tabRegisterBtn');
+  const alertBox = document.getElementById('authAlertBox');
+  if (alertBox) alertBox.style.display = 'none';
+
+  if (mode === 'login') {
+    if (loginForm) loginForm.style.display = 'block';
+    if (registerForm) registerForm.style.display = 'none';
+    if (loginBtn) loginBtn.classList.add('active');
+    if (registerBtn) registerBtn.classList.remove('active');
+  } else {
+    if (loginForm) loginForm.style.display = 'none';
+    if (registerForm) registerForm.style.display = 'block';
+    if (loginBtn) loginBtn.classList.remove('active');
+    if (registerBtn) registerBtn.classList.add('active');
+  }
+
+  // Update URL state
+  try {
+    const url = new URL(window.location);
+    url.searchParams.set('mode', mode);
+    window.history.replaceState({}, '', url);
+  } catch (e) {}
+}
+
+function fillDemo(email, pwd) {
+  const emailInput = document.getElementById('loginEmail');
+  const pwdInput = document.getElementById('loginPwd');
+  if (emailInput) emailInput.value = email;
+  if (pwdInput) pwdInput.value = pwd;
+
+  const btn = document.getElementById('loginSubmitBtn');
+  if (btn) {
+    btn.style.boxShadow = '0 0 28px #00f0ff';
+    setTimeout(() => {
+      btn.style.boxShadow = '';
+    }, 600);
+  }
+}
+
+function togglePwd(id, btn) {
+  const input = document.getElementById(id);
+  if (!input) return;
+  const isText = input.type === 'text';
+  input.type = isText ? 'password' : 'text';
+  btn.textContent = isText ? 'SHOW' : 'HIDE';
+}
+
+function evalStrength(val) {
+  const fill  = document.getElementById('strengthFill');
+  const label = document.getElementById('strengthLabel');
+  if (!fill || !label) return;
+
+  if (!val) {
+    fill.style.width = '0';
+    label.textContent = '';
+    return;
+  }
+
+  let score = 0;
+  if (val.length >= 6)  score++;
+  if (val.length >= 10) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+
+  const levels = [
+    { pct: '20%', color: '#f43f5e', text: 'WEAK — Minimum 8 characters' },
+    { pct: '40%', color: '#f97316', text: 'FAIR — Add numbers and symbols' },
+    { pct: '60%', color: '#facc15', text: 'MODERATE — Good complexity' },
+    { pct: '80%', color: '#38bdf8', text: 'STRONG — High entropy' },
+    { pct: '100%', color: '#00f0ff', text: 'ENTERPRISE-GRADE PASSPHRASE ✓' },
+  ];
+
+  const l = levels[Math.min(score, 4)];
+  fill.style.width = l.pct;
+  fill.style.background = l.color;
+  label.textContent = l.text;
+  label.style.color = l.color;
+}
+
+function simulateSSO(provider) {
+  const emailInput = document.getElementById('loginEmail');
+  const pwdInput = document.getElementById('loginPwd');
+  if (emailInput) {
+    emailInput.value = `lead@${provider.toLowerCase()}-cloud.sec`;
+  }
+  if (pwdInput) {
+    pwdInput.value = 'FederatedSSO!2026';
+  }
+  const form = document.getElementById('loginForm');
+  if (form) form.submit();
+}
+
+// Initial setup on page load
+document.addEventListener('DOMContentLoaded', () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const planParam = urlParams.get('plan');
+  if (planParam === 'company') {
+    switchPlanTrack('company');
+  } else if (planParam === 'individual') {
+    switchPlanTrack('individual');
+  }
+});
+</script>
+{% endblock %}

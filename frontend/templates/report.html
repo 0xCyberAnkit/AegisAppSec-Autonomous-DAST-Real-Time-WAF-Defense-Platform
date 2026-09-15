@@ -1,0 +1,808 @@
+{% extends "base.html" %}
+{% block title %}Executive Report Studio — AegisAppSec DevSecOps{% endblock %}
+
+{% block extra_head %}
+<style>
+/* ══ EXECUTIVE REPORT STUDIO STYLES ═══════════════════════════ */
+.sk-report-wrap {
+  padding: 32px 0 80px;
+}
+
+/* Page Hero Banner */
+.sk-report-hero {
+  background: radial-gradient(circle at 0% 0%, rgba(0, 240, 255, 0.06), transparent 50%),
+              radial-gradient(circle at 100% 100%, rgba(255, 0, 51, 0.05), transparent 45%),
+              rgba(9, 13, 24, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 28px 32px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
+}
+
+.sk-report-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #00f0ff, #ff0033 60%, transparent);
+}
+
+.sk-report-hero-grid {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.sk-report-eyebrow {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--red, #ff0033);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sk-report-title {
+  font-size: 1.85rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  margin: 0 0 10px;
+  line-height: 1.2;
+}
+
+.sk-report-title .highlight-red {
+  color: var(--red, #ff0033);
+  text-shadow: 0 0 24px rgba(255, 0, 51, 0.4);
+}
+
+.sk-report-desc {
+  font-size: 0.88rem;
+  color: var(--text-muted, #94a3b8);
+  max-width: 680px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Action Bar */
+.sk-export-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.sk-btn-export-primary {
+  background: #ffffff;
+  color: #040711;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  border: 1px solid #ffffff;
+  border-radius: 999px;
+  padding: 10px 22px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.18s ease;
+  text-decoration: none;
+  box-shadow: 0 4px 16px rgba(255, 255, 255, 0.2);
+}
+
+.sk-btn-export-primary:hover {
+  background: #00f0ff;
+  border-color: #00f0ff;
+  color: #040711;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 240, 255, 0.4);
+}
+
+.sk-btn-export-secondary {
+  background: rgba(255, 255, 255, 0.04);
+  color: #e2e8f0;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  padding: 10px 18px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.18s ease;
+  text-decoration: none;
+}
+
+.sk-btn-export-secondary:hover {
+  background: rgba(0, 240, 255, 0.1);
+  border-color: rgba(0, 240, 255, 0.4);
+  color: var(--cyan, #00f0ff);
+  transform: translateY(-1px);
+}
+
+/* Audit Scope Bar */
+.sk-scope-card {
+  background: rgba(9, 13, 24, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.sk-scope-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 260px;
+}
+
+.sk-scope-label {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.70rem;
+  font-weight: 700;
+  color: var(--text-muted, #94a3b8);
+  white-space: nowrap;
+}
+
+.sk-select-dark {
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-family: var(--font-mono, monospace);
+  outline: none;
+  width: 100%;
+}
+
+.sk-select-dark:focus {
+  border-color: var(--cyan, #00f0ff);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+}
+
+/* HUD Grid */
+.sk-hud-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 1024px) {
+  .sk-hud-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px) {
+  .sk-hud-grid { grid-template-columns: 1fr; }
+}
+
+.sk-hud-card {
+  background: rgba(9, 13, 24, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.sk-hud-card:hover {
+  border-color: rgba(0, 240, 255, 0.25);
+}
+
+.sk-hud-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cyan, #00f0ff);
+  flex-shrink: 0;
+}
+
+.sk-hud-icon.red {
+  color: var(--red, #ff0033);
+  background: rgba(255, 0, 51, 0.06);
+  border-color: rgba(255, 0, 51, 0.2);
+}
+
+.sk-hud-icon.green {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.06);
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+.sk-hud-icon.amber {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.06);
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+.sk-hud-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.sk-hud-label {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-muted, #94a3b8);
+  margin-bottom: 4px;
+}
+
+.sk-hud-val {
+  font-size: 1.30rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.1;
+  margin-bottom: 4px;
+  font-family: var(--font-mono, monospace);
+}
+
+.sk-hud-sub {
+  font-size: 0.68rem;
+  color: var(--text-muted, #94a3b8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sk-dot-pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  display: inline-block;
+}
+
+.sk-dot-pulse.red {
+  background: #ff0033;
+  box-shadow: 0 0 8px #ff0033;
+}
+
+/* ── INTERACTIVE STUDIO VIEW TABS ────────────────────────────── */
+.sk-studio-card {
+  background: rgba(9, 13, 24, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 12px;
+  padding: 24px;
+  position: relative;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  margin-bottom: 28px;
+}
+
+.sk-studio-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.sk-view-tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.sk-view-tab-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.70rem;
+  font-weight: 700;
+  color: var(--text-muted, #94a3b8);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.18s;
+  white-space: nowrap;
+}
+
+.sk-view-tab-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.sk-view-tab-btn.active {
+  background: rgba(0, 240, 255, 0.12);
+  border-color: rgba(0, 240, 255, 0.4);
+  color: var(--cyan, #00f0ff);
+}
+
+/* Findings Table */
+.sk-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+}
+
+.sk-data-table th {
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--text-muted, #94a3b8);
+  padding: 12px 14px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.sk-data-table td {
+  padding: 14px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: #e2e8f0;
+  vertical-align: middle;
+}
+
+.sk-data-table tr:hover td {
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.badge-sev {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  letter-spacing: 0.04em;
+}
+
+.badge-sev.critical { background: rgba(255, 0, 51, 0.15); color: #ff0033; border: 1px solid rgba(255, 0, 51, 0.35); }
+.badge-sev.high { background: rgba(249, 115, 22, 0.15); color: #f97316; border: 1px solid rgba(249, 115, 22, 0.35); }
+.badge-sev.medium { background: rgba(234, 179, 8, 0.15); color: #eab308; border: 1px solid rgba(234, 179, 8, 0.35); }
+.badge-sev.low { background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.35); }
+
+/* Code / Inspector Viewports */
+.sk-code-viewport {
+  background: #02050b;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.sk-code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.sk-code-pre {
+  margin: 0;
+  padding: 16px;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.74rem;
+  line-height: 1.6;
+  color: #cbd5e1;
+  overflow-x: auto;
+  max-height: 480px;
+  scrollbar-width: thin;
+}
+
+/* Formal Document Preview Container */
+.sk-doc-frame {
+  background: #ffffff;
+  color: #0f172a;
+  border-radius: 8px;
+  padding: 40px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+  font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, sans-serif);
+}
+
+.sk-doc-frame h2 {
+  color: #0f172a;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 8px;
+  margin-top: 24px;
+}
+
+/* Drawer / Modal */
+.sk-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.sk-modal-overlay.active {
+  display: flex;
+}
+
+.sk-modal-box {
+  background: #0b0f1d;
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 720px;
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: 28px;
+  position: relative;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8);
+}
+
+.sk-modal-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+}
+
+.sk-modal-close:hover { color: #ffffff; }
+
+/* Toast alert notification */
+.sk-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #090d18;
+  border: 1px solid #10b981;
+  border-radius: 8px;
+  padding: 12px 18px;
+  color: #ffffff;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.25s ease-out;
+}
+
+.sk-toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sk-container sk-report-wrap">
+
+  <!-- ══ HERO BANNER ═════════════════════════════════════════════ -->
+  <div class="sk-report-hero">
+    <div class="sk-report-hero-grid">
+      <div>
+        <div class="sk-report-eyebrow">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          AUDIT DOCUMENTATION // EXECUTIVE RISK &amp; COMPLIANCE GOVERNANCE
+        </div>
+        <h1 class="sk-report-title">
+          EXECUTIVE <span class="highlight-red">REPORT STUDIO</span>.
+        </h1>
+        <p class="sk-report-desc">
+          Generate comprehensive audit documentation formatted for executive leadership and engineering teams, complete with CVSS v3.1 vector calculations, OWASP Top 10 compliance metrics, and verified proof-of-concept diffs.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ EXPORT ACTION BAR (ZERO EMOJIS, CLEAN SVGS) ══════════════ -->
+  <div class="sk-export-bar">
+    <a href="/api/reports/export/html" target="_blank" class="sk-btn-export-primary" id="btnExportHtml">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      VIEW &amp; PRINT REPORT (HTML / PDF)
+    </a>
+    <a href="/api/reports/export/json" target="_blank" class="sk-btn-export-secondary" id="btnExportJson">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      DOWNLOAD JSON
+    </a>
+    <a href="/api/reports/export/csv" target="_blank" class="sk-btn-export-secondary" id="btnExportCsv">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
+      EXPORT CSV
+    </a>
+    <a href="/api/reports/export/markdown" target="_blank" class="sk-btn-export-secondary" id="btnExportMarkdown">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      VIEW MARKDOWN
+    </a>
+    <a href="/api/reports/export/sarif" target="_blank" class="sk-btn-export-secondary" id="btnExportSarif">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      EXPORT SARIF v2.1.0
+    </a>
+  </div>
+
+  <!-- ══ AUDIT SESSION & TARGET SELECTION BAR ═════════════════════ -->
+  <div class="sk-scope-card">
+    <div class="sk-scope-group">
+      <span class="sk-scope-label">TARGET EVALUATION SCOPE:</span>
+      <select class="sk-select-dark" id="selectReportTarget" onchange="handleTargetChange()">
+        <option value="all">CyberMart E-Commerce API (http://127.0.0.1:8000/api/shop)</option>
+      </select>
+    </div>
+    <div class="sk-scope-group">
+      <span class="sk-scope-label">AUDIT SCAN SESSION:</span>
+      <select class="sk-select-dark" id="selectReportScan" onchange="handleScanChange()">
+        <option value="">Latest Live DAST Assessment</option>
+      </select>
+    </div>
+    <button class="sk-btn-export-secondary" onclick="reloadReportData()" style="border-radius: 6px; padding: 8px 16px;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+      REFRESH DATA
+    </button>
+  </div>
+
+  <!-- ══ EXECUTIVE SECURITY POSTURE TELEMETRY HUD ═════════════════ -->
+  <div class="sk-hud-grid">
+    <div class="sk-hud-card">
+      <div class="sk-hud-icon red">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <div class="sk-hud-content">
+        <div class="sk-hud-label">EXECUTIVE RISK RATING</div>
+        <div class="sk-hud-val" id="hudRiskGrade" style="color: var(--red, #ff0033);">CRITICAL</div>
+        <div class="sk-hud-sub" id="hudRiskSub">
+          <span class="sk-dot-pulse red"></span>
+          <span>CVSS 9.8 Max Detected</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sk-hud-card">
+      <div class="sk-hud-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      </div>
+      <div class="sk-hud-content">
+        <div class="sk-hud-label">VERIFIED FINDINGS</div>
+        <div class="sk-hud-val" id="hudTotalFindings">4 ISSUES</div>
+        <div class="sk-hud-sub" id="hudFindingsBreakdown">
+          <span>1 Crit</span> | <span>1 High</span> | <span>1 Med</span> | <span>1 Low</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sk-hud-card">
+      <div class="sk-hud-icon amber">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <div class="sk-hud-content">
+        <div class="sk-hud-label">PCI-DSS 4.0 AUDIT STATUS</div>
+        <div class="sk-hud-val" id="hudPciStatus" style="color: #f59e0b; font-size: 1.15rem;">NON-COMPLIANT</div>
+        <div class="sk-hud-sub">Blockers: SQLi, SSRF Detected</div>
+      </div>
+    </div>
+
+    <div class="sk-hud-card">
+      <div class="sk-hud-icon green">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="sk-hud-content">
+        <div class="sk-hud-label">EXPLOIT PROOF REPRODUCIBILITY</div>
+        <div class="sk-hud-val" style="color: #10b981; font-size: 1.15rem;">100% VERIFIED</div>
+        <div class="sk-hud-sub">Active cURL PoCs Generated</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ INTERACTIVE MULTI-MODE IN-BROWSER REPORT VIEWER ═════════ -->
+  <div class="sk-studio-card">
+    <div class="sk-studio-header">
+      <div class="sk-view-tabs">
+        <button class="sk-view-tab-btn active" data-tab="dossier" onclick="switchReportTab('dossier')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          FINDINGS DOSSIER
+        </button>
+        <button class="sk-view-tab-btn" data-tab="html" onclick="switchReportTab('html')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          FORMAL DOCUMENT PREVIEW
+        </button>
+        <button class="sk-view-tab-btn" data-tab="markdown" onclick="switchReportTab('markdown')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          MARKDOWN REPORT
+        </button>
+        <button class="sk-view-tab-btn" data-tab="json" onclick="switchReportTab('json')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          JSON &amp; SARIF v2.1.0
+        </button>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span id="tabActionBtnSlot"></span>
+      </div>
+    </div>
+
+    <!-- ── TAB 1: FINDINGS DOSSIER TABLE ───────────────────────── -->
+    <div id="tabContentDossier">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; gap: 14px; flex-wrap: wrap;">
+        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+          <span style="font-family: var(--font-mono, monospace); font-size: 0.70rem; color: var(--text-muted);">FILTER BY SEVERITY:</span>
+          <button class="sk-view-tab-btn active" data-sev="ALL" onclick="filterFindingsBySeverity('ALL', this)">ALL (<span id="countAll">0</span>)</button>
+          <button class="sk-view-tab-btn" data-sev="CRITICAL" onclick="filterFindingsBySeverity('CRITICAL', this)">CRITICAL (<span id="countCrit">0</span>)</button>
+          <button class="sk-view-tab-btn" data-sev="HIGH" onclick="filterFindingsBySeverity('HIGH', this)">HIGH (<span id="countHigh">0</span>)</button>
+          <button class="sk-view-tab-btn" data-sev="MEDIUM" onclick="filterFindingsBySeverity('MEDIUM', this)">MEDIUM (<span id="countMed">0</span>)</button>
+          <button class="sk-view-tab-btn" data-sev="LOW" onclick="filterFindingsBySeverity('LOW', this)">LOW (<span id="countLow">0</span>)</button>
+        </div>
+        <input type="text" id="inputFilterDossier" placeholder="Filter findings..." class="sk-select-dark" style="width: 200px; padding: 6px 12px;" oninput="filterFindingsSearch()" />
+      </div>
+
+      <div style="overflow-x: auto;">
+        <table class="sk-data-table">
+          <thead>
+            <tr>
+              <th>VULNERABILITY TITLE</th>
+              <th>SEVERITY</th>
+              <th>CVSS v3.1</th>
+              <th>CWE ID</th>
+              <th>TARGET ENDPOINT</th>
+              <th>PROOF EXPLOIT</th>
+              <th style="text-align: right;">ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody id="dossierTableBody">
+            <tr>
+              <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 28px;">
+                Loading audit findings dossier...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── TAB 2: FORMAL DOCUMENT PREVIEW ──────────────────────── -->
+    <div id="tabContentHtml" style="display: none;">
+      <div style="margin-bottom: 14px; display: flex; justify-content: flex-end;">
+        <button class="sk-btn-export-primary" onclick="printReportDoc()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          PRINT / SAVE AS PDF
+        </button>
+      </div>
+      <div class="sk-doc-frame" id="formalDocFrame">
+        <!-- Live Document Rendered via JS -->
+      </div>
+    </div>
+
+    <!-- ── TAB 3: MARKDOWN REPORT INSPECTOR ────────────────────── -->
+    <div id="tabContentMarkdown" style="display: none;">
+      <div class="sk-code-viewport">
+        <div class="sk-code-header">
+          <span style="font-family: var(--font-mono, monospace); font-size: 0.68rem; color: #64748b;">aegis_security_audit_report.md</span>
+          <button class="sk-btn-export-secondary" style="border-radius: 4px; padding: 4px 12px; font-size: 0.65rem;" onclick="copyMarkdownText()">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            COPY MARKDOWN
+          </button>
+        </div>
+        <pre class="sk-code-pre" id="markdownPre">Loading markdown report...</pre>
+      </div>
+    </div>
+
+    <!-- ── TAB 4: JSON & SARIF INSPECTOR ───────────────────────── -->
+    <div id="tabContentJson" style="display: none;">
+      <div style="margin-bottom: 12px; display: flex; gap: 8px;">
+        <button class="sk-view-tab-btn active" id="btnModeJson" onclick="switchJsonMode('json')">Structured JSON</button>
+        <button class="sk-view-tab-btn" id="btnModeSarif" onclick="switchJsonMode('sarif')">OASIS SARIF v2.1.0</button>
+      </div>
+      <div class="sk-code-viewport">
+        <div class="sk-code-header">
+          <span style="font-family: var(--font-mono, monospace); font-size: 0.68rem; color: #64748b;" id="jsonFilename">audit_report.json</span>
+          <button class="sk-btn-export-secondary" style="border-radius: 4px; padding: 4px 12px; font-size: 0.65rem;" onclick="copyJsonText()">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            COPY JSON
+          </button>
+        </div>
+        <pre class="sk-code-pre" id="jsonPre">Loading JSON report...</pre>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ FINDING DOSSIER & REMEDIATION MODAL ═════════════════════ -->
+<div class="sk-modal-overlay" id="findingModal">
+  <div class="sk-modal-box">
+    <button class="sk-modal-close" onclick="closeFindingModal()">&times;</button>
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+      <span class="badge-sev" id="modalSevBadge">CRITICAL</span>
+      <span style="font-family: var(--font-mono, monospace); font-size: 0.72rem; color: var(--cyan, #00f0ff);" id="modalCweId">CWE-89</span>
+      <span style="font-family: var(--font-mono, monospace); font-size: 0.72rem; color: #94a3b8;" id="modalCvssScore">CVSS 9.8</span>
+    </div>
+    <h2 style="font-size: 1.25rem; font-weight: 800; color: #ffffff; margin: 0 0 16px;" id="modalTitle">Finding Title</h2>
+
+    <div style="font-size: 0.80rem; color: #cbd5e1; margin-bottom: 16px; line-height: 1.6;" id="modalDesc">
+      Description
+    </div>
+
+    <div style="margin-bottom: 16px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <span style="font-family: var(--font-mono, monospace); font-size: 0.68rem; font-weight: 700; color: #64748b;">VERIFIED REPRODUCTION cURL EXPLOIT:</span>
+        <button class="sk-btn-export-secondary" style="border-radius: 4px; padding: 2px 8px; font-size: 0.62rem;" onclick="copyModalCurl()">
+          COPY CURL
+        </button>
+      </div>
+      <pre style="background: #000; color: #10b981; padding: 12px; border-radius: 6px; font-family: var(--font-mono, monospace); font-size: 0.75rem; overflow-x: auto; margin: 0;" id="modalCurl">curl ...</pre>
+    </div>
+
+    <div style="margin-bottom: 16px;">
+      <div style="font-family: var(--font-mono, monospace); font-size: 0.68rem; font-weight: 700; color: #64748b; margin-bottom: 6px;">AUDIT EVIDENCE &amp; IMPACT:</div>
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 12px; font-size: 0.78rem; color: #e2e8f0; font-family: var(--font-mono, monospace);" id="modalEvidence">
+        Evidence
+      </div>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <div style="font-family: var(--font-mono, monospace); font-size: 0.68rem; font-weight: 700; color: #10b981; margin-bottom: 6px;">RECOMMENDED SECURE REMEDIATION:</div>
+      <div style="background: rgba(16,185,129,0.08); border-left: 3px solid #10b981; border-radius: 4px; padding: 12px; font-size: 0.78rem; color: #a7f3d0;" id="modalRemediation">
+        Remediation Guidance
+      </div>
+    </div>
+
+    <div style="display: flex; justify-content: flex-end; gap: 10px;">
+      <button class="sk-btn-export-secondary" onclick="closeFindingModal()">Close</button>
+      <a href="/remediation" class="sk-btn-export-primary" style="text-decoration: none;">
+        OPEN REMEDIATION STUDIO
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TOAST NOTIFICATION ══════════════════════════════════════ -->
+<div class="sk-toast" id="skToast">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="skToastMsg">Action completed successfully.</span>
+</div>
+
+<!-- Scripts -->
+<script src="/js/reports_page.js"></script>
+{% endblock %}

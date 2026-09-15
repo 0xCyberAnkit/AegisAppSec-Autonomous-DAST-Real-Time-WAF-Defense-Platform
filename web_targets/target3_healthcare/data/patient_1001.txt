@@ -1,0 +1,5 @@
+PATIENT: Jane Doe | DOB: 1984-07-12 | MRN: 994012
+DIAGNOSIS: Acute Viral Bronchitis, Hypertension Stage 1
+MEDICATIONS: Lisinopril 10mg PO Daily, Albuterol Inhaler
+ATTENDING PHYSICIAN: Dr. Robert Mercer, MD (Cardiology)
+CONFIDENTIAL MEDICAL RECORD - HIPAA PROTECTED

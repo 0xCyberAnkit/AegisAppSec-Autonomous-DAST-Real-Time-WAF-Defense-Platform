@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PulseHealth Hospital System — Autonomous Target 03</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #061118;
+      --card-bg: rgba(10, 26, 36, 0.75);
+      --border: rgba(255, 255, 255, 0.08);
+      --teal: #14b8a6;
+      --rose: #f43f5e;
+      --orange: #f97316;
+      --cyan: #06b6d4;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      padding: 24px;
+      min-height: 100vh;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+    .logo {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--teal);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .badge-port {
+      background: rgba(20, 184, 166, 0.12);
+      border: 1px solid var(--teal);
+      color: var(--teal);
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .badge-vuln {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 3px;
+      margin-left: 6px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      backdrop-filter: blur(8px);
+    }
+    .card h3 {
+      font-size: 1.05rem;
+      color: #fff;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    input, textarea, button {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,0.35);
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+    }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--teal);
+      box-shadow: 0 0 8px rgba(20, 184, 166, 0.2);
+    }
+    button {
+      background: linear-gradient(135deg, var(--teal), #0f766e);
+      color: #030712;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.2s;
+    }
+    button:hover { opacity: 0.9; }
+    .patient-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.03);
+      padding: 8px 12px;
+      border-radius: 6px;
+      margin-bottom: 6px;
+      font-size: 0.85rem;
+    }
+    .footer-note {
+      margin-top: 30px;
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">
+      <span>🏥 PulseHealth Hospital Information System</span>
+    </div>
+    <div>
+      <span class="badge-port">TARGET 03 // PORT 8003</span>
+    </div>
+  </div>
+
+  <div class="grid">
+    <!-- 1. Path Traversal / LFI Card -->
+    <div class="card">
+      <h3>
+        <span>1. Medical Record Download</span>
+        <span class="badge-vuln" style="background: rgba(244,63,94,0.15); color: var(--rose); border: 1px solid var(--rose);">LFI [CWE-22]</span>
+      </h3>
+      <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 12px;">Unrestricted file download permitting directory traversal sequences (e.g. <code>../../app.py</code>).</p>
+      <form action="/records/download" method="GET" target="_blank">
+        <input type="text" name="file" value="../../app.py" placeholder="patient_1001.txt or ../../app.py">
+        <button type="submit">Download Clinical File</button>
+      </form>
+      <div style="font-size: 0.72rem; color: var(--muted); margin-top: 6px;">
+        Legitimate file: <code>patient_1001.txt</code> | Arbitrary file read: <code>../../app.py</code>
+      </div>
+    </div>
+
+    <!-- 2. XXE Injection Card -->
+    <div class="card">
+      <h3>
+        <span>2. XML Clinical Lab Import</span>
+        <span class="badge-vuln" style="background: rgba(249,115,22,0.15); color: var(--orange); border: 1px solid var(--orange);">XXE [CWE-611]</span>
+      </h3>
+      <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 12px;">Insecure XML parser evaluating external entity DTD declarations.</p>
+      <form id="xxeForm" onsubmit="submitXml(event)">
+        <textarea id="xmlBody" rows="4" style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;">&lt;?xml version="1.0"?&gt;
+&lt;!DOCTYPE test [&lt;!ENTITY xxe SYSTEM "file:///etc/passwd"&gt;]&gt;
+&lt;lab_report&gt;
+  &lt;patient_name&gt;&amp;xxe;&lt;/patient_name&gt;
+  &lt;result&gt;Blood Panel Normal&lt;/result&gt;
+&lt;/lab_report&gt;</textarea>
+        <button type="submit">Upload Clinical XML</button>
+      </form>
+      <div id="xmlResult" style="font-size: 0.75rem; color: var(--teal); font-family: 'JetBrains Mono', monospace; display: none; margin-top: 6px; word-break: break-all;"></div>
+    </div>
+
+    <!-- 3. CORS Misconfiguration Card -->
+    <div class="card">
+      <h3>
+        <span>3. Patient FHIR API (CORS)</span>
+        <span class="badge-vuln" style="background: rgba(6,182,212,0.15); color: var(--cyan); border: 1px solid var(--cyan);">CORS [CWE-942]</span>
+      </h3>
+      <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 12px;">Reflects arbitrary untrusted Origins with <code>Access-Control-Allow-Credentials: true</code>.</p>
+      <div style="display: flex; gap: 8px;">
+        <input type="text" id="patientId" value="1001" placeholder="Patient ID">
+        <button type="button" style="width: 140px;" onclick="window.open('/api/patient/' + document.getElementById('patientId').value)">Inspect API</button>
+      </div>
+      <div style="margin-top: 14px;">
+        <span style="font-size: 0.75rem; color: var(--muted); font-family: 'JetBrains Mono', monospace;">IN-PATIENT ROSTER:</span>
+        <div style="margin-top: 8px;">
+          {% for pid, pdata in patients.items() %}
+          <div class="patient-row">
+            <span>MRN-{{ pid }}: {{ pdata.name }}</span>
+            <span style="color: var(--teal); font-family: 'JetBrains Mono', monospace;">{{ pdata.condition }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    AEGIS APPSEC TARGET 03 // PULSEHEALTH EHR // PURPOSE-BUILT FOR DAST PENETRATION TESTING
+  </div>
+
+  <script>
+    async function submitXml(e) {
+      e.preventDefault();
+      const body = document.getElementById('xmlBody').value;
+      const resEl = document.getElementById('xmlResult');
+      resEl.style.display = 'block';
+      resEl.textContent = 'Parsing XML...';
+      try {
+        const resp = await fetch('/api/records/xml-import', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/xml' },
+          body: body
+        });
+        const data = await resp.json();
+        resEl.textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        resEl.textContent = 'Error: ' + err.message;
+      }
+    }
+  </script>
+</body>
+</html>

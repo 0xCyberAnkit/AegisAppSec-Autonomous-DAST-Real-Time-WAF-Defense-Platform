@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="40" height="40">
+  <defs>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f2fe" />
+      <stop offset="100%" stop-color="#4facfe" />
+    </linearGradient>
+    <linearGradient id="coreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+  </defs>
+  <!-- Outer Shield Outline -->
+  <polygon points="50,5 92,20 92,55 50,95 8,55 8,20" fill="none" stroke="url(#shieldGrad)" stroke-width="4" />
+  <!-- Inner Circuit Grid -->
+  <polygon points="50,15 82,27 82,52 50,83 18,52 18,27" fill="#0b1329" stroke="#1f293d" stroke-width="2" />
+  <!-- Core Neon Hexagon -->
+  <polygon points="50,30 68,40 68,60 50,70 32,60 32,40" fill="url(#coreGrad)" opacity="0.9" />
+  <!-- Center Dot -->
+  <circle cx="50" cy="50" r="5" fill="#ffffff" />
+</svg>

@@ -1,0 +1,1364 @@
+{% extends "base.html" %}
+{% block title %}DAST Scanner Console — AegisAppSec | Live Autonomous Vulnerability Workbench{% endblock %}
+
+{% block extra_head %}
+<style>
+/* ══ AUTHENTICATED SCANNER WORKBENCH STYLES ════════════════════ */
+.sk-console-wrap {
+  padding: 36px 32px 80px;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.sk-console-hero {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 24px;
+  margin-bottom: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.sk-console-eyebrow {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--cyan, #00f0ff);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sk-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 10px #10b981;
+  display: inline-block;
+  animation: skPulse 2s infinite ease-in-out;
+}
+
+@keyframes skPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.sk-console-title {
+  font-family: var(--font-main, 'Inter', sans-serif);
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: -0.025em;
+  margin: 0 0 8px;
+}
+
+.sk-console-desc {
+  font-size: 0.92rem;
+  color: var(--text-muted, #94a3b8);
+  max-width: 720px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.sk-quick-nav-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.sk-quick-pill {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-body, #cbd5e1);
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+}
+
+.sk-quick-pill:hover {
+  background: rgba(0, 240, 255, 0.1);
+  border-color: rgba(0, 240, 255, 0.35);
+  color: #00f0ff;
+  transform: translateY(-1px);
+}
+
+/* Workbench Grid (2 Columns: Config vs Execution Matrix) */
+.sk-workbench-grid {
+  display: grid;
+  grid-template-columns: 440px 1fr;
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+@media (max-width: 1100px) {
+  .sk-workbench-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Config Panel Card */
+.sk-panel-card {
+  background: rgba(10, 15, 28, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 24px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.sk-panel-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #00f0ff, transparent);
+}
+
+.sk-panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 20px;
+}
+
+.sk-panel-head-title {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sk-status-badge {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.sk-field-group {
+  margin-bottom: 18px;
+}
+
+.sk-field-label {
+  display: block;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted, #94a3b8);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.sk-select-input, .sk-text-input {
+  width: 100%;
+  background: rgba(4, 7, 16, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.82rem;
+  padding: 10px 12px;
+  border-radius: 6px;
+  outline: none;
+  transition: all 0.2s;
+  box-sizing: border-box;
+}
+
+.sk-select-input:focus, .sk-text-input:focus {
+  border-color: #00f0ff;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
+}
+
+/* Checkbox Items & Modules Toolbar */
+.sk-modules-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.sk-btn-micro {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #94a3b8;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.sk-btn-micro:hover {
+  background: rgba(0, 240, 255, 0.12);
+  border-color: rgba(0, 240, 255, 0.35);
+  color: #00f0ff;
+}
+
+.sk-module-search {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.72rem;
+  color: #ffffff;
+  font-family: inherit;
+  margin-bottom: 8px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.sk-module-search:focus {
+  border-color: rgba(0, 240, 255, 0.4);
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.15);
+}
+
+.sk-checkbox-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  max-height: 290px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 240, 255, 0.3) rgba(0, 0, 0, 0.2);
+}
+
+.sk-checkbox-grid::-webkit-scrollbar {
+  width: 5px;
+}
+.sk-checkbox-grid::-webkit-scrollbar-thumb {
+  background: rgba(0, 240, 255, 0.3);
+  border-radius: 4px;
+}
+.sk-checkbox-grid::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.sk-check-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.76rem;
+  color: #e2e8f0;
+  cursor: pointer;
+  user-select: none;
+  padding: 5px 8px;
+  border-radius: 5px;
+  transition: all 0.15s ease;
+  border: 1px solid transparent;
+}
+
+.sk-check-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(0, 240, 255, 0.15);
+}
+
+.sk-check-item input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  accent-color: #00f0ff;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.sk-cwe-tag {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.65rem;
+  font-weight: 700;
+  margin-left: auto;
+  opacity: 0.9;
+  flex-shrink: 0;
+  letter-spacing: 0.03em;
+}
+
+.sk-btn-launch {
+  width: 100%;
+  background: linear-gradient(135deg, #ff0033 0%, #ff2255 100%);
+  color: #ffffff;
+  border: 1px solid #ff3366;
+  font-family: var(--font-main, sans-serif);
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 14px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 0 24px rgba(255, 0, 51, 0.4);
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.sk-btn-launch:hover:not(:disabled) {
+  box-shadow: 0 0 36px rgba(255, 0, 51, 0.6);
+  transform: translateY(-1px);
+}
+
+.sk-btn-launch:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  background: #334155;
+  border-color: #475569;
+  box-shadow: none;
+}
+
+/* Console Panel Card */
+.sk-console-panel {
+  background: rgba(6, 9, 20, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+}
+
+.sk-console-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #ff0033, #00f0ff, transparent);
+}
+
+.sk-console-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.sk-console-title-text {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #00f0ff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sk-btn-clear {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-muted, #94a3b8);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sk-btn-clear:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+/* Progress Track */
+.sk-progress-container {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+}
+
+.sk-progress-meta {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #e2e8f0;
+  margin-bottom: 6px;
+}
+
+.sk-progress-track {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.sk-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #00f0ff, #ff0033);
+  transition: width 0.3s ease;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.5);
+}
+
+/* Terminal Log Console */
+.sk-terminal-logs {
+  background: #04060d;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.76rem;
+  line-height: 1.65;
+  color: #cbd5e1;
+  height: 380px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.log-entry {
+  display: flex;
+  gap: 8px;
+  word-break: break-all;
+}
+
+.log-time {
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.log-level-START   { color: #00f0ff; font-weight: 700; flex-shrink: 0; }
+.log-level-INFO    { color: #38bdf8; font-weight: 700; flex-shrink: 0; }
+.log-level-PHASE   { color: #a855f7; font-weight: 700; flex-shrink: 0; }
+.log-level-ALERT   { color: #ef4444; font-weight: 700; flex-shrink: 0; }
+.log-level-SUCCESS { color: #10b981; font-weight: 700; flex-shrink: 0; }
+.log-level-WARN    { color: #f59e0b; font-weight: 700; flex-shrink: 0; }
+.log-level-FINISH  { color: #10b981; font-weight: 800; flex-shrink: 0; }
+
+.log-msg {
+  color: #f1f5f9;
+}
+
+/* Vulnerabilities Triage Section */
+.sk-triage-section {
+  margin-top: 20px;
+}
+
+.sk-triage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.sk-filter-chips {
+  display: flex;
+  gap: 6px;
+}
+
+.filter-chip {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-muted, #94a3b8);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-chip.active {
+  background: rgba(0, 240, 255, 0.12);
+  border-color: #00f0ff;
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.25);
+}
+
+.vuln-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 20px;
+}
+
+.vuln-card {
+  background: rgba(10, 15, 28, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.2s;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.vuln-card:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.vuln-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.severity-pill {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.sev-critical { background: rgba(239, 68, 68, 0.18); color: #ef4444; border: 1px solid #ef4444; }
+.sev-high     { background: rgba(245, 158, 11, 0.18); color: #f59e0b; border: 1px solid #f59e0b; }
+.sev-medium   { background: rgba(56, 189, 248, 0.18); color: #38bdf8; border: 1px solid #38bdf8; }
+.sev-low      { background: rgba(148, 163, 184, 0.18); color: #94a3b8; border: 1px solid #94a3b8; }
+
+.cvss-meter {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+.vuln-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 8px;
+}
+
+.vuln-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.78rem;
+  color: var(--text-muted, #94a3b8);
+  margin-bottom: 12px;
+  font-family: var(--font-mono, monospace);
+}
+
+.vuln-meta code {
+  color: #00f0ff;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.vuln-evidence {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.74rem;
+  color: #e2e8f0;
+  margin-bottom: 16px;
+  max-height: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vuln-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-poc {
+  flex: 1;
+  background: rgba(0, 240, 255, 0.1);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  color: #00f0ff;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.btn-poc:hover {
+  background: rgba(0, 240, 255, 0.2);
+  border-color: #00f0ff;
+}
+
+.btn-jira-copy {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-body, #cbd5e1);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-jira-copy:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+/* PoC Modal Overlay */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 15, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal-card {
+  background: #090e1c;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 820px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 28px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 240, 255, 0.1);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+}
+
+.modal-header h2 {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 6px;
+}
+
+.btn-close-modal {
+  background: none;
+  border: none;
+  color: var(--text-muted, #94a3b8);
+  font-size: 1.5rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 4px 8px;
+}
+
+.btn-close-modal:hover {
+  color: #ffffff;
+}
+
+.modal-code-block {
+  background: #03050a;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  padding: 12px;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.74rem;
+  color: #cbd5e1;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  margin-top: 6px;
+  margin-bottom: 16px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sk-console-wrap">
+  <!-- ══ HERO BAR ════════════════════════════════════════════════ -->
+  <div class="sk-console-hero">
+    <div>
+      <div class="sk-console-eyebrow">
+        <span class="sk-pulse-dot"></span>
+        <span>AUTHENTICATED OPERATOR WORKBENCH // AUTONOMOUS DAST ENGINE</span>
+      </div>
+      <h1 class="sk-console-title">
+        DAST SCANNER <span style="color: var(--cyan, #00f0ff); text-shadow: 0 0 16px rgba(0,240,255,0.4);">CONSOLE</span>
+      </h1>
+      <p class="sk-console-desc">
+        Launch autonomous multi-vector fuzzing against verified target endpoints, stream real-time execution telemetry over WebSocket, and triage discovered OWASP vulnerabilities.
+      </p>
+    </div>
+
+    <!-- Quick Console Nav Pills -->
+    <div class="sk-quick-nav-pills">
+      <a href="{{ url_for('targets') }}" class="sk-quick-pill">🎯 Manage Targets</a>
+      <a href="{{ url_for('storefront') }}" class="sk-quick-pill">🛒 CyberMart Testbed</a>
+      <a href="{{ url_for('history') }}" class="sk-quick-pill">🕒 Scan History</a>
+      <a href="{{ url_for('compliance') }}" class="sk-quick-pill">📋 Compliance Matrix</a>
+      <a href="{{ url_for('report') }}" class="sk-quick-pill">📄 Report Studio</a>
+    </div>
+  </div>
+
+  <!-- ══ WORKBENCH GRID ══════════════════════════════════════════ -->
+  <div class="sk-workbench-grid">
+    
+    <!-- 1. Scan Parameters Configuration Panel -->
+    <div class="sk-panel-card">
+      <div class="sk-panel-head">
+        <div class="sk-panel-head-title">
+          <span>⚙ DAST PARAMETERS</span>
+        </div>
+        <span class="sk-status-badge">● Anti-SSRF Guard Active</span>
+      </div>
+
+      <!-- Verified Targets Selector -->
+      <div class="sk-field-group">
+        <label class="sk-field-label" for="verified-targets-dropdown">Select Verified Target</label>
+        <select id="verified-targets-dropdown" class="sk-select-input" onchange="onTargetSelectChange(this.value)">
+          <option value="http://127.0.0.1:8001" selected>Target 01: VoltMart E-Commerce Store (127.0.0.1:8001)</option>
+          <option value="http://127.0.0.1:8002">Target 02: ApexBank Treasury &amp; FX API (127.0.0.1:8002)</option>
+          <option value="http://127.0.0.1:8003">Target 03: PulseHealth Hospital EHR (127.0.0.1:8003)</option>
+          <option value="http://127.0.0.1:8004">Target 04: CloudOps Infrastructure Console (127.0.0.1:8004)</option>
+          <option value="http://127.0.0.1:8000/api/shop">Aegis Built-in Storefront (127.0.0.1:8000)</option>
+          <option value="CUSTOM">-- Enter Custom Target Endpoint --</option>
+        </select>
+      </div>
+
+      <!-- Target URL Endpoint Input -->
+      <div class="sk-field-group">
+        <label class="sk-field-label" for="scan-target-url">Target URL / Base Endpoint</label>
+        <input type="text" id="scan-target-url" class="sk-text-input" value="{{ prefill_target }}" placeholder="http://127.0.0.1:8000/api/shop">
+        <div style="font-size: 0.72rem; color: #64748b; margin-top: 4px;">
+          Autonomous asynchronous detectors will probe this target.
+        </div>
+      </div>
+
+      <!-- Vulnerability Modules Checkbox List (OWASP Top 10 + CWE Top 25) -->
+      <div class="sk-field-group">
+        <div class="sk-modules-toolbar">
+          <label class="sk-field-label" style="margin-bottom: 0;">Active Vulnerability Modules</label>
+          <div style="display: flex; align-items: center; gap: 4px;">
+            <button type="button" class="sk-btn-micro" onclick="selectAllModules(true)" title="Select all 15 detectors">All (15)</button>
+            <button type="button" class="sk-btn-micro" onclick="selectOwaspTop10()" title="Select standard OWASP Top 10">Top 10</button>
+            <button type="button" class="sk-btn-micro" onclick="selectAllModules(false)" title="Deselect all">None</button>
+          </div>
+        </div>
+
+        <input type="text" class="sk-module-search" id="moduleSearchInput" placeholder="Filter detectors (e.g. sqli, rce, auth, cwe)..." oninput="filterModules(this.value)">
+
+        <div class="sk-checkbox-grid" id="moduleCheckboxGrid">
+          <!-- 1. SQL Injection -->
+          <label class="sk-check-item" data-module-id="sqli" data-tags="sqli sql injection cwe-89 a03 database union blind error">
+            <input type="checkbox" class="module-checkbox" value="sqli" checked onchange="updateSelectedCount()">
+            <span>SQL Injection (SQLi)</span>
+            <span class="sk-cwe-tag" style="color: #ef4444;">[CWE-89]</span>
+          </label>
+          <!-- 2. Cross-Site Scripting -->
+          <label class="sk-check-item" data-module-id="xss" data-tags="xss cross site scripting cwe-79 a03 injection dom stored reflected">
+            <input type="checkbox" class="module-checkbox" value="xss" checked onchange="updateSelectedCount()">
+            <span>Cross-Site Scripting (XSS)</span>
+            <span class="sk-cwe-tag" style="color: #f59e0b;">[CWE-79]</span>
+          </label>
+          <!-- 3. OS Command Injection -->
+          <label class="sk-check-item" data-module-id="cmdi" data-tags="cmdi command injection os shell rce cwe-78 a03 system exec">
+            <input type="checkbox" class="module-checkbox" value="cmdi" checked onchange="updateSelectedCount()">
+            <span>OS Command Injection (CMDi)</span>
+            <span class="sk-cwe-tag" style="color: #ef4444;">[CWE-78]</span>
+          </label>
+          <!-- 4. Server-Side Request Forgery -->
+          <label class="sk-check-item" data-module-id="ssrf" data-tags="ssrf server side request forgery cwe-918 a10 cloud metadata loopback">
+            <input type="checkbox" class="module-checkbox" value="ssrf" checked onchange="updateSelectedCount()">
+            <span>Server-Side Request Forgery (SSRF)</span>
+            <span class="sk-cwe-tag" style="color: #a855f7;">[CWE-918]</span>
+          </label>
+          <!-- 5. Cross-Site Request Forgery -->
+          <label class="sk-check-item" data-module-id="csrf" data-tags="csrf cross site request forgery cwe-352 a01 state changing samesite">
+            <input type="checkbox" class="module-checkbox" value="csrf" checked onchange="updateSelectedCount()">
+            <span>Cross-Site Request Forgery (CSRF)</span>
+            <span class="sk-cwe-tag" style="color: #38bdf8;">[CWE-352]</span>
+          </label>
+          <!-- 6. Insecure Direct Object Reference -->
+          <label class="sk-check-item" data-module-id="idor" data-tags="idor insecure direct object reference cwe-639 a01 tenant isolation access control">
+            <input type="checkbox" class="module-checkbox" value="idor" checked onchange="updateSelectedCount()">
+            <span>Insecure Direct Object Reference (IDOR)</span>
+            <span class="sk-cwe-tag" style="color: #00f0ff;">[CWE-639]</span>
+          </label>
+          <!-- 7. Path Traversal & LFI -->
+          <label class="sk-check-item" data-module-id="path_traversal" data-tags="path traversal lfi local file inclusion cwe-22 a01 directory dot dot slash arbitrary file read">
+            <input type="checkbox" class="module-checkbox" value="path_traversal" checked onchange="updateSelectedCount()">
+            <span>Path Traversal / Directory Traversal</span>
+            <span class="sk-cwe-tag" style="color: #f43f5e;">[CWE-22]</span>
+          </label>
+          <!-- 8. Unvalidated Open Redirect -->
+          <label class="sk-check-item" data-module-id="open_redirect" data-tags="open redirect unvalidated redirects forwards cwe-601 a01 phishing destination">
+            <input type="checkbox" class="module-checkbox" value="open_redirect" checked onchange="updateSelectedCount()">
+            <span>Unvalidated Open Redirect</span>
+            <span class="sk-cwe-tag" style="color: #eab308;">[CWE-601]</span>
+          </label>
+          <!-- 9. Broken Authentication -->
+          <label class="sk-check-item" data-module-id="broken_auth" data-tags="broken authentication session hijacking brute force password cwe-287 a07 credentials">
+            <input type="checkbox" class="module-checkbox" value="broken_auth" checked onchange="updateSelectedCount()">
+            <span>Broken Authentication &amp; Sessions</span>
+            <span class="sk-cwe-tag" style="color: #ec4899;">[CWE-287]</span>
+          </label>
+          <!-- 10. Security Misconfiguration & Headers -->
+          <label class="sk-check-item" data-module-id="misconfig" data-tags="security misconfiguration missing headers csp hsts xfo nosniff cwe-16 a05 hardening">
+            <input type="checkbox" class="module-checkbox" value="misconfig" checked onchange="updateSelectedCount()">
+            <span>Security Misconfiguration &amp; Headers</span>
+            <span class="sk-cwe-tag" style="color: #94a3b8;">[CWE-16]</span>
+          </label>
+          <!-- 11. CORS Misconfiguration -->
+          <label class="sk-check-item" data-module-id="cors" data-tags="cors cross origin resource sharing origin credentials allow origin cwe-942 a05">
+            <input type="checkbox" class="module-checkbox" value="cors" checked onchange="updateSelectedCount()">
+            <span>CORS Misconfiguration &amp; Origins</span>
+            <span class="sk-cwe-tag" style="color: #06b6d4;">[CWE-942]</span>
+          </label>
+          <!-- 12. XML External Entity (XXE) -->
+          <label class="sk-check-item" data-module-id="xxe" data-tags="xxe xml external entity injection doctype parser cwe-611 a05">
+            <input type="checkbox" class="module-checkbox" value="xxe" checked onchange="updateSelectedCount()">
+            <span>XML External Entity Injection (XXE)</span>
+            <span class="sk-cwe-tag" style="color: #f97316;">[CWE-611]</span>
+          </label>
+          <!-- 13. Insecure Deserialization -->
+          <label class="sk-check-item" data-module-id="deserialization" data-tags="insecure deserialization object injection pickle java rce cwe-502 a08 integrity">
+            <input type="checkbox" class="module-checkbox" value="deserialization" checked onchange="updateSelectedCount()">
+            <span>Insecure Deserialization</span>
+            <span class="sk-cwe-tag" style="color: #8b5cf6;">[CWE-502]</span>
+          </label>
+          <!-- 14. Information Disclosure -->
+          <label class="sk-check-item" data-module-id="info_disclosure" data-tags="information disclosure sensitive data exposure stack trace debug secrets cwe-200 a02">
+            <input type="checkbox" class="module-checkbox" value="info_disclosure" checked onchange="updateSelectedCount()">
+            <span>Sensitive Data Exposure &amp; Leaks</span>
+            <span class="sk-cwe-tag" style="color: #10b981;">[CWE-200]</span>
+          </label>
+          <!-- 15. Vulnerable & Outdated Components -->
+          <label class="sk-check-item" data-module-id="outdated_components" data-tags="vulnerable outdated components cve sbom dependencies software cwe-1104 a06">
+            <input type="checkbox" class="module-checkbox" value="outdated_components" checked onchange="updateSelectedCount()">
+            <span>Vulnerable &amp; Outdated Dependencies</span>
+            <span class="sk-cwe-tag" style="color: #84cc16;">[CWE-1104]</span>
+          </label>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-family: var(--font-mono, monospace); font-size: 0.68rem; color: #64748b;">
+          <span id="selected-module-count">15 / 15 Detectors Active</span>
+          <span style="color: var(--neon-cyan, #00f0ff); letter-spacing: 0.04em;">OWASP TOP 10 + CWE TOP 25</span>
+        </div>
+      </div>
+
+      <!-- Scan Depth Profile -->
+      <div class="sk-field-group">
+        <label class="sk-field-label" for="scan-profile">Heuristic Fuzzing Depth</label>
+        <select id="scan-profile" class="sk-select-input">
+          <option value="thorough" selected>Comprehensive Fuzzing (Standard OWASP + Evasions)</option>
+          <option value="rapid">Rapid Triage (High-Confidence Probes Only)</option>
+          <option value="deep">Deep Adversarial (Dynamic Parameter Mutations)</option>
+        </select>
+      </div>
+
+      <!-- Launch Button -->
+      <button id="btn-launch-scan" class="sk-btn-launch" onclick="startScanJob()">
+        <span>🚀 Launch Autonomous DAST Scan</span>
+      </button>
+    </div>
+
+    <!-- 2. Live Execution Matrix & WebSocket Console -->
+    <div class="sk-console-panel">
+      <div class="sk-console-head">
+        <div class="sk-console-title-text">
+          <span>⚡ LIVE EXECUTION MATRIX</span>
+          <span style="font-size: 0.68rem; color: #64748b;">(WebSocket Stream)</span>
+        </div>
+        <button id="btn-clear-logs" class="sk-btn-clear" onclick="clearTerminalLogs()">
+          Clear Console
+        </button>
+      </div>
+
+      <!-- Progress Track -->
+      <div class="sk-progress-container">
+        <div class="sk-progress-meta">
+          <span>PIPELINE PROGRESS</span>
+          <span id="scan-progress-label">0%</span>
+        </div>
+        <div class="sk-progress-track">
+          <div id="scan-progress-fill" class="sk-progress-fill"></div>
+        </div>
+      </div>
+
+      <!-- Terminal Output -->
+      <div id="terminal-logs" class="sk-terminal-logs">
+        <div class="log-entry">
+          <span class="log-time">[00:00:00]</span>
+          <span class="log-level-START">[READY]</span>
+          <span class="log-msg">AegisAppSec Autonomous DAST Engine initialized. Select target and click Launch.</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ SECTION 2: VULNERABILITY TRIAGE GRID ════════════════════ -->
+  <div class="sk-triage-section">
+    <div class="sk-triage-header">
+      <div>
+        <h2 style="font-size: 1.4rem; font-weight: 800; color: #ffffff; margin: 0 0 4px;">
+          Confirmed Vulnerabilities &amp; Triage Stream
+        </h2>
+        <p style="font-size: 0.82rem; color: #94a3b8; margin: 0;">
+          Differential analysis findings discovered during active scan execution.
+        </p>
+      </div>
+
+      <!-- Severity Filter Chips -->
+      <div class="sk-filter-chips">
+        <button class="filter-chip active" onclick="filterFindings('ALL', this)">ALL</button>
+        <button class="filter-chip" onclick="filterFindings('CRITICAL', this)">CRITICAL</button>
+        <button class="filter-chip" onclick="filterFindings('HIGH', this)">HIGH</button>
+        <button class="filter-chip" onclick="filterFindings('MEDIUM', this)">MEDIUM</button>
+        <button class="filter-chip" onclick="filterFindings('LOW', this)">LOW</button>
+      </div>
+    </div>
+
+    <!-- Cards Grid -->
+    <div id="vuln-cards-grid" class="vuln-cards-grid">
+      <div style="grid-column: 1 / -1; text-align: center; padding: 48px 20px; color: #64748b; background: rgba(0,0,0,0.2); border: 1px dashed rgba(255,255,255,0.08); border-radius: 8px;">
+        <div style="font-size: 32px; margin-bottom: 8px;">🛡️</div>
+        <div style="font-size: 15px; font-weight: 700; color: #cbd5e1;">Awaiting Scan Execution</div>
+        <div style="font-size: 13px; margin-top: 4px;">Click "Launch Autonomous DAST Scan" above to discover vulnerabilities on the selected target.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PROOF-OF-CONCEPT (POC) MODAL ════════════════════════════ -->
+<div id="poc-modal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div>
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+          <span id="poc-modal-sev" class="severity-pill sev-critical">CRITICAL</span>
+          <span id="poc-modal-cvss" class="cvss-meter">CVSS 9.8</span>
+        </div>
+        <h2 id="poc-modal-title">SQL Injection in Product Catalog Search</h2>
+      </div>
+      <button id="btn-close-poc-modal" class="btn-close-modal" onclick="closePoCModal()">&times;</button>
+    </div>
+
+    <div>
+      <div style="font-family: var(--font-mono, monospace); font-size: 0.76rem; color: #94a3b8; margin-bottom: 6px;">
+        <strong>AFFECTED ENDPOINT:</strong> <code id="poc-modal-endpoint" style="color: #00f0ff;">GET /api/shop/search</code>
+      </div>
+
+      <div style="font-family: var(--font-mono, monospace); font-size: 0.76rem; color: #94a3b8; margin-bottom: 6px;">
+        <strong>EXPLOIT PAYLOAD:</strong>
+      </div>
+      <div id="poc-modal-payload" class="modal-code-block" style="color: #ef4444;">' OR '1'='1</div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; margin-bottom: 6px;">
+        <span style="font-family: var(--font-mono, monospace); font-size: 0.76rem; color: #94a3b8; font-weight: 700;">REPRODUCIBLE cURL COMMAND:</span>
+        <button id="btn-copy-curl" class="btn-jira-copy" onclick="copyPoCCurl()">📋 Copy cURL</button>
+      </div>
+      <div id="poc-modal-curl" class="modal-code-block" style="color: #38bdf8;">curl -X GET "http://127.0.0.1:8000/api/shop/search?q='%20OR%20'1'='1"</div>
+
+      <div style="font-family: var(--font-mono, monospace); font-size: 0.76rem; color: #94a3b8; margin-top: 14px; margin-bottom: 6px;">
+        <strong>RAW HTTP REQUEST TRANSMISSION:</strong>
+      </div>
+      <div id="poc-modal-req" class="modal-code-block">GET /api/shop/search?q='%20OR%20'1'='1 HTTP/1.1\nHost: 127.0.0.1:8000\nUser-Agent: AegisAppSec-Autonomous-DAST/2.6.0</div>
+
+      <div style="font-family: var(--font-mono, monospace); font-size: 0.76rem; color: #94a3b8; margin-top: 14px; margin-bottom: 6px;">
+        <strong>RAW HTTP SERVER RESPONSE (CONFIRMING EXPLOITATION):</strong>
+      </div>
+      <div id="poc-modal-resp" class="modal-code-block">HTTP/1.1 200 OK\nContent-Type: application/json\n\n{"status":"success","count":8,"data":[...]}</div>
+
+      <div style="font-family: var(--font-mono, monospace); font-size: 0.76rem; color: #10b981; font-weight: 700; margin-top: 14px; margin-bottom: 6px;">
+        REMEDIATION GUIDANCE:
+      </div>
+      <div id="poc-modal-remediation" class="modal-code-block" style="color: #10b981;">Parameterize SQL queries using SQLAlchemy or parameterized prepared statements. Do not concatenate untrusted input into raw SQL strings.</div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+let currentFindings = [];
+let activeFilter = 'ALL';
+let isScanning = false;
+let wsClient = null;
+
+function updateSelectedCount() {
+  const all = document.querySelectorAll('.module-checkbox');
+  const checked = document.querySelectorAll('.module-checkbox:checked');
+  const countEl = document.getElementById('selected-module-count');
+  if (countEl) countEl.textContent = `${checked.length} / ${all.length} Detectors Active`;
+}
+
+function selectAllModules(check) {
+  document.querySelectorAll('.module-checkbox').forEach(cb => {
+    cb.checked = !!check;
+  });
+  updateSelectedCount();
+}
+
+function selectOwaspTop10() {
+  const top10 = ['sqli', 'xss', 'cmdi', 'ssrf', 'csrf', 'idor', 'path_traversal', 'broken_auth', 'misconfig', 'deserialization'];
+  document.querySelectorAll('.module-checkbox').forEach(cb => {
+    cb.checked = top10.includes(cb.value);
+  });
+  updateSelectedCount();
+}
+
+function filterModules(q) {
+  const query = (q || '').toLowerCase().trim();
+  document.querySelectorAll('#moduleCheckboxGrid .sk-check-item').forEach(item => {
+    const text = (item.innerText || '') + ' ' + (item.getAttribute('data-tags') || '');
+    item.style.display = (!query || text.toLowerCase().includes(query)) ? 'flex' : 'none';
+  });
+}
+
+function onTargetSelectChange(val) {
+  const targetInput = document.getElementById('scan-target-url');
+  if (val !== 'CUSTOM') {
+    targetInput.value = val;
+  } else {
+    targetInput.value = 'http://';
+    targetInput.focus();
+  }
+}
+
+function clearTerminalLogs() {
+  const logsEl = document.getElementById('terminal-logs');
+  if (logsEl) logsEl.innerHTML = '';
+}
+
+function appendLog(level, message, timestamp) {
+  const logsEl = document.getElementById('terminal-logs');
+  if (!logsEl) return;
+  const time = timestamp || new Date().toLocaleTimeString();
+  const row = document.createElement('div');
+  row.className = 'log-entry';
+  row.innerHTML = `
+    <span class="log-time">[${time}]</span>
+    <span class="log-level-${level}">[${level}]</span>
+    <span class="log-msg">${escapeHtml(message)}</span>
+  `;
+  logsEl.appendChild(row);
+  logsEl.scrollTop = logsEl.scrollHeight;
+}
+
+function updateProgress(pct) {
+  const fill = document.getElementById('scan-progress-fill');
+  const label = document.getElementById('scan-progress-label');
+  if (fill) fill.style.width = pct + '%';
+  if (label) label.textContent = pct + '%';
+}
+
+async function startScanJob() {
+  const targetUrl = document.getElementById('scan-target-url').value.trim();
+  if (!targetUrl) {
+    alert('Please specify a target endpoint URL.');
+    return;
+  }
+
+  const modules = [];
+  document.querySelectorAll('.module-checkbox:checked').forEach(cb => {
+    modules.push(cb.value);
+  });
+
+  const launchBtn = document.getElementById('btn-launch-scan');
+  launchBtn.disabled = true;
+  launchBtn.innerHTML = '<span>⏳ Probing Target & Mutating Payloads...</span>';
+
+  updateProgress(5);
+  appendLog('START', `Launching autonomous scan against: ${targetUrl}`);
+
+  try {
+    const resp = await fetch('/api/scanner/start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ target_url: targetUrl, modules: modules })
+    });
+    const data = await resp.json();
+
+    if (resp.status !== 200 || data.status === 'error') {
+      appendLog('ALERT', `Scan Validation Error: ${data.detail || data.message || 'Unknown error'}`);
+      launchBtn.disabled = false;
+      launchBtn.innerHTML = '<span>🚀 Launch Autonomous DAST Scan</span>';
+      updateProgress(0);
+    } else {
+      isScanning = true;
+      appendLog('INFO', `Job registered: ${data.scan_id}. Running concurrent OWASP Top 10 detectors...`);
+    }
+  } catch (err) {
+    appendLog('ALERT', `Network connection failure: ${err.message}`);
+    launchBtn.disabled = false;
+    launchBtn.innerHTML = '<span>🚀 Launch Autonomous DAST Scan</span>';
+  }
+}
+
+function initWebSocket() {
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const wsUrl = `${protocol}//${window.location.host}/api/scanner/ws`;
+
+  try {
+    wsClient = new WebSocket(wsUrl);
+
+    wsClient.onopen = () => {
+      console.log('[Aegis Scanner WS] Connected to live scan matrix.');
+    };
+
+    wsClient.onmessage = (event) => {
+      try {
+        const msg = JSON.parse(event.data);
+        handleWsMessage(msg);
+      } catch (e) {
+        console.error('Error parsing WS message:', e);
+      }
+    };
+
+    wsClient.onclose = () => {
+      setTimeout(initWebSocket, 4000);
+    };
+  } catch (e) {
+    console.warn('WebSocket init error:', e);
+  }
+}
+
+function handleWsMessage(msg) {
+  if (msg.type === 'init') {
+    if (msg.data.findings && msg.data.findings.length > 0) {
+      currentFindings = msg.data.findings;
+      renderFindings();
+    }
+    if (msg.data.progress) updateProgress(msg.data.progress);
+  } else if (msg.type === 'progress') {
+    updateProgress(msg.data.progress);
+  } else if (msg.type === 'log') {
+    appendLog(msg.data.level || 'INFO', msg.data.message, msg.data.timestamp);
+  } else if (msg.type === 'crawler_completed') {
+    appendLog('SUCCESS', `Spider Discovery: Discovered ${msg.data.endpoints_count} attack surface endpoints across ${msg.data.pages_visited} pages (${msg.data.duration_seconds}s)`);
+  } else if (msg.type === 'vuln_found') {
+
+    addFinding(msg.data);
+  } else if (msg.type === 'scan_completed') {
+    isScanning = false;
+    const launchBtn = document.getElementById('btn-launch-scan');
+    if (launchBtn) {
+      launchBtn.disabled = false;
+      launchBtn.innerHTML = '<span>🚀 Launch Autonomous DAST Scan</span>';
+    }
+    updateProgress(100);
+    if (msg.data.findings) {
+      currentFindings = msg.data.findings;
+      renderFindings();
+    }
+  }
+}
+
+function addFinding(finding) {
+  if (!currentFindings.some(f => f.id === finding.id)) {
+    currentFindings.unshift(finding);
+    renderFindings();
+  }
+}
+
+function filterFindings(filter, el) {
+  activeFilter = filter;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  if (el) el.classList.add('active');
+  renderFindings();
+}
+
+function renderFindings() {
+  const grid = document.getElementById('vuln-cards-grid');
+  if (!grid) return;
+
+  let filtered = currentFindings;
+  if (activeFilter !== 'ALL') {
+    filtered = currentFindings.filter(f => f.severity.toUpperCase() === activeFilter);
+  }
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 48px 20px; color: #64748b; background: rgba(0,0,0,0.2); border: 1px dashed rgba(255,255,255,0.08); border-radius: 8px;">
+        <div style="font-size: 32px; margin-bottom: 8px;">🛡️</div>
+        <div style="font-size: 15px; font-weight: 700; color: #cbd5e1;">No Vulnerabilities in Filter [${activeFilter}]</div>
+        <div style="font-size: 13px; margin-top: 4px;">Launch a scan against the target to identify exploitable security flaws.</div>
+      </div>
+    `;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(f => {
+    const sevClass = `sev-${f.severity.toLowerCase()}`;
+    return `
+      <div class="vuln-card">
+        <div>
+          <div class="vuln-card-top">
+            <span class="severity-pill ${sevClass}">${escapeHtml(f.severity)}</span>
+            <span class="cvss-meter">CVSS ${f.cvss_score}</span>
+          </div>
+          <div class="vuln-title">${escapeHtml(f.title)}</div>
+          <div class="vuln-meta">
+            <span><strong>ENDPOINT:</strong> <code>${f.method} ${escapeHtml(f.endpoint)}</code></span>
+            <span><strong>CWE:</strong> ${escapeHtml(f.cwe_id)}</span>
+            <span><strong>OWASP:</strong> ${escapeHtml(f.owasp_category)}</span>
+          </div>
+          <div class="vuln-evidence">
+            <strong>Evidence:</strong> ${escapeHtml(f.evidence)}
+          </div>
+        </div>
+        <div class="vuln-actions">
+          <button class="btn-poc" onclick="openPoCModal('${f.id}')">
+            ⚡ View Exploit PoC & Raw Diff
+          </button>
+          <button class="btn-jira-copy" onclick="copyJiraIssue('${f.id}')">
+            📋 Copy Issue
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function openPoCModal(findingId) {
+  const f = currentFindings.find(item => item.id === findingId);
+  if (!f) return;
+
+  document.getElementById('poc-modal-title').textContent = f.title;
+  document.getElementById('poc-modal-sev').textContent = f.severity;
+  document.getElementById('poc-modal-sev').className = `severity-pill sev-${f.severity.toLowerCase()}`;
+  document.getElementById('poc-modal-cvss').textContent = `CVSS ${f.cvss_score} (${f.cvss_vector || 'N/A'})`;
+  document.getElementById('poc-modal-endpoint').textContent = `${f.method} ${f.endpoint}`;
+  document.getElementById('poc-modal-payload').textContent = f.payload_used || 'Standard mutation string';
+  document.getElementById('poc-modal-curl').textContent = f.curl_command || `curl -X ${f.method} "${f.endpoint}"`;
+  document.getElementById('poc-modal-req').textContent = f.request_raw || `${f.method} ${f.endpoint} HTTP/1.1\nHost: 127.0.0.1:8000`;
+  document.getElementById('poc-modal-resp').textContent = f.response_raw || 'HTTP/1.1 200 OK\n\n' + f.evidence;
+  document.getElementById('poc-modal-remediation').textContent = f.remediation_summary || 'Sanitize user input and apply parameterized statements.';
+
+  document.getElementById('poc-modal').classList.add('active');
+}
+
+function closePoCModal() {
+  document.getElementById('poc-modal').classList.remove('active');
+}
+
+function copyPoCCurl() {
+  const curlText = document.getElementById('poc-modal-curl').textContent;
+  navigator.clipboard.writeText(curlText).then(() => {
+    const btn = document.getElementById('btn-copy-curl');
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => { btn.textContent = '📋 Copy cURL'; }, 2000);
+  });
+}
+
+function copyJiraIssue(findingId) {
+  const f = currentFindings.find(item => item.id === findingId);
+  if (!f) return;
+
+  const md = `## [${f.severity}] Security Finding: ${f.title}
+
+### Vulnerability Details
+- **Severity:** \`${f.severity}\` (CVSS v3.1: **${f.cvss_score}**)
+- **CWE:** ${f.cwe_id}
+- **OWASP:** ${f.owasp_category}
+- **Endpoint:** \`${f.method} ${f.endpoint}\`
+
+### Verified Evidence
+> ${f.evidence}
+
+### Reproducible cURL Command
+\`\`\`bash
+${f.curl_command || `curl -X ${f.method} "${f.endpoint}"`}
+\`\`\`
+
+### Remediation Guidance
+${f.remediation_summary}
+`;
+
+  navigator.clipboard.writeText(md).then(() => {
+    alert(`Copied Jira/GitHub Markdown for: ${f.title}`);
+  });
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// Initial status fetch
+async function fetchStatus() {
+  try {
+    const resp = await fetch('/api/scanner/status');
+    const data = await resp.json();
+    if (data.findings && data.findings.length > 0) {
+      currentFindings = data.findings;
+      renderFindings();
+    }
+    if (data.progress) updateProgress(data.progress);
+    if (data.logs && data.logs.length > 0) {
+      data.logs.forEach(l => appendLog(l.level, l.message, l.timestamp));
+    }
+  } catch (e) {}
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initWebSocket();
+  fetchStatus();
+
+  // Close modal on click outside
+  const modal = document.getElementById('poc-modal');
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closePoCModal();
+    });
+  }
+});
+</script>
+{% endblock %}

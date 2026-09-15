@@ -1,0 +1,1021 @@
+{% extends "base.html" %}
+{% block title %}About Us — AegisAppSec | Autonomous DAST &amp; Real-Time WAF Platform{% endblock %}
+
+{% block extra_head %}
+<style>
+/* Universal Layout Container */
+.sk-container {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.sk-section {
+  padding: 40px 0;
+  margin-bottom: 28px;
+}
+
+/* Section Typography */
+.sk-section-header {
+  margin-bottom: 32px;
+}
+
+.sk-section-tag {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--red, #ff0033);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sk-section-tag::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--red, #ff0033);
+  box-shadow: 0 0 8px var(--red-glow, rgba(255, 0, 51, 0.4));
+}
+
+.sk-section-title {
+  font-family: var(--font-main, 'Inter', sans-serif);
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--text-white, #ffffff);
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+
+.sk-section-desc {
+  font-size: 0.95rem;
+  color: var(--text-muted, #64748b);
+  max-width: 740px;
+  margin-top: 8px;
+  line-height: 1.6;
+}
+
+/* ── ABOUT PAGE HERO ─────────────────────────────────────────── */
+.sk-about-hero {
+  padding: 24px 0 40px;
+  position: relative;
+}
+
+.sk-about-hero-title {
+  font-family: var(--font-main, 'Inter', sans-serif);
+  font-size: 3rem;
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--text-white, #ffffff);
+  margin: 16px 0 18px;
+}
+
+.sk-about-hero-sub {
+  font-size: 1.12rem;
+  color: var(--text-body, #94a3b8);
+  max-width: 860px;
+  line-height: 1.65;
+  margin-bottom: 36px;
+}
+
+/* Stats Metric Strip */
+.sk-about-stats-strip {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 16px;
+  background: rgba(9, 13, 24, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 28px 24px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+}
+
+.sk-about-stat-box {
+  text-align: center;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 0 16px;
+}
+
+.sk-about-stat-box:last-child {
+  border-right: none;
+}
+
+.sk-about-stat-num {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 2.35rem;
+  font-weight: 800;
+  color: var(--text-white, #ffffff);
+  line-height: 1.1;
+}
+
+.sk-about-stat-num span {
+  color: var(--red, #ff0033);
+  text-shadow: 0 0 12px rgba(255, 0, 51, 0.4);
+}
+
+.sk-about-stat-label {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.72rem;
+  color: var(--text-muted, #64748b);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 6px;
+}
+
+/* ── PARADIGM COMPARISON BENTO GRID ───────────────────────────── */
+.sk-about-split {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 24px;
+}
+
+.sk-about-card {
+  border-radius: 14px;
+  padding: 32px;
+  backdrop-filter: blur(16px);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.22s, box-shadow 0.22s;
+}
+
+.sk-about-card.legacy {
+  background: linear-gradient(180deg, rgba(244, 63, 94, 0.05) 0%, rgba(9, 13, 24, 0.9) 100%);
+  border: 1px solid rgba(244, 63, 94, 0.25);
+}
+
+.sk-about-card.legacy:hover {
+  border-color: rgba(244, 63, 94, 0.45);
+  transform: translateY(-2px);
+}
+
+.sk-about-card.aegis {
+  background: linear-gradient(180deg, rgba(255, 0, 51, 0.09) 0%, rgba(9, 13, 24, 0.95) 100%);
+  border: 1px solid rgba(255, 0, 51, 0.35);
+  box-shadow: 0 0 32px rgba(255, 0, 51, 0.12);
+}
+
+.sk-about-card.aegis:hover {
+  border-color: #ff0033;
+  box-shadow: 0 0 45px rgba(255, 0, 51, 0.4);
+  transform: translateY(-2px);
+}
+
+.sk-about-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  margin-bottom: 24px;
+}
+
+.sk-about-card-title {
+  font-family: var(--font-main, 'Inter', sans-serif);
+  font-size: 1.12rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sk-about-card-title.legacy {
+  color: #f43f5e;
+}
+
+.sk-about-card-title.aegis {
+  color: var(--text-white, #ffffff);
+}
+
+.sk-about-card-title.aegis span {
+  color: var(--red, #ff0033);
+  text-shadow: 0 0 10px rgba(255, 0, 51, 0.4);
+}
+
+.sk-about-status-pill {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  text-transform: uppercase;
+}
+
+.sk-about-status-pill.legacy {
+  background: rgba(244, 63, 94, 0.15);
+  color: #f43f5e;
+  border: 1px solid rgba(244, 63, 94, 0.3);
+}
+
+.sk-about-status-pill.aegis {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+}
+
+.sk-about-item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.sk-about-item-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--text-body, #94a3b8);
+}
+
+.sk-about-icon-badge {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 800;
+  margin-top: 2px;
+}
+
+.sk-about-icon-badge.legacy {
+  background: rgba(244, 63, 94, 0.12);
+  color: #f43f5e;
+  border: 1px solid rgba(244, 63, 94, 0.3);
+}
+
+.sk-about-icon-badge.aegis {
+  background: rgba(255, 0, 51, 0.15);
+  color: var(--red, #ff0033);
+  border: 1px solid rgba(255, 0, 51, 0.35);
+  box-shadow: 0 0 10px rgba(255, 0, 51, 0.4);
+}
+
+.sk-about-item-text strong {
+  color: var(--text-white, #ffffff);
+  font-weight: 700;
+}
+
+/* ── 4-STAGE PIPELINE ARCHITECTURE ────────────────────────────── */
+.sk-pipeline-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 18px;
+  position: relative;
+}
+
+.sk-pipeline-card {
+  background: rgba(9, 13, 24, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.22s;
+  position: relative;
+}
+
+.sk-pipeline-card:hover {
+  border-color: #ff0033;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(255, 0, 51, 0.15);
+}
+
+.sk-pipeline-step-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.sk-pipeline-step-badge {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--red, #ff0033);
+  background: rgba(255, 0, 51, 0.08);
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 0, 51, 0.35);
+}
+
+.sk-pipeline-step-num {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text-dim, #475569);
+}
+
+.sk-pipeline-card-title {
+  font-family: var(--font-main, 'Inter', sans-serif);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-white, #ffffff);
+  margin-bottom: 8px;
+}
+
+.sk-pipeline-card-desc {
+  font-size: 0.84rem;
+  color: var(--text-muted, #64748b);
+  line-height: 1.55;
+  margin-bottom: 16px;
+  flex: 1;
+}
+
+.sk-pipeline-tech-tag {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.68rem;
+  color: var(--text-muted, #64748b);
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  padding-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sk-pipeline-tech-tag span {
+  color: #00f0ff;
+  font-weight: 600;
+}
+
+/* ── 4 ARCHITECTURAL PILLARS ──────────────────────────────────── */
+.sk-pillars-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 20px;
+}
+
+.sk-pillar-card {
+  background: rgba(9, 13, 24, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 30px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.22s;
+  position: relative;
+  overflow: hidden;
+}
+
+.sk-pillar-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #ff0033, transparent);
+  opacity: 0;
+  transition: opacity 0.22s;
+}
+
+.sk-pillar-card:hover {
+  border-color: rgba(255, 0, 51, 0.35);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(255, 0, 51, 0.16);
+}
+
+.sk-pillar-card:hover::before {
+  opacity: 1;
+}
+
+.sk-pillar-n {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--red, #ff0033);
+  text-shadow: 0 0 16px rgba(255, 0, 51, 0.4);
+  line-height: 1;
+  margin-bottom: 14px;
+}
+
+.sk-pillar-title {
+  font-family: var(--font-main, 'Inter', sans-serif);
+  font-size: 1.22rem;
+  font-weight: 800;
+  color: var(--text-white, #ffffff);
+  margin-bottom: 10px;
+}
+
+.sk-pillar-desc {
+  font-size: 0.88rem;
+  color: var(--text-body, #94a3b8);
+  line-height: 1.6;
+  margin-bottom: 20px;
+  flex: 1;
+}
+
+.sk-pillar-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.sk-pillar-tag-item {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.65rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 3px 8px;
+  border-radius: 4px;
+  color: var(--text-muted, #64748b);
+}
+
+
+/* ── COMPLIANCE & TRUST MATRIX ────────────────────────────────── */
+.sk-trust-matrix {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.sk-trust-badge-card {
+  background: rgba(9, 13, 24, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.22s;
+}
+
+.sk-trust-badge-card:hover {
+  border-color: rgba(255, 0, 51, 0.4);
+  background: rgba(12, 16, 28, 0.85);
+  transform: translateY(-2px);
+}
+
+.sk-trust-badge-icon {
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+}
+
+.sk-trust-badge-title {
+  font-family: var(--font-main, 'Inter', sans-serif);
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-white, #ffffff);
+  margin-bottom: 4px;
+}
+
+.sk-trust-badge-sub {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.7rem;
+  color: var(--text-muted, #64748b);
+}
+
+/* ── BOTTOM EPIC CALL TO ACTION ───────────────────────────────── */
+.sk-cta-band {
+  margin-top: 64px;
+  background: linear-gradient(135deg, rgba(255, 0, 51, 0.12) 0%, rgba(12, 16, 28, 0.95) 55%, rgba(6, 9, 19, 0.98) 100%);
+  border: 1px solid rgba(255, 0, 51, 0.35);
+  border-radius: 16px;
+  padding: 56px 48px;
+  box-shadow: 0 0 50px rgba(255, 0, 51, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.sk-cta-band::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(255, 0, 51, 0.18) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.sk-cta-inner {
+  display: flex !important;
+  justify-content: space-between;
+  align-items: center;
+  gap: 40px;
+  position: relative;
+  z-index: 2;
+}
+
+.sk-cta-title {
+  font-family: var(--font-main, 'Inter', sans-serif);
+  font-size: 2.25rem;
+  font-weight: 900;
+  color: var(--text-white, #ffffff);
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  margin: 8px 0 12px;
+}
+
+.sk-cta-title .accent {
+  color: var(--red, #ff0033);
+  text-shadow: 0 0 16px rgba(255, 0, 51, 0.4);
+}
+
+.sk-cta-sub {
+  font-size: 1.02rem;
+  color: var(--text-body, #94a3b8);
+  max-width: 620px;
+  line-height: 1.6;
+}
+
+.sk-cta-actions {
+  display: flex !important;
+  flex-direction: column;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+/* ── BUTTON STYLES ────────────────────────────────────────────── */
+.sk-btn-primary {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #ff0033 !important;
+  color: #ffffff !important;
+  font-family: var(--font-main, 'Inter', sans-serif);
+  font-size: 0.92rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  padding: 13px 28px;
+  border-radius: 999px;
+  border: 1px solid #ff2255;
+  box-shadow: 0 0 24px rgba(255, 0, 51, 0.4);
+  cursor: pointer;
+  transition: all 0.22s;
+  text-decoration: none !important;
+}
+
+.sk-btn-primary:hover {
+  background: #ff2255 !important;
+  box-shadow: 0 0 36px rgba(255, 0, 51, 0.4);
+  transform: translateY(-2px);
+  color: #ffffff !important;
+}
+
+.sk-btn-secondary {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: #ffffff !important;
+  font-family: var(--font-main, 'Inter', sans-serif);
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 12px 26px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+  transition: all 0.22s;
+  text-decoration: none !important;
+}
+
+.sk-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: #ffffff;
+  transform: translateY(-2px);
+  color: #ffffff !important;
+}
+
+.sk-btn-ghost {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--text-muted, #64748b) !important;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 8px 16px;
+  text-decoration: none !important;
+  transition: color 0.22s;
+}
+
+.sk-btn-ghost:hover {
+  color: #ffffff !important;
+}
+
+/* ── RESPONSIVE ABOUT MEDIA QUERIES ───────────────────────────── */
+@media (max-width: 1024px) {
+  .sk-about-split {
+    grid-template-columns: 1fr !important;
+  }
+  .sk-pipeline-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  .sk-pillars-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  .sk-trust-matrix {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  .sk-cta-inner {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+  .sk-about-stats-strip {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .sk-about-hero-title {
+    font-size: 2.2rem;
+  }
+  .sk-pipeline-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .sk-pillars-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .sk-about-stats-strip {
+    grid-template-columns: 1fr !important;
+  }
+  .sk-trust-matrix {
+    grid-template-columns: 1fr !important;
+  }
+  .sk-cta-band {
+    padding: 32px 24px;
+  }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- ══ ATMOSPHERIC CHROMATIC AURORA GLOW ═════════════════════════ -->
+<div class="sk-aurora-glow" aria-hidden="true"></div>
+<div class="sk-aurora-glow-secondary" aria-hidden="true"></div>
+
+<!-- ══ ABOUT HERO SECTION ════════════════════════════════════════ -->
+<div class="sk-about-hero">
+  <div class="sk-container">
+    <div class="sk-hero-tagline-badge">
+      <span class="sk-tag-glow-dot"></span>
+      <span>// ABOUT THE PLATFORM — GENESIS &amp; ARCHITECTURE</span>
+    </div>
+
+    <h1 class="sk-about-hero-title">
+      ENGINEERED FOR <span class="sk-brand-red">REAL-WORLD SECURITY</span>.
+    </h1>
+
+    <p class="sk-about-hero-sub">
+      AegisAppSec unifies offensive autonomous DAST exploration with real-time defensive edge WAF runtime protection. Built from the ground up for modern engineering velocity, continuous compliance, and zero false-positive fatigue.
+    </p>
+
+    <!-- Key Performance Metrics Strip -->
+    <div class="sk-about-stats-strip">
+      <div class="sk-about-stat-box">
+        <div class="sk-about-stat-num">99.4<span>%</span></div>
+        <div class="sk-about-stat-label">Exploit Precision Rate</div>
+      </div>
+      <div class="sk-about-stat-box">
+        <div class="sk-about-stat-num">&lt;0.2<span>ms</span></div>
+        <div class="sk-about-stat-label">Edge WAF Inline Latency</div>
+      </div>
+      <div class="sk-about-stat-box">
+        <div class="sk-about-stat-num">100<span>%</span></div>
+        <div class="sk-about-stat-label">OWASP Top 10 Native Coverage</div>
+      </div>
+      <div class="sk-about-stat-box">
+        <div class="sk-about-stat-num">0</div>
+        <div class="sk-about-stat-label">False Positive Fatigue</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 1: PARADIGM COMPARISON BENTO GRID ═════════════════ -->
+<section class="sk-section">
+  <div class="sk-container">
+    <div class="sk-section-header">
+      <div class="sk-section-tag">// PARADIGM SHIFT</div>
+      <h2 class="sk-section-title">The Evolution of Application Security</h2>
+      <p class="sk-section-desc">
+        Why traditional periodic scanners leave fatal exposure windows, and how our continuous autonomous dual-engine architecture transforms vulnerability discovery into immediate edge defense.
+      </p>
+    </div>
+
+    <div class="sk-about-split">
+      <!-- Left Card: Traditional Vulnerability Scanners -->
+      <div class="sk-about-card legacy">
+        <div class="sk-about-card-header">
+          <div class="sk-about-card-title legacy">
+            <span>✕</span> TRADITIONAL VULNERABILITY SCANNERS
+          </div>
+          <span class="sk-about-status-pill legacy">LEGACY MODEL // HIGH FRICTION</span>
+        </div>
+
+        <div class="sk-about-item-list">
+          <div class="sk-about-item-row">
+            <div class="sk-about-icon-badge legacy">✕</div>
+            <div class="sk-about-item-text">
+              <strong>Point-in-Time Blindspots:</strong> Quarterly or weekly scan batches leave weeks of unmonitored exposure between release cycles.
+            </div>
+          </div>
+          <div class="sk-about-item-row">
+            <div class="sk-about-icon-badge legacy">✕</div>
+            <div class="sk-about-item-text">
+              <strong>Brittle Script Maintenance:</strong> Hand-crafted Selenium or curl test suites break whenever dynamic frontend routes and SPA state machines change.
+            </div>
+          </div>
+          <div class="sk-about-item-row">
+            <div class="sk-about-icon-badge legacy">✕</div>
+            <div class="sk-about-item-text">
+              <strong>High False-Positive Noise:</strong> Endless 200-page generic PDF reports waste valuable senior developer hours triaging non-exploitable findings.
+            </div>
+          </div>
+          <div class="sk-about-item-row">
+            <div class="sk-about-icon-badge legacy">✕</div>
+            <div class="sk-about-item-text">
+              <strong>Siloed Operations Friction:</strong> Security analysts and backend engineers operate in disjointed systems without shared reproduction context.
+            </div>
+          </div>
+          <div class="sk-about-item-row">
+            <div class="sk-about-icon-badge legacy">✕</div>
+            <div class="sk-about-item-text">
+              <strong>Zero Runtime Defense:</strong> Flaws are flagged, but production servers remain completely exposed for weeks while developers draft code fixes.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Card: The AegisAppSec Advantage -->
+      <div class="sk-about-card aegis">
+        <div class="sk-about-card-header">
+          <div class="sk-about-card-title aegis">
+            <span>✓</span> THE AEGISAPPSEC ADVANTAGE
+          </div>
+          <span class="sk-about-status-pill aegis">ACTIVE ENFORCEMENT // REAL-TIME</span>
+        </div>
+
+        <div class="sk-about-item-list">
+          <div class="sk-about-item-row">
+            <div class="sk-about-icon-badge aegis">✓</div>
+            <div class="sk-about-item-text">
+              <strong>Continuous Autonomous DAST:</strong> The engine automatically adapts to endpoints, parameters, and schema mutations with zero manual configuration.
+            </div>
+          </div>
+          <div class="sk-about-item-row">
+            <div class="sk-about-icon-badge aegis">✓</div>
+            <div class="sk-about-item-text">
+              <strong>Intelligent Payload Fuzzing:</strong> Synthesizes real evasive attack mutations with multi-encoding heuristics to uncover blind injection and business logic flaws.
+            </div>
+          </div>
+          <div class="sk-about-item-row">
+            <div class="sk-about-icon-badge aegis">✓</div>
+            <div class="sk-about-item-text">
+              <strong>Deterministic Proof Verification:</strong> Captures concrete proof-of-concept execution evidence with executable cURL repros — zero false-positive guessing.
+            </div>
+          </div>
+          <div class="sk-about-item-row">
+            <div class="sk-about-icon-badge aegis">✓</div>
+            <div class="sk-about-item-text">
+              <strong>Developer-Ready Code Diffs:</strong> Actionable fix recommendations with framework-specific code snippets so pull requests ship within hours.
+            </div>
+          </div>
+          <div class="sk-about-item-row">
+            <div class="sk-about-icon-badge aegis">✓</div>
+            <div class="sk-about-item-text">
+              <strong>Instant Edge WAF Virtual Patching:</strong> The millisecond a flaw is verified, edge middleware automatically shields endpoints before code changes deploy.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SECTION 2: DUAL-ENGINE ARCHITECTURE PIPELINE ═══════════════ -->
+<section class="sk-section">
+  <div class="sk-container">
+    <div class="sk-section-header">
+      <div class="sk-section-tag">// DUAL-ENGINE WORKFLOW</div>
+      <h2 class="sk-section-title">Continuous Dual-Engine Pipeline Architecture</h2>
+      <p class="sk-section-desc">
+        From dynamic discovery to edge defense in seconds: see how offensive red-teaming and defensive runtime protection operate in perfect synchronization.
+      </p>
+    </div>
+
+    <div class="sk-pipeline-grid">
+      <!-- Step 1: Recon & Crawl -->
+      <div class="sk-pipeline-card">
+        <div class="sk-pipeline-step-head">
+          <span class="sk-pipeline-step-badge">PHASE 01 // DISCOVER</span>
+          <span class="sk-pipeline-step-num">01</span>
+        </div>
+        <h3 class="sk-pipeline-card-title">Deep Topology Crawling</h3>
+        <p class="sk-pipeline-card-desc">
+          State-machine crawlers map the full surface of web pages, hidden API endpoints, GraphQL schemas, and dynamic input vectors.
+        </p>
+        <div class="sk-pipeline-tech-tag">
+          <span>ENGINE:</span> DOM Graph Mapper
+        </div>
+      </div>
+
+      <!-- Step 2: Adaptive Mutation Fuzzing -->
+      <div class="sk-pipeline-card">
+        <div class="sk-pipeline-step-head">
+          <span class="sk-pipeline-step-badge">PHASE 02 // PROBE</span>
+          <span class="sk-pipeline-step-num">02</span>
+        </div>
+        <h3 class="sk-pipeline-card-title">Adaptive Payload Fuzzing</h3>
+        <p class="sk-pipeline-card-desc">
+          Generates 1,000+ context-aware evasion payloads utilizing double-URL, Unicode, and hex encoding mutations tailored to the backend framework.
+        </p>
+        <div class="sk-pipeline-tech-tag">
+          <span>MUTATION:</span> Multi-Vector Evasion
+        </div>
+      </div>
+
+      <!-- Step 3: Exploit Proof Verification -->
+      <div class="sk-pipeline-card">
+        <div class="sk-pipeline-step-head">
+          <span class="sk-pipeline-step-badge">PHASE 03 // VERIFY</span>
+          <span class="sk-pipeline-step-num">03</span>
+        </div>
+        <h3 class="sk-pipeline-card-title">Deterministic Proof Capture</h3>
+        <p class="sk-pipeline-card-desc">
+          Verifies exploitability using non-destructive timing diffs and execution proofs. Computes standardized CVSS v3.1 severity scores.
+        </p>
+        <div class="sk-pipeline-tech-tag">
+          <span>VALIDATION:</span> PoC Execution Proof
+        </div>
+      </div>
+
+      <!-- Step 4: Edge Shield & Code Patch -->
+      <div class="sk-pipeline-card">
+        <div class="sk-pipeline-step-head">
+          <span class="sk-pipeline-step-badge">PHASE 04 // DEFEND</span>
+          <span class="sk-pipeline-step-num">04</span>
+        </div>
+        <h3 class="sk-pipeline-card-title">Edge Shield &amp; Code Patch</h3>
+        <p class="sk-pipeline-card-desc">
+          Instantly generates sub-millisecond edge WAF virtual patches to block live attacks while delivering Git pull-request diffs to developers.
+        </p>
+        <div class="sk-pipeline-tech-tag">
+          <span>RUNTIME:</span> Edge WAF + GitOps Fix
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SECTION 3: 4 ARCHITECTURAL PILLARS ═════════════════════════ -->
+<section class="sk-section">
+  <div class="sk-container">
+    <div class="sk-section-header">
+      <div class="sk-section-tag">// ENGINEERING FOUNDATIONS</div>
+      <h2 class="sk-section-title">Our 4 Architectural Pillars</h2>
+      <p class="sk-section-desc">
+        The fundamental engineering principles that enable AegisAppSec to bridge the gap between offensive pentesting and real-time defensive infrastructure.
+      </p>
+    </div>
+
+    <div class="sk-pillars-grid">
+      <!-- Pillar 1 -->
+      <div class="sk-pillar-card">
+        <div>
+          <div class="sk-pillar-n">01</div>
+          <h3 class="sk-pillar-title">Continuous Exploration</h3>
+          <p class="sk-pillar-desc">
+            Security is an ongoing runtime process, not a periodic audit. Our engine operates around the clock alongside every deployment and microservice change.
+          </p>
+        </div>
+        <div class="sk-pillar-tags">
+          <span class="sk-pillar-tag-item">24/7 Runtime</span>
+          <span class="sk-pillar-tag-item">Continuous Audit</span>
+          <span class="sk-pillar-tag-item">Zero Config</span>
+        </div>
+      </div>
+
+      <!-- Pillar 2 -->
+      <div class="sk-pillar-card">
+        <div>
+          <div class="sk-pillar-n">02</div>
+          <h3 class="sk-pillar-title">Adaptive Intelligence</h3>
+          <p class="sk-pillar-desc">
+            Attack payloads and fuzzing strategies learn dynamically from application response headers, error states, and latency diffs to bypass defensive filters.
+          </p>
+        </div>
+        <div class="sk-pillar-tags">
+          <span class="sk-pillar-tag-item">Dynamic Probes</span>
+          <span class="sk-pillar-tag-item">Evasion Mutation</span>
+          <span class="sk-pillar-tag-item">Blind Inference</span>
+        </div>
+      </div>
+
+      <!-- Pillar 3 -->
+      <div class="sk-pillar-card">
+        <div>
+          <div class="sk-pillar-n">03</div>
+          <h3 class="sk-pillar-title">Developer-First Fixes</h3>
+          <p class="sk-pillar-desc">
+            Findings are translated directly into IDE code snippets, framework best practices, and PR annotations that developers can review and ship immediately.
+          </p>
+        </div>
+        <div class="sk-pillar-tags">
+          <span class="sk-pillar-tag-item">Side-by-Side Diffs</span>
+          <span class="sk-pillar-tag-item">PR Annotations</span>
+          <span class="sk-pillar-tag-item">CI/CD Gates</span>
+        </div>
+      </div>
+
+      <!-- Pillar 4 -->
+      <div class="sk-pillar-card">
+        <div>
+          <div class="sk-pillar-n">04</div>
+          <h3 class="sk-pillar-title">Unified Full-Stack</h3>
+          <p class="sk-pillar-desc">
+            Unifies offensive penetration testing and defensive edge WAF middleware into a single cohesive platform, stopping threats before and after code deploys.
+          </p>
+        </div>
+        <div class="sk-pillar-tags">
+          <span class="sk-pillar-tag-item">Offensive DAST</span>
+          <span class="sk-pillar-tag-item">Edge WAF Core</span>
+          <span class="sk-pillar-tag-item">Virtual Patch</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ SECTION 5: COMPLIANCE & TRUST STANDARDS ═══════════════════ -->
+<section class="sk-section" style="padding-top: 10px;">
+  <div class="sk-container">
+    <div class="sk-section-header" style="margin-bottom: 24px;">
+      <div class="sk-section-tag">// ENTERPRISE TRUST &amp; COMPLIANCE</div>
+      <h2 class="sk-section-title" style="font-size: 1.6rem;">Enterprise Security Standards &amp; SLA Commitments</h2>
+    </div>
+
+    <div class="sk-trust-matrix">
+      <div class="sk-trust-badge-card">
+        <div class="sk-trust-badge-icon">🛡</div>
+        <div class="sk-trust-badge-title">OWASP Top 10 Native</div>
+        <div class="sk-trust-badge-sub">Full 2021/2026 Test Coverage</div>
+      </div>
+      <div class="sk-trust-badge-card">
+        <div class="sk-trust-badge-icon">💳</div>
+        <div class="sk-trust-badge-title">PCI-DSS 4.0 Standard</div>
+        <div class="sk-trust-badge-sub">Section 6.4.1 WAF &amp; DAST Mandates</div>
+      </div>
+      <div class="sk-trust-badge-card">
+        <div class="sk-trust-badge-icon">📋</div>
+        <div class="sk-trust-badge-title">SOC 2 Type II Certified</div>
+        <div class="sk-trust-badge-sub">Audited Security &amp; Availability</div>
+      </div>
+      <div class="sk-trust-badge-card">
+        <div class="sk-trust-badge-icon">🌐</div>
+        <div class="sk-trust-badge-title">ISO/IEC 27001 ISMS</div>
+        <div class="sk-trust-badge-sub">Global Information Governance</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SECTION 6: EPIC CALL TO ACTION (CTA BAND) ═════════════════ -->
+<div class="sk-container">
+  <div class="sk-cta-band">
+    <div class="sk-cta-inner">
+      <div>
+        <div class="sk-section-tag" style="margin-bottom: 10px;">// READY TO ELEVATE YOUR APPSEC?</div>
+        <div class="sk-cta-title">
+          START SCANNING IN 60 SECONDS.<br>
+          <span class="accent">PROTECT YOUR PRODUCTION CODE TODAY.</span>
+        </div>
+        <p class="sk-cta-sub">
+          Experience intelligent application security designed for modern cloud infrastructure. Zero complex agent installs, continuous DAST exploration, and immediate edge WAF defense.
+        </p>
+      </div>
+      <div class="sk-cta-actions">
+        <a href="{{ url_for('scanner') }}" class="sk-btn-primary">
+          Launch Free DAST Scan
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="{{ url_for('services') }}" class="sk-btn-secondary">
+          Explore WAF Sandbox ⚔
+        </a>
+        <a href="{{ url_for('contact') }}" class="sk-btn-ghost">
+          Contact Advisory SLA →
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,1213 @@
+{% extends "base.html" %}
+{% block title %}CI/CD Integration &amp; Automated API Keys — AegisAppSec DevSecOps{% endblock %}
+
+{% block extra_head %}
+<style>
+/* ══ CI/CD INTEGRATION & API KEYS STUDIO STYLES ═══════════════ */
+.sk-cicd-wrap {
+  padding: 32px 0 80px;
+}
+
+/* Page Hero Banner */
+.sk-cicd-hero {
+  background: radial-gradient(circle at 0% 0%, rgba(0, 240, 255, 0.06), transparent 50%),
+              radial-gradient(circle at 100% 100%, rgba(255, 0, 51, 0.04), transparent 45%),
+              rgba(9, 13, 24, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 28px 32px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
+}
+
+.sk-cicd-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #00f0ff, #ff0033 60%, transparent);
+}
+
+.sk-cicd-hero-grid {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.sk-cicd-eyebrow {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--red, #ff0033);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sk-cicd-title {
+  font-size: 1.85rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  margin: 0 0 10px;
+  line-height: 1.2;
+}
+
+.sk-cicd-title .highlight-red {
+  color: var(--red, #ff0033);
+  text-shadow: 0 0 24px rgba(255, 0, 51, 0.4);
+}
+
+.sk-cicd-title .highlight-cyan {
+  color: var(--cyan, #00f0ff);
+  text-shadow: 0 0 24px rgba(0, 240, 255, 0.4);
+}
+
+.sk-cicd-desc {
+  font-size: 0.88rem;
+  color: var(--text-muted, #94a3b8);
+  max-width: 680px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.sk-cicd-hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.sk-btn-primary {
+  background: linear-gradient(135deg, #ff0033, #b80026);
+  color: #ffffff;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  border: 1px solid rgba(255, 0, 51, 0.5);
+  border-radius: 6px;
+  padding: 10px 18px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 16px rgba(255, 0, 51, 0.25);
+  text-decoration: none;
+}
+
+.sk-btn-primary:hover {
+  background: linear-gradient(135deg, #ff1a47, #d9002c);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(255, 0, 51, 0.4);
+}
+
+.sk-btn-cyan {
+  background: rgba(0, 240, 255, 0.08);
+  color: var(--cyan, #00f0ff);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  border-radius: 6px;
+  padding: 10px 18px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.sk-btn-cyan:hover {
+  background: rgba(0, 240, 255, 0.18);
+  border-color: var(--cyan, #00f0ff);
+  transform: translateY(-1px);
+}
+
+/* ── HUD STATS TELEMETRY GRID ────────────────────────────────── */
+.sk-hud-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 1024px) {
+  .sk-hud-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .sk-hud-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sk-hud-card {
+  background: rgba(9, 13, 24, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.sk-hud-card:hover {
+  border-color: rgba(0, 240, 255, 0.25);
+}
+
+.sk-hud-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cyan, #00f0ff);
+  flex-shrink: 0;
+}
+
+.sk-hud-icon.red {
+  color: var(--red, #ff0033);
+  background: rgba(255, 0, 51, 0.06);
+  border-color: rgba(255, 0, 51, 0.2);
+}
+
+.sk-hud-icon.green {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.06);
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+.sk-hud-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.sk-hud-label {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-muted, #94a3b8);
+  margin-bottom: 4px;
+}
+
+.sk-hud-val {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.1;
+  margin-bottom: 4px;
+  font-family: var(--font-mono, monospace);
+}
+
+.sk-hud-sub {
+  font-size: 0.68rem;
+  color: var(--text-muted, #94a3b8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sk-dot-pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  display: inline-block;
+}
+
+/* ── TWO-COLUMN CORE WORKSPACE ───────────────────────────────── */
+.sk-cicd-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+@media (max-width: 1024px) {
+  .sk-cicd-split {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sk-panel-card {
+  background: rgba(9, 13, 24, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 12px;
+  padding: 24px;
+  position: relative;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.sk-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.sk-panel-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sk-panel-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.sk-panel-badge {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(0, 240, 255, 0.1);
+  color: var(--cyan, #00f0ff);
+  border: 1px solid rgba(0, 240, 255, 0.25);
+}
+
+/* Form Elements */
+.sk-form-group {
+  margin-bottom: 16px;
+}
+
+.sk-form-label {
+  display: block;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.70rem;
+  font-weight: 700;
+  color: var(--text-muted, #94a3b8);
+  margin-bottom: 6px;
+  letter-spacing: 0.03em;
+}
+
+.sk-input, .sk-select {
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 6px;
+  padding: 10px 14px;
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-family: var(--font-mono, monospace);
+  outline: none;
+  transition: all 0.18s;
+}
+
+.sk-input:focus, .sk-select:focus {
+  border-color: var(--cyan, #00f0ff);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.2);
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.sk-input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+/* One-Time Key Display Area */
+.sk-key-reveal-box {
+  display: none;
+  margin-top: 16px;
+  background: rgba(16, 185, 129, 0.06);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: 8px;
+  padding: 16px;
+  position: relative;
+  animation: skFadeIn 0.25s ease-out;
+}
+
+@keyframes skFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.sk-key-reveal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.sk-key-reveal-title {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #10b981;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sk-key-raw-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+}
+
+.sk-key-raw-text {
+  flex: 1;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.78rem;
+  color: var(--cyan, #00f0ff);
+  word-break: break-all;
+  user-select: all;
+}
+
+.sk-key-reveal-warn {
+  font-size: 0.68rem;
+  color: #fbbf24;
+  line-height: 1.4;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── MULTI-PLATFORM WORKFLOW TABS ────────────────────────────── */
+.sk-tab-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 12px;
+  margin-bottom: 14px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.sk-tab-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.sk-tab-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-muted, #94a3b8);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  transition: all 0.18s;
+}
+
+.sk-tab-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.sk-tab-btn.active {
+  background: rgba(0, 240, 255, 0.12);
+  border-color: rgba(0, 240, 255, 0.4);
+  color: var(--cyan, #00f0ff);
+}
+
+.sk-code-viewport {
+  background: #02050b;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.sk-code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.sk-code-filename {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sk-copy-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  color: var(--text-muted, #94a3b8);
+  padding: 4px 10px;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.65rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.18s;
+}
+
+.sk-copy-btn:hover {
+  background: rgba(0, 240, 255, 0.15);
+  color: var(--cyan, #00f0ff);
+  border-color: var(--cyan, #00f0ff);
+}
+
+.sk-code-pre {
+  margin: 0;
+  padding: 16px;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.74rem;
+  line-height: 1.6;
+  color: #e2e8f0;
+  overflow-x: auto;
+  max-height: 320px;
+  scrollbar-width: thin;
+}
+
+.sk-code-pre .c-key { color: var(--cyan, #00f0ff); }
+.sk-code-pre .c-val { color: #f43f5e; }
+.sk-code-pre .c-str { color: #10b981; }
+.sk-code-pre .c-com { color: #64748b; font-style: italic; }
+
+/* ── ENTERPRISE DATA TABLES ──────────────────────────────────── */
+.sk-table-section {
+  background: rgba(9, 13, 24, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 28px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.sk-table-head-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.sk-table-title-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sk-table-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.sk-table-count {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  font-weight: 800;
+  background: rgba(0, 240, 255, 0.1);
+  color: var(--cyan, #00f0ff);
+  border: 1px solid rgba(0, 240, 255, 0.25);
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+.sk-table-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sk-search-input {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  color: #ffffff;
+  outline: none;
+  width: 200px;
+  transition: all 0.18s;
+}
+
+.sk-search-input:focus {
+  border-color: var(--cyan, #00f0ff);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+}
+
+.sk-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+}
+
+.sk-data-table th {
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--text-muted, #94a3b8);
+  padding: 12px 14px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.sk-data-table td {
+  padding: 14px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: #e2e8f0;
+  vertical-align: middle;
+}
+
+.sk-data-table tr:hover td {
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.sk-role-badge {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(0, 240, 255, 0.08);
+  color: var(--cyan, #00f0ff);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  display: inline-flex;
+  align-items: center;
+}
+
+.sk-status-pill {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sk-btn-revoke {
+  background: rgba(255, 0, 51, 0.08);
+  color: var(--red, #ff0033);
+  border: 1px solid rgba(255, 0, 51, 0.25);
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.65rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sk-btn-revoke:hover {
+  background: rgba(255, 0, 51, 0.2);
+  border-color: var(--red, #ff0033);
+  box-shadow: 0 0 10px rgba(255, 0, 51, 0.3);
+}
+
+/* ── INTERACTIVE PIPELINE SIMULATOR ──────────────────────────── */
+.sk-sim-card {
+  background: #040711;
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  border-radius: 12px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+}
+
+.sk-sim-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #00f0ff, transparent 80%);
+}
+
+.sk-sim-controls {
+  display: grid;
+  grid-template-columns: 1.2fr 1.2fr 1fr auto;
+  gap: 14px;
+  align-items: flex-end;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 900px) {
+  .sk-sim-controls {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sk-terminal-box {
+  background: #010308;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.sk-terminal-header {
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sk-terminal-dots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sk-t-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.sk-t-dot.r { background: #ef4444; }
+.sk-t-dot.y { background: #f59e0b; }
+.sk-t-dot.g { background: #10b981; }
+
+.sk-terminal-status {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-muted, #94a3b8);
+}
+
+.sk-terminal-body {
+  padding: 16px;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.74rem;
+  line-height: 1.7;
+  color: #cbd5e1;
+  max-height: 260px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.sk-term-line {
+  margin-bottom: 4px;
+}
+
+.sk-term-line.info { color: #38bdf8; }
+.sk-term-line.success { color: #10b981; font-weight: 700; }
+.sk-term-line.warn { color: #f59e0b; }
+.sk-term-line.mute { color: #64748b; }
+
+/* ── MODAL STYLES ────────────────────────────────────────────── */
+.sk-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.sk-modal-overlay.active {
+  display: flex;
+}
+
+.sk-modal-box {
+  background: #0b0f1d;
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 520px;
+  padding: 28px;
+  position: relative;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7);
+  animation: skFadeIn 0.2s ease-out;
+}
+
+.sk-modal-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+}
+
+.sk-modal-close:hover {
+  color: #ffffff;
+}
+
+/* Toast alert notification */
+.sk-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #090d18;
+  border: 1px solid #10b981;
+  border-radius: 8px;
+  padding: 12px 18px;
+  color: #ffffff;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.25s ease-out;
+}
+
+.sk-toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sk-container sk-cicd-wrap">
+
+  <!-- ══ HERO BANNER ═════════════════════════════════════════════ -->
+  <div class="sk-cicd-hero">
+    <div class="sk-cicd-hero-grid">
+      <div>
+        <div class="sk-cicd-eyebrow">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          DEVSECOPS AUTOMATION // PIPELINE GOVERNANCE
+        </div>
+        <h1 class="sk-cicd-title">
+          CI/CD INTEGRATION &amp; <span class="highlight-red">API KEYS</span>.
+        </h1>
+        <p class="sk-cicd-desc">
+          Automate dynamic application security testing (DAST) across GitHub Actions, GitLab CI, and Jenkins. Block pull requests introducing critical vulnerabilities before deployment.
+        </p>
+      </div>
+      <div class="sk-cicd-hero-actions">
+        <a href="#generateKeyCard" class="sk-btn-primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+          GENERATE KEY
+        </a>
+        <button id="btnOpenWebhookModal" class="sk-btn-cyan">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          REGISTER WEBHOOK
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ DEVSECOPS TELEMETRY HUD ═════════════════════════════════ -->
+  <div class="sk-hud-grid">
+    <div class="sk-hud-card">
+      <div class="sk-hud-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+      </div>
+      <div class="sk-hud-content">
+        <div class="sk-hud-label">ACTIVE API KEYS</div>
+        <div class="sk-hud-val" id="hudActiveKeys">--</div>
+        <div class="sk-hud-sub">
+          <span class="sk-dot-pulse"></span>
+          <span>CI_CD_RUNNER SCOPED</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sk-hud-card">
+      <div class="sk-hud-icon green">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      </div>
+      <div class="sk-hud-content">
+        <div class="sk-hud-label">ALERTING WEBHOOKS</div>
+        <div class="sk-hud-val" id="hudActiveWebhooks">--</div>
+        <div class="sk-hud-sub">SLACK &amp; SIEM DISPATCH</div>
+      </div>
+    </div>
+
+    <div class="sk-hud-card">
+      <div class="sk-hud-icon red">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div class="sk-hud-content">
+        <div class="sk-hud-label">GATE ENFORCEMENT</div>
+        <div class="sk-hud-val" style="color: var(--red, #ff0033); font-size: 1.1rem;">SYS.BLOCKING</div>
+        <div class="sk-hud-sub">FAIL ON: CRITICAL, HIGH</div>
+      </div>
+    </div>
+
+    <div class="sk-hud-card">
+      <div class="sk-hud-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+      </div>
+      <div class="sk-hud-content">
+        <div class="sk-hud-label">DAST ENGINE</div>
+        <div class="sk-hud-val">v2.6.0</div>
+        <div class="sk-hud-sub">BENCHMARK TESTBED READY</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TWO-COLUMN CORE WORKSPACE ═══════════════════════════════ -->
+  <div class="sk-cicd-split">
+    
+    <!-- Column 1: Generate Key Card -->
+    <div class="sk-panel-card" id="generateKeyCard">
+      <div class="sk-panel-head">
+        <div class="sk-panel-title-wrap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--cyan, #00f0ff)" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+          <h2 class="sk-panel-title">Generate Automated API Key</h2>
+        </div>
+        <span class="sk-panel-badge">ROLE SCOPED</span>
+      </div>
+
+      <form id="generateKeyForm" onsubmit="handleGenerateKey(event)">
+        <div class="sk-form-group">
+          <label class="sk-form-label" for="newKeyName">Key Name / Pipeline Identifier:</label>
+          <input class="sk-input" type="text" id="newKeyName" value="GitHub-Actions-Staging-Gate" required />
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+          <div class="sk-form-group">
+            <label class="sk-form-label" for="newKeyRole">Access Scope / Role:</label>
+            <select class="sk-select" id="newKeyRole">
+              <option value="ci_cd_runner" selected>ci_cd_runner (Pipeline DAST Gate)</option>
+              <option value="admin">admin (Full Platform Access)</option>
+              <option value="auditor">auditor (Read-Only Reports)</option>
+            </select>
+          </div>
+          <div class="sk-form-group">
+            <label class="sk-form-label" for="newKeyExpiry">Rotation Window:</label>
+            <select class="sk-select" id="newKeyExpiry">
+              <option value="90">90 Days (Recommended)</option>
+              <option value="180">180 Days</option>
+              <option value="365">1 Year</option>
+              <option value="never">No Expiration</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="sk-btn-primary" style="width: 100%; justify-content: center;" id="btnSubmitGenerate">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          GENERATE SCOPED API KEY
+        </button>
+      </form>
+
+      <!-- Dynamic One-Time Key Display Area -->
+      <div class="sk-key-reveal-box" id="keyRevealBox">
+        <div class="sk-key-reveal-head">
+          <span class="sk-key-reveal-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Scoped API Token Created Successfully
+          </span>
+          <button class="sk-copy-btn" onclick="copyGeneratedKey()" id="btnCopyGenerated">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            COPY TOKEN
+          </button>
+        </div>
+        <div class="sk-key-raw-row">
+          <code class="sk-key-raw-text" id="rawKeyDisplay">aegis_live_...</code>
+        </div>
+        <p class="sk-key-reveal-warn">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Store this token securely in your CI/CD repository secrets. It cannot be shown again.
+        </p>
+      </div>
+    </div>
+
+    <!-- Column 2: Multi-Platform CI/CD Pipeline Workflow Steps -->
+    <div class="sk-panel-card">
+      <div class="sk-panel-head">
+        <div class="sk-panel-title-wrap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--cyan, #00f0ff)" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          <h2 class="sk-panel-title">CI/CD Pipeline Integration Steps</h2>
+        </div>
+        <button class="sk-copy-btn" onclick="copyCurrentSnippet()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          COPY WORKFLOW STEP
+        </button>
+      </div>
+
+      <!-- Platform Selection Tabs -->
+      <div class="sk-tab-nav">
+        <button class="sk-tab-btn active" data-platform="github" onclick="switchPlatform('github', this)">
+          GitHub Actions
+        </button>
+        <button class="sk-tab-btn" data-platform="gitlab" onclick="switchPlatform('gitlab', this)">
+          GitLab CI
+        </button>
+        <button class="sk-tab-btn" data-platform="jenkins" onclick="switchPlatform('jenkins', this)">
+          Jenkinsfile
+        </button>
+        <button class="sk-tab-btn" data-platform="curl" onclick="switchPlatform('curl', this)">
+          cURL / Shell CLI
+        </button>
+        <button class="sk-tab-btn" data-platform="python" onclick="switchPlatform('python', this)">
+          Python SDK
+        </button>
+      </div>
+
+      <!-- Code Viewport -->
+      <div class="sk-code-viewport">
+        <div class="sk-code-header">
+          <span class="sk-code-filename" id="codeFilename">.github/workflows/aegis-dast.yml</span>
+          <span style="font-family: var(--font-mono, monospace); font-size: 0.62rem; color: #10b981;">// ZERO-DEFECT GATE</span>
+        </div>
+        <pre class="sk-code-pre" id="codeSnippetPre"></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ACTIVE API KEYS MANAGEMENT TABLE ════════════════════════ -->
+  <div class="sk-table-section">
+    <div class="sk-table-head-bar">
+      <div class="sk-table-title-area">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--cyan, #00f0ff)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <h2 class="sk-table-title">Active CI/CD Credentials &amp; Scoped Keys</h2>
+        <span class="sk-table-count" id="tableKeysCount">0 KEYS</span>
+      </div>
+      <div class="sk-table-actions">
+        <input type="text" class="sk-search-input" id="searchKeysInput" placeholder="Filter keys..." oninput="filterKeysTable()" />
+        <button class="sk-copy-btn" onclick="ApiKeysManager.loadKeys()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          REFRESH
+        </button>
+      </div>
+    </div>
+
+    <div style="overflow-x: auto;">
+      <table class="sk-data-table">
+        <thead>
+          <tr>
+            <th>KEY IDENTIFIER</th>
+            <th>PREFIX &amp; TOKEN MASK</th>
+            <th>ACCESS SCOPE</th>
+            <th>CREATED DATE</th>
+            <th>LAST USED</th>
+            <th>GATE STATUS</th>
+            <th style="text-align: right;">ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody id="apikeys-table-body">
+          <tr>
+            <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 24px;">
+              Loading authenticated pipeline keys...
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ SECOPS ALERTING & SIEM WEBHOOK DISPATCHERS ═══════════════ -->
+  <div class="sk-table-section">
+    <div class="sk-table-head-bar">
+      <div class="sk-table-title-area">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--cyan, #00f0ff)" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        <h2 class="sk-table-title">SecOps Alerting &amp; SIEM Webhook Dispatchers</h2>
+        <span class="sk-table-count" id="tableWebhooksCount">0 DESTINATIONS</span>
+      </div>
+      <div class="sk-table-actions">
+        <button class="sk-btn-cyan" onclick="openWebhookModal()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          REGISTER NEW WEBHOOK
+        </button>
+      </div>
+    </div>
+
+    <div style="overflow-x: auto;">
+      <table class="sk-data-table">
+        <thead>
+          <tr>
+            <th>CHANNEL / DESTINATION</th>
+            <th>TARGET WEBHOOK URL</th>
+            <th>SUBSCRIBED EVENTS</th>
+            <th>STATUS</th>
+            <th style="text-align: right;">ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody id="webhooks-table-body">
+          <tr>
+            <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 20px;">
+              Loading webhook dispatchers...
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ INTERACTIVE PIPELINE EXECUTION SIMULATOR ═════════════════ -->
+  <div class="sk-sim-card">
+    <div class="sk-panel-head">
+      <div class="sk-panel-title-wrap">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--cyan, #00f0ff)" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <h2 class="sk-panel-title">Interactive CI/CD Pipeline Execution Simulator</h2>
+      </div>
+      <span class="sk-panel-badge" style="color: #10b981; border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.1);">LIVE TESTBED</span>
+    </div>
+
+    <p style="font-size: 0.80rem; color: var(--text-muted); margin: 0 0 16px;">
+      Simulate an automated pull request build step executing the AegisAppSec DAST security gate against your target environment.
+    </p>
+
+    <div class="sk-sim-controls">
+      <div class="sk-form-group" style="margin: 0;">
+        <label class="sk-form-label">Active Key Scoping:</label>
+        <select class="sk-select" id="simKeySelect">
+          <option value="aegis_live_">Loading active keys...</option>
+        </select>
+      </div>
+      <div class="sk-form-group" style="margin: 0;">
+        <label class="sk-form-label">Target Evaluation URL:</label>
+        <input class="sk-input" type="text" id="simTargetUrl" value="http://127.0.0.1:8000/api/shop" />
+      </div>
+      <div class="sk-form-group" style="margin: 0;">
+        <label class="sk-form-label">Git Branch / PR:</label>
+        <input class="sk-input" type="text" id="simBranch" value="main" />
+      </div>
+      <button class="sk-btn-primary" onclick="simulatePipelineRun()" id="btnSimulateRun" style="height: 38px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        RUN GATE TEST
+      </button>
+    </div>
+
+    <!-- Terminal Box -->
+    <div class="sk-terminal-box">
+      <div class="sk-terminal-header">
+        <div class="sk-terminal-dots">
+          <div class="sk-t-dot r"></div>
+          <div class="sk-t-dot y"></div>
+          <div class="sk-t-dot g"></div>
+        </div>
+        <div class="sk-terminal-status" id="simTerminalStatus">PIPELINE RUNNER: READY (STANDBY)</div>
+      </div>
+      <div class="sk-terminal-body" id="simTerminalBody">
+        <div class="sk-term-line mute">// AegisAppSec Autonomous DAST Pipeline Gate Runner [v2.6.0]</div>
+        <div class="sk-term-line mute">// Select an active pipeline key and click "RUN GATE TEST" to execute a live simulated testbed assessment.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ REGISTER WEBHOOK MODAL ══════════════════════════════════ -->
+<div class="sk-modal-overlay" id="webhookModal">
+  <div class="sk-modal-box">
+    <button class="sk-modal-close" onclick="closeWebhookModal()">&times;</button>
+    <div class="sk-panel-head" style="margin-bottom: 16px;">
+      <div class="sk-panel-title-wrap">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--cyan, #00f0ff)" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/></svg>
+        <h3 class="sk-panel-title">Register SecOps Webhook</h3>
+      </div>
+    </div>
+
+    <form id="newWebhookForm" onsubmit="handleCreateWebhook(event)">
+      <div class="sk-form-group">
+        <label class="sk-form-label" for="newWebhookName">Channel / Destination Name:</label>
+        <input class="sk-input" type="text" id="newWebhookName" placeholder="e.g. Slack #secops-alerts or Datadog SIEM" required />
+      </div>
+
+      <div class="sk-form-group">
+        <label class="sk-form-label" for="newWebhookUrl">Webhook HTTPS Endpoint URL:</label>
+        <input class="sk-input" type="url" id="newWebhookUrl" placeholder="https://hooks.slack.com/services/..." required />
+      </div>
+
+      <div class="sk-form-group">
+        <label class="sk-form-label">Subscribed Security Events:</label>
+        <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.76rem; color: #cbd5e1; font-family: var(--font-mono, monospace);">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" id="evScanComplete" checked /> Scan Assessment Completed
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" id="evCritVuln" checked /> Critical Vulnerability Identified
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" id="evHighVuln" checked /> High Severity Vulnerability Identified
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" id="evGateBlocked" checked /> CI/CD Pull Request Blocked by Gate
+          </label>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+        <button type="button" class="sk-copy-btn" onclick="closeWebhookModal()">Cancel</button>
+        <button type="submit" class="sk-btn-primary" id="btnSubmitWebhook">
+          REGISTER DESTINATION
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ══ TOAST NOTIFICATION ══════════════════════════════════════ -->
+<div class="sk-toast" id="skToast">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="skToastMsg">Action completed successfully.</span>
+</div>
+
+<!-- Scripts -->
+<script src="/js/apikeys.js"></script>
+{% endblock %}

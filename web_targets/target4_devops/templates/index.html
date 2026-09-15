@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CloudOps Infrastructure Console — Autonomous Target 04</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #050a0e;
+      --card-bg: rgba(10, 18, 26, 0.75);
+      --border: rgba(255, 255, 255, 0.08);
+      --cyan: #00f0ff;
+      --red: #ef4444;
+      --purple: #8b5cf6;
+      --lime: #84cc16;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      padding: 24px;
+      min-height: 100vh;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+    .logo {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--lime);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .badge-port {
+      background: rgba(132, 204, 22, 0.12);
+      border: 1px solid var(--lime);
+      color: var(--lime);
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .badge-vuln {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 3px;
+      margin-left: 6px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      backdrop-filter: blur(8px);
+    }
+    .card h3 {
+      font-size: 1.05rem;
+      color: #fff;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    input, textarea, button {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,0.35);
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+    }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--lime);
+      box-shadow: 0 0 8px rgba(132, 204, 22, 0.2);
+    }
+    button {
+      background: linear-gradient(135deg, var(--lime), #65a30d);
+      color: #030712;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.2s;
+    }
+    button:hover { opacity: 0.9; }
+    .node-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.03);
+      padding: 8px 12px;
+      border-radius: 6px;
+      margin-bottom: 6px;
+      font-size: 0.85rem;
+    }
+    .footer-note {
+      margin-top: 30px;
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">
+      <span>☁️ CloudOps Cluster & Infrastructure Console</span>
+    </div>
+    <div>
+      <span class="badge-port">TARGET 04 // PORT 8004</span>
+    </div>
+  </div>
+
+  <div class="grid">
+    <!-- 1. OS Command Injection Card -->
+    <div class="card">
+      <h3>
+        <span>1. Network Diagnostics (Ping Tool)</span>
+        <span class="badge-vuln" style="background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid var(--red);">CMDi [CWE-78]</span>
+      </h3>
+      <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 12px;">Shell command injection via unescaped host parameter execution.</p>
+      <form action="/api/tools/ping" method="POST" target="_blank">
+        <input type="text" name="host" value="127.0.0.1 && whoami" placeholder="127.0.0.1 or 127.0.0.1 && whoami">
+        <button type="submit">Execute Shell Ping (RCE)</button>
+      </form>
+      <div style="font-size: 0.72rem; color: var(--muted); margin-top: 6px;">
+        Try payloads: <code>127.0.0.1 && whoami</code> or <code>127.0.0.1 | dir</code>
+      </div>
+    </div>
+
+    <!-- 2. Insecure Deserialization Card -->
+    <div class="card">
+      <h3>
+        <span>2. Cluster State Snapshot Loader</span>
+        <span class="badge-vuln" style="background: rgba(139,92,246,0.15); color: var(--purple); border: 1px solid var(--purple);">DESER [CWE-502]</span>
+      </h3>
+      <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 12px;">Untrusted Python pickle bytecode deserialization into runtime memory.</p>
+      <form action="/api/cluster/state/load" method="POST" target="_blank">
+        <textarea name="state" rows="3" placeholder="Base64 encoded pickle state">gASVFAAAAAAAAACMBXN0YXRllIwGcmVkdWNllJQu</textarea>
+        <button type="submit">Restore Cluster State (Pickle)</button>
+      </form>
+      <div style="font-size: 0.72rem; color: var(--muted); margin-top: 6px;">
+        Accepts raw pickle base64 payloads allowing arbitrary object instantiation.
+      </div>
+    </div>
+
+    <!-- 3. Outdated Components & Banner Exposure Card -->
+    <div class="card">
+      <h3>
+        <span>3. Server Fingerprint & Stack</span>
+        <span class="badge-vuln" style="background: rgba(132,204,22,0.15); color: var(--lime); border: 1px solid var(--lime);">CVE [CWE-1104]</span>
+      </h3>
+      <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 12px;">Emulates vulnerable legacy web server software stack.</p>
+      <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 6px; padding: 10px; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;">
+        <div style="color: var(--muted);">HTTP RESPONSE HEADERS:</div>
+        <div style="color: var(--lime); margin-top: 4px;">Server: Apache/2.2.8 (Ubuntu) PHP/5.2.4</div>
+        <div style="color: var(--cyan);">X-Powered-By: PHP/5.2.4-2ubuntu5.27</div>
+      </div>
+      <div style="margin-top: 14px;">
+        <button type="button" onclick="window.open('/api/system/crash')">Simulate Uncaught Crash (Stack Trace Leak)</button>
+      </div>
+    </div>
+
+    <!-- 4. Cluster Nodes Card -->
+    <div class="card">
+      <h3>
+        <span>4. Cluster Fleet Topology</span>
+        <span class="badge-vuln" style="background: rgba(0,240,255,0.15); color: var(--cyan); border: 1px solid var(--cyan);">TELEMETRY</span>
+      </h3>
+      <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 12px;">Real-time node telemetry and utilization matrix.</p>
+      <div style="margin-top: 8px;">
+        {% for n in nodes %}
+        <div class="node-row">
+          <div>
+            <strong>{{ n.name }}</strong>
+            <span style="color: var(--muted); font-size: 0.75rem; display: block;">{{ n.ip }}</span>
+          </div>
+          <div style="text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;">
+            <span style="color: {% if n.status == 'Ready' %}var(--lime){% else %}var(--red){% endif %}; font-weight: 700;">{{ n.status }}</span>
+            <div style="color: var(--muted); font-size: 0.72rem;">CPU: {{ n.cpu }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    AEGIS APPSEC TARGET 04 // CLOUDOPS CONSOLE // PURPOSE-BUILT FOR DAST PENETRATION TESTING
+  </div>
+</body>
+</html>
